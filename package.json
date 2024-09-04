@@ -1,0 +1,22 @@
+{
+  "name": "aeims",
+  "version": "1.0.0",
+  "description": "Amrita Event and Inventory Management System",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "dotenv": "^16.4.5",
+    "ejs": "^3.1.10",
+    "express": "^4.19.2",
+    "mysql2": "^3.11.0"
+  },
+  "devDependencies": {
+    "tailwindcss": "^3.4.10"
+  }
+}
