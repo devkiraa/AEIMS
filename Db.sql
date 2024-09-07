@@ -58,7 +58,7 @@ CREATE TABLE `user_details` (
 CREATE TABLE `event_tb` (
   `evn_id` int NOT NULL,
   `evn_name` varchar(100) NOT NULL,
-  `evn_desc` varchar(260) NOT NULL,
+  `evn_desc` varchar(50) NOT NULL,
   `evn_dept` varchar(100) NOT NULL,
   `event_poster` varchar(100) NOT NULL,
   `ven_id` int NOT NULL,
