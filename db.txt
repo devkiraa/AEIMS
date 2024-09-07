@@ -39,7 +39,7 @@ CREATE TABLE `inventory` (
   `inv_service_count` varchar(5) NOT NULL,
   `inv_remove_count` varchar(5) NOT NULL,
   `inv_first_added` date NOT NULL,
-  `inv_stat` varchar(20) DEFAULT NULL,
+  `inv_stat` varchar(10) DEFAULT NULL,
   PRIMARY KEY (`inv_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
@@ -47,7 +47,7 @@ CREATE TABLE `inventory` (
 CREATE TABLE `user_details` (
   `usr_id` int NOT NULL,
   `usr_aname` varchar(100) NOT NULL,
-  `usr_mob` int NOT NULL,
+  `usr_mob` varchar(15) NOT NULL,
   `usr_club` varchar(50) DEFAULT NULL,
   PRIMARY KEY (`usr_id`),
   UNIQUE KEY `usr_mob_UNIQUE` (`usr_mob`),
@@ -58,7 +58,7 @@ CREATE TABLE `user_details` (
 CREATE TABLE `event_tb` (
   `evn_id` int NOT NULL,
   `evn_name` varchar(100) NOT NULL,
-  `evn_desc` varchar(260) NOT NULL,
+  `evn_desc` varchar(50) NOT NULL,
   `evn_dept` varchar(100) NOT NULL,
   `event_poster` varchar(100) NOT NULL,
   `ven_id` int NOT NULL,
@@ -152,7 +152,7 @@ CREATE TABLE `notification_tb` (
   `evn_id` int NOT NULL,
   `evn_date` date NOT NULL,
   `evn_time` time NOT NULL,
-  `noti_stat` int NOT NULL,
+  `noti_stat` varchar(10) NOT NULL,
   PRIMARY KEY (`noti_id`),
   KEY `noti_evn_ref_idx` (`evn_id`),
   CONSTRAINT `noti_evn_ref` FOREIGN KEY (`evn_id`) REFERENCES `event_tb` (`evn_id`)
