@@ -10,6 +10,15 @@
         body {
             font-family: 'Poppins', sans-serif;
         }
+        #password-criteria {
+            display: none;
+        }
+        .valid {
+            color: green;
+        }
+        .invalid {
+            color: red;
+        }
     </style>
 </head>
 <body class="min-h-screen bg-gray-100 flex items-center justify-end">
@@ -65,14 +74,14 @@
                 <input type="password" name="confirm_password" id="confirm_password" placeholder="Confirm password" class="w-full p-2 border border-gray-300 rounded mt-1" required>
             </div>
 
-            <!-- Password Criteria -->
-            <div class="text-xs text-gray-500 mb-3">
+            <!-- Password Criteria (Initially Hidden) -->
+            <div id="password-criteria" class="text-xs text-gray-500 mb-3">
                 <p>Password must contain:</p>
                 <ul class="list-disc pl-4">
-                    <li>Minimum 6 characters</li>
-                    <li>Uppercase letters (A-Z)</li>
-                    <li>Numbers (0-9)</li>
-                    <li>Special characters</li>
+                    <li id="min-characters" class="invalid">Minimum 6 characters</li>
+                    <li id="uppercase" class="invalid">Uppercase letters (A-Z)</li>
+                    <li id="numbers" class="invalid">Numbers (0-9)</li>
+                    <li id="special-characters" class="invalid">Special characters</li>
                 </ul>
             </div>
 
@@ -85,5 +94,60 @@
             Have an account? <a href="/auth/login" class="text-blue-500">Sign in now</a>
         </p>
     </div>
+
+    <!-- JavaScript to Validate Password and Show Criteria -->
+    <script>
+        document.getElementById('password').addEventListener('input', function() {
+            var password = this.value;
+            var passwordCriteria = document.getElementById('password-criteria');
+
+            // Show the password criteria section if password is being typed
+            if (password.length > 0) {
+                passwordCriteria.style.display = 'block';
+            } else {
+                passwordCriteria.style.display = 'none';
+            }
+
+            // Validate password length
+            var minCharacters = document.getElementById('min-characters');
+            if (password.length >= 6) {
+                minCharacters.classList.remove('invalid');
+                minCharacters.classList.add('valid');
+            } else {
+                minCharacters.classList.remove('valid');
+                minCharacters.classList.add('invalid');
+            }
+
+            // Validate if there is an uppercase letter
+            var uppercase = document.getElementById('uppercase');
+            if (/[A-Z]/.test(password)) {
+                uppercase.classList.remove('invalid');
+                uppercase.classList.add('valid');
+            } else {
+                uppercase.classList.remove('valid');
+                uppercase.classList.add('invalid');
+            }
+
+            // Validate if there is a number
+            var numbers = document.getElementById('numbers');
+            if (/\d/.test(password)) {
+                numbers.classList.remove('invalid');
+                numbers.classList.add('valid');
+            } else {
+                numbers.classList.remove('valid');
+                numbers.classList.add('invalid');
+            }
+
+            // Validate if there is a special character
+            var specialCharacters = document.getElementById('special-characters');
+            if (/[!@#$%^&*(),.?":{}|<>]/.test(password)) {
+                specialCharacters.classList.remove('invalid');
+                specialCharacters.classList.add('valid');
+            } else {
+                specialCharacters.classList.remove('valid');
+                specialCharacters.classList.add('invalid');
+            }
+        });
+    </script>
 </body>
 </html>
