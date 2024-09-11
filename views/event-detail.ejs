@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Event Details</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+        }
+    </style>
+</head>
+<body class="min-h-screen bg-gray-100 flex items-center justify-center">
+    <!-- Form container -->
+    <div class="bg-white min-h-screen w-full max-w-4xl absolute top-0 flex flex-col justify-start p-6 lg:p-12 shadow-lg">
+        
+        <!-- Header Text -->
+        <div class="text-center mb-10">
+            <h2 class="text-2xl lg:text-3xl font-semibold">Add Event Details!</h2>
+        </div>
+        
+        <!-- Form -->
+        <form action="/events/create" method="POST">
+            <!-- Grid Layout for Fields -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <!-- Left Column -->
+                <div>
+                    <!-- Event Title -->
+                    <div class="mb-3">
+                        <label for="event_title" class="block text-gray-700">Event Title</label>
+                        <input type="text" name="event_title" id="event_title" placeholder="Event title...?" class="w-full p-2 border border-gray-300 rounded mt-1" required>
+                    </div>
+
+                    <!-- Event Start Date -->
+                    <div class="mb-3">
+                        <label for="start_date" class="block text-gray-700">Event Start Date</label>
+                        <input type="date" name="start_date" id="start_date" class="w-full p-2 border border-gray-300 rounded mt-1" required>
+                    </div>
+
+                    <!-- Event Start Time -->
+                    <div class="mb-3">
+                        <label for="start_time" class="block text-gray-700">Event Start Time</label>
+                        <input type="time" name="start_time" id="start_time" class="w-full p-2 border border-gray-300 rounded mt-1" required>
+                    </div>
+
+                    <!-- Venue -->
+                    <div class="mb-3">
+                        <label for="venue" class="block text-gray-700">Venue</label>
+                        <select name="venue" id="venue" class="w-full p-2 border border-gray-300 rounded mt-1">
+                            <option value="Data Analytics Lab">Data Analytics Lab</option>
+                            <!-- Add more venue options here -->
+                        </select>
+                    </div>
+
+                    <!-- Event Volunteers -->
+                    <div class="mb-3">
+                        <label class="block text-gray-700">Event Volunteers</label>
+                        <div class="flex items-center space-x-4">
+                            <label class="flex items-center">
+                                <input type="radio" name="event_volunteers" value="yes" class="mr-2" checked>
+                                Yes
+                            </label>
+                            <label class="flex items-center">
+                                <input type="radio" name="event_volunteers" value="no" class="mr-2">
+                                No
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Event Coordinators -->
+                    <div class="mb-3">
+                        <label class="block text-gray-700">Event Coordinators</label>
+                        <div class="flex items-center space-x-4">
+                            <label class="flex items-center">
+                                <input type="radio" name="event_coordinators" value="single" class="mr-2" checked>
+                                Single
+                            </label>
+                            <label class="flex items-center">
+                                <input type="radio" name="event_coordinators" value="multiple" class="mr-2">
+                                Multiple
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Column -->
+                <div>
+                    <!-- Event Description -->
+                    <div class="mb-3">
+                        <label for="event_description" class="block text-gray-700">Event Description</label>
+                        <input type="text" name="event_description" id="event_description" placeholder="Event description...?" class="w-full p-2 border border-gray-300 rounded mt-1" required>
+                    </div>
+
+                    <!-- Event End Date -->
+                    <div class="mb-3">
+                        <label for="end_date" class="block text-gray-700">Event End Date</label>
+                        <input type="date" name="end_date" id="end_date" class="w-full p-2 border border-gray-300 rounded mt-1" required>
+                    </div>
+
+                    <!-- Event End Time -->
+                    <div class="mb-3">
+                        <label for="end_time" class="block text-gray-700">Event End Time</label>
+                        <input type="time" name="end_time" id="end_time" class="w-full p-2 border border-gray-300 rounded mt-1" required>
+                    </div>
+
+                    <!-- Event Poster -->
+                    <div class="mb-3">
+                        <label for="event_poster" class="block text-gray-700">Event Poster</label>
+                        <input type="file" name="event_poster" id="event_poster" class="w-full p-2 border border-gray-300 rounded mt-1">
+                    </div>
+
+                    <!-- Event Food -->
+                    <div class="mb-3">
+                        <label class="block text-gray-700">Event Food</label>
+                        <div class="flex items-center space-x-4">
+                            <label class="flex items-center">
+                                <input type="radio" name="event_food" value="yes" class="mr-2" checked>
+                                Yes
+                            </label>
+                            <label class="flex items-center">
+                                <input type="radio" name="event_food" value="no" class="mr-2">
+                                No
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Event Guests -->
+                    <div class="mb-3">
+                        <label class="block text-gray-700">Event Guests</label>
+                        <div class="flex items-center space-x-4">
+                            <label class="flex items-center">
+                                <input type="radio" name="event_guests" value="none" class="mr-2" checked>
+                                None
+                            </label>
+                            <label class="flex items-center">
+                                <input type="radio" name="event_guests" value="single" class="mr-2">
+                                Single
+                            </label>
+                            <label class="flex items-center">
+                                <input type="radio" name="event_guests" value="multiple" class="mr-2">
+                                Multiple
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Navigation Buttons -->
+            <div class="flex justify-between mt-6">
+                <button type="button" class="bg-gray-500 text-white py-2 px-4 rounded">Back</button>
+                <button type="submit" class="bg-blue-500 text-white py-2 px-4 rounded">Next</button>
+            </div>
+        </form>
+    </div>
+</body>
+</html>

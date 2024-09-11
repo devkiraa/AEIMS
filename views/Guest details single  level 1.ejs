@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Guest Details</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen">
+
+    <!-- Navbar -->
+    <nav class="bg-blue-600 p-4">
+        <div class="container mx-auto flex justify-between items-center">
+            <!-- Move header elements to the left -->
+            <div class="flex items-center space-x-6">
+                <div class="text-white text-xl font-bold">Dashboard</div>
+                <ul class="flex space-x-6 text-white">
+                    <li><a href="#" class="hover:text-gray-300">Home</a></li>
+                    <li><a href="#" class="hover:text-gray-300">Create</a></li>
+                    <li><a href="#" class="hover:text-gray-300">Users</a></li>
+                    <li><a href="#" class="hover:text-gray-300">My Events</a></li>
+                    <li><a href="#" class="hover:text-gray-300">About Us</a></li>
+                </ul>
+            </div>
+            <!-- User icon in rounded background -->
+            <div class="bg-white rounded-full p-2">
+                <a href="#"><img src="https://img.icons8.com/ios-filled/50/000000/user.png" alt="User Icon" class="w-6 h-6"></a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container mx-auto px-4 py-8">
+        <!-- Form Heading -->
+        <h1 class="text-2xl font-semibold mb-6">Add Guest Details!</h1>
+
+        <!-- Form Section -->
+        <form>
+            <!-- Guest Name -->
+            <div class="mb-6">
+                <label for="guestName" class="block text-gray-700 text-lg font-medium">Guest Name</label>
+                <input type="text" id="guestName" placeholder="Guest Name...?" class="w-full max-w-full md:w-64 mt-2 p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+            </div>
+
+            <!-- About Guest -->
+            <div class="mb-6">
+                <label for="aboutGuest" class="block text-gray-700 text-lg font-medium">About Guest</label>
+                <input type="text" id="aboutGuest" placeholder="About the guest...?" class="w-full max-w-full md:w-64 mt-2 p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+            </div>
+
+            <!-- Guest Type -->
+            <div class="mb-8">
+                <p class="text-lg font-medium text-gray-700 mb-2">Guest Type</p>
+                <div class="flex items-center space-x-6">
+                    <label class="inline-flex items-center">
+                        <input type="radio" name="guestType" value="internal" class="form-radio h-5 w-5 text-blue-600" checked>
+                        <span class="ml-2 text-gray-700">Internal</span>
+                    </label>
+                    <label class="inline-flex items-center">
+                        <input type="radio" name="guestType" value="external" class="form-radio h-5 w-5 text-gray-400">
+                        <span class="ml-2 text-gray-700">External</span>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="flex flex-col space-y-4 md:flex-row md:space-x-4 md:space-y-0 justify-end">
+                <button type="button" class="bg-gray-200 text-gray-700 py-2 px-4 rounded-lg font-medium hover:bg-gray-300 flex items-center justify-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M7 10a1 1 0 001-1V5a1 1 0 00-2 0v4a1 1 0 001 1zm-1 4h10a1 1 0 110 2H6a1 1 0 110-2zm7-4a1 1 0 100 2h2.293l-3.647 3.646a1 1 0 101.414 1.414L18.414 12l-5.354-5.354a1 1 0 00-1.414 1.414L15.293 10H6z" clip-rule="evenodd" />
+                    </svg>
+                    Back
+                </button>
+                <button type="submit" class="bg-blue-600 text-white py-2 px-6 rounded-lg font-medium hover:bg-blue-700 flex items-center justify-center">
+                    Next
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-2" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M13 10a1 1 0 00-1-1H5a1 1 0 000 2h7a1 1 0 001-1zm4-5.293l-5.354 5.354a1 1 0 001.414 1.414L18 7.414V17a1 1 0 002 0V6a1 1 0 00-2 0v4.414l-5.354-5.354a1 1 0 00-1.414 1.414L16.293 10H5a1 1 0 100 2h9a1 1 0 100-2H5a1 1 0 000-2h9a1 1 0 001-1z" clip-rule="evenodd" />
+                    </svg>
+                </button>
+            </div>
+        </form>
+    </div>
+    
+</body>
+</html>
