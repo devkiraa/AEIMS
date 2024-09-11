@@ -23,7 +23,7 @@
         }
 
         .form-container {
-            max-width: 0 auto;
+            max-width: 100%;
             margin: 0 auto;
         }
 
@@ -66,7 +66,36 @@
             border-radius: 0.375rem;
             font-weight: 600;
         }
+
+        /* Hide search bar by default */
+        #coordinator-search {
+            display: none;
+            margin-left: 1rem; /* Space between radio and search bar */
+        }
     </style>
+    <script>
+        function toggleCoordinatorSearch() {
+            const multipleRadio = document.querySelector('input[name="event_coordinators"][value="multiple"]');
+            const searchBar = document.getElementById("coordinator-search");
+
+            if (multipleRadio.checked) {
+                searchBar.style.display = "inline-block";
+            } else {
+                searchBar.style.display = "none";
+            }
+        }
+
+        document.addEventListener("DOMContentLoaded", function() {
+            // Attach event listeners to the radio buttons
+            const coordinatorRadios = document.querySelectorAll('input[name="event_coordinators"]');
+            coordinatorRadios.forEach(radio => {
+                radio.addEventListener('change', toggleCoordinatorSearch);
+            });
+
+            // Initial check to display search bar if 'multiple' is pre-selected
+            toggleCoordinatorSearch();
+        });
+    </script>
 </head>
 <body class="min-h-screen bg-gray-100 flex flex-col items-center">
     <!-- Navbar -->
@@ -91,10 +120,9 @@
     </nav>
 
     <!-- Form container -->
-    <div class="bg-white w-full p-8 lg:p-12 shadow-lg form-container mt-8">
-        
+    <div class="bg-white w-full max-w-4xl p-8 lg:p-12 shadow-lg form-container mt-8">
         <!-- Header Text -->
-        <div class="text-center mb-10">
+        <div class="text-left mb-10">
             <h2 class="form-title">Add Event Details!</h2>
         </div>
         
@@ -149,7 +177,7 @@
                     <!-- Event Coordinators -->
                     <div class="form-section">
                         <label class="form-label block">Event Coordinators</label>
-                        <div class="flex">
+                        <div class="flex items-center">
                             <label class="radio-label">
                                 <input type="radio" name="event_coordinators" value="single" checked>
                                 Single
@@ -158,6 +186,8 @@
                                 <input type="radio" name="event_coordinators" value="multiple">
                                 Multiple
                             </label>
+                            <!-- Search Bar for Multiple Coordinators -->
+                            <input type="text" id="coordinator-search" name="coordinator_search" placeholder="Search for Coordinators..." class="w-full p-2 border border-gray-300 rounded">
                         </div>
                     </div>
                 </div>
@@ -226,8 +256,26 @@
 
             <!-- Navigation Buttons (Right Aligned) -->
             <div class="flex justify-end mt-6 space-x-4">
-                <button type="button" class="btn-secondary">Back</button>
-                <button type="submit" class="btn-primary">Next</button>
+                <!-- Action Buttons (Always at Bottom Right) -->
+                <div class="form-buttons flex flex-col space-y-4 md:flex-row md:space-x-4 md:space-y-0">
+                    <!-- Back Button with Left Arrow -->
+                    <button type="button" class="bg-gray-200 text-gray-700 py-2 px-4 rounded-lg font-medium hover:bg-gray-300 flex items-center justify-center">
+                        <!-- Left Arrow SVG -->
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M7.707 9l4.646-4.646a.5.5 0 00-.708-.708L6.5 9l5.146 5.146a.5.5 0 00.708-.708L7.707 9z" clip-rule="evenodd" />
+                        </svg>
+                        Back
+                    </button>
+
+                    <!-- Next Button with Right Arrow -->
+                    <button type="submit" class="bg-blue-600 text-white py-2 px-4 rounded-lg font-medium hover:bg-blue-700 flex items-center justify-center">
+                        Next
+                        <!-- Right Arrow SVG -->
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-2" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M12.293 10.707l-5.146 5.146a.5.5 0 01-.708-.708L11.293 10 6.44 5.146a.5.5 0 01.708-.708l5.146 5.146a.5.5 0 010 .708z" clip-rule="evenodd" />
+                        </svg>
+                    </button>
+                </div>
             </div>
         </form>
     </div>
