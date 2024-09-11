@@ -10,111 +10,191 @@
         body {
             font-family: 'Poppins', sans-serif;
         }
-        .venue-available {
-            background-color: #1E5631; /* Darker Green */
-            color: white;
-        }
-        .venue-waiting {
-            background-color: #D4A017; /* Darker Yellow */
-            color: white;
-        }
-        .venue-booked {
-            background-color: #8B0000; /* Darker Red */
-            color: white;
-        }
-        .venue {
-            padding: 15px 25px;
-            margin: 10px;
-            border-radius: 10px;
-            cursor: pointer;
-            font-weight: bold;
-        }
-        .venue-container {
+
+        /* Blue header section */
+        .top-border {
+            background-color: #3563E9;
+            height: 10vh; /* 10% of the viewport height */
+            width: 100%;
             display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            margin-top: 30px;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
         }
+
+        /* Navigation styles */
+        .nav-links {
+            display: flex;
+            align-items: center;
+            list-style: none;
+            margin: 0;
+        }
+
+        .nav-links li {
+            margin: 0 15px;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: white;
+            font-size: 16px;
+            font-weight: 500;
+        }
+
+        /* Button colors for venue status */
+        .available {
+            background-color: #27AE60;
+            color: white;
+        }
+
+        .waiting {
+            background-color: #F2C94C;
+            color: white;
+        }
+
+        .booked {
+            background-color: #EB5757;
+            color: white;
+        }
+
+        /* Button styles */
+        .venue-btn {
+            padding: 12px 24px;
+            font-size: 16px;
+            border-radius: 8px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin: 10px;
+        }
+
+        /* Legend styles */
         .legend {
             display: flex;
-            justify-content: center;
+            align-items: center;
             margin-top: 20px;
         }
+
+        .legend span {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border-radius: 4px;
+            margin-right: 8px;
+        }
+
         .legend-item {
             display: flex;
             align-items: center;
             margin-right: 20px;
         }
-        .legend-color {
-            width: 20px;
-            height: 20px;
-            margin-right: 8px;
+
+        /* Profile icon */
+        .profile-icon {
+            width: 32px;
+            height: 32px;
             border-radius: 50%;
+            background-color: white;
+        }
+
+        /* Styling for form inputs */
+        .input-field {
+            width: 170px; /* Fixed width to fit dd-mm-yyyy */
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            margin: 10px 0;
+        }
+
+        /* Adjusting spacing and alignment between date and time fields */
+        .form-row {
+            display: flex;
+            justify-content: flex-start; /* Align to left */
+            align-items: center;
+            gap: 170px; /* Space equal to the width of one input */
+            margin-bottom: 20px; /* Optional: Add some space below each row */
+        }
+
+        .form-row > .input-group {
+            display: flex;
+            flex-direction: column;
         }
     </style>
 </head>
 <body class="min-h-screen bg-gray-100">
-    <div class="container mx-auto px-4 py-10">
-        <h1 class="text-3xl font-bold text-center mb-6">Book an Event!</h1>
-        
-        <!-- Date and Time Selection -->
-        <div class="flex justify-center mb-6">
-            <div class="mx-2">
-                <label for="start_date" class="block text-gray-700">Start Date</label>
-                <input type="date" id="start_date" value="2024-12-05" class="p-2 border border-gray-300 rounded w-full">
+    <!-- Blue header with navigation and profile icon -->
+    <div class="top-border">
+        <ul class="nav-links">
+            <li><a href="#">Home</a></li>
+            <li><a href="#">Create</a></li>
+            <li><a href="#">Users</a></li>
+            <li><a href="#">My Events</a></li>
+            <li><a href="#">About Us</a></li>
+        </ul>
+        <div class="profile-icon"></div>
+    </div>
+
+    <!-- Main container -->
+    <div class="max-w-7xl mx-auto px-8 py-12">
+        <h1 class="text-3xl font-semibold mb-6">Book an Event!</h1>
+
+        <!-- Date and time selection -->
+        <div class="form-row">
+            <div class="input-group">
+                <label class="block mb-2 text-gray-700">Start Date</label>
+                <input type="date" class="input-field" required>
             </div>
-            <div class="mx-2">
-                <label for="end_date" class="block text-gray-700">End Date</label>
-                <input type="date" id="end_date" value="2024-12-05" class="p-2 border border-gray-300 rounded w-full">
-            </div>
-        </div>
-        
-        <div class="flex justify-center mb-6">
-            <div class="mx-2">
-                <label for="start_time" class="block text-gray-700">Start Time</label>
-                <input type="time" id="start_time" value="13:00" class="p-2 border border-gray-300 rounded w-full">
-            </div>
-            <div class="mx-2">
-                <label for="end_time" class="block text-gray-700">End Time</label>
-                <input type="time" id="end_time" value="14:00" class="p-2 border border-gray-300 rounded w-full">
+            <div class="input-group">
+                <label class="block mb-2 text-gray-700">End Date</label>
+                <input type="date" class="input-field" required>
             </div>
         </div>
 
-        <!-- Venue Selection -->
-        <div class="venue-container">
-            <div class="venue venue-available">CS Lab 1</div>
-            <div class="venue venue-available">CS Lab 2</div>
-            <div class="venue venue-waiting">CS Lab 3</div>
-            <div class="venue venue-waiting">CS Lab 4</div>
-            <div class="venue venue-available">CS Lab 5</div>
-            <div class="venue venue-booked">CS Lab 6</div>
-            <div class="venue venue-available">Auditorium</div>
-            <div class="venue venue-waiting">Seminar Hall</div>
-            <div class="venue venue-waiting">Conference Room</div>
-            <div class="venue venue-booked">Prayer Hall</div>
-            <div class="venue venue-booked">Library</div>
-            <div class="venue venue-booked">Data Analytics Lab</div>
+        <div class="form-row">
+            <div class="input-group">
+                <label class="block mb-2 text-gray-700">Start Time</label>
+                <input type="time" class="input-field" required>
+            </div>
+            <div class="input-group">
+                <label class="block mb-2 text-gray-700">End Time</label>
+                <input type="time" class="input-field" required>
+            </div>
         </div>
 
-        <!-- Next Button -->
-        <div class="flex justify-center mt-8">
-            <button class="bg-blue-600 text-white py-2 px-8 rounded-full font-medium hover:bg-blue-700">Next</button>
+        <!-- Venue buttons -->
+        <div class="mb-6">
+            <div class="flex flex-wrap">
+                <button class="venue-btn available">CS Lab 1</button>
+                <button class="venue-btn available">CS Lab 2</button>
+                <button class="venue-btn waiting">CS Lab 3</button>
+                <button class="venue-btn waiting">CS Lab 4</button>
+                <button class="venue-btn available">CS Lab 5</button>
+                <button class="venue-btn booked">CS Lab 6</button>
+                <button class="venue-btn available">Auditorium</button>
+                <button class="venue-btn waiting">Seminar Hall</button>
+                <button class="venue-btn waiting">Conference Room</button>
+                <button class="venue-btn booked">Prayer Hall</button>
+                <button class="venue-btn booked">Library</button>
+                <button class="venue-btn booked">Data Analytics Lab</button>
+            </div>
         </div>
 
-        <!-- Legend for Status -->
+        <!-- Legend -->
         <div class="legend">
             <div class="legend-item">
-                <div class="legend-color" style="background-color: #1E5631;"></div>
-                <span>Available</span>
+                <span class="available"></span> Available
             </div>
             <div class="legend-item">
-                <div class="legend-color" style="background-color: #D4A017;"></div>
-                <span>Waiting</span>
+                <span class="waiting"></span> Waiting
             </div>
             <div class="legend-item">
-                <div class="legend-color" style="background-color: #8B0000;"></div>
-                <span>Booked</span>
+                <span class="booked"></span> Booked
             </div>
+        </div>
+
+        <!-- Next button -->
+        <div class="mt-6 flex justify-end">
+            <button class="bg-blue-500 text-white py-2 px-4 rounded">Next</button>
         </div>
     </div>
 </body>
