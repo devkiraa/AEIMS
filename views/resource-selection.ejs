@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Resources</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50">
+    <div class="min-h-screen flex flex-col">
+        <!-- Header -->
+        <nav class="bg-blue-600 shadow">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex justify-between h-16">
+                    <div class="flex">
+                        <div class="hidden sm:-my-px sm:ml-6 sm:flex sm:space-x-8">
+                            <a href="#" class="text-white no-underline hover:text-gray-200 inline-flex items-center px-1 pt-1 text-sm font-medium">
+                                Home
+                            </a>
+                            <a href="#" class="text-white no-underline hover:text-gray-200 inline-flex items-center px-1 pt-1 text-sm font-medium">
+                                Events
+                            </a>
+                            <a href="#" class="text-white no-underline hover:text-gray-200 inline-flex items-center px-1 pt-1 text-sm font-medium">
+                                Inventory
+                            </a>
+                            <a href="#" class="text-white no-underline hover:text-gray-200 inline-flex items-center px-1 pt-1 text-sm font-medium">
+                                Services
+                            </a>
+                            <a href="#" class="text-white no-underline hover:text-gray-200 inline-flex items-center px-1 pt-1 text-sm font-medium">
+                                About Us
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Profile Dropdown -->
+                    <div class="relative">
+                        <a href="#" class="text-white inline-flex items-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.121 17.804A10.972 10.972 0 0112 16c2.617 0 5.035.926 6.879 2.804M12 14a5 5 0 100-10 5 5 0 000 10zm0 0v1m0 4a10.97 10.97 0 01-6.879-2.804M5.121 17.804a10.972 10.972 0 011.879-2.804m12 0a10.972 10.972 0 011.879 2.804M5.121 17.804L4 19m16-1.196L19.879 17.804M12 12v10" />
+                            </svg>
+                        </a>
+                        <!-- Dropdown Menu -->
+                        <div class="hidden absolute right-0 mt-2 w-48 bg-white shadow-lg rounded-lg py-2 z-20">
+                            <a href="#" class="block px-4 py-2 text-gray-800 hover:bg-gray-200">Profile</a>
+                            <a href="#" class="block px-4 py-2 text-gray-800 hover:bg-gray-200">Settings</a>
+                            <a href="/logout" class="block px-4 py-2 text-gray-800 hover:bg-gray-200">Logout</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="flex-grow container mx-auto p-6 max-w-5xl">
+            <h1 class="text-3xl font-bold mb-8 text-center">Add Resources!</h1>
+
+            <!-- Inventory Section -->
+            <div class="mb-12">
+                <h2 class="text-xl font-bold mb-4">Inventory</h2>
+
+                <!-- Search Input -->
+                <div class="mb-4 w-full md:w-1/2 mx-auto">
+                    <input type="text" id="searchInventory" placeholder="Search Inventory..." class="w-full border-2 border-gray-300 rounded-lg p-2">
+                </div>
+
+                <!-- Inventory Table -->
+                <div class="overflow-x-auto">
+                    <table class="min-w-full bg-white border border-gray-300 rounded-lg">
+                        <thead>
+                            <tr class="bg-gray-100 text-gray-600 text-left">
+                                <th class="p-4">Name</th>
+                                <th class="p-4">Category</th>
+                                <th class="p-4">In Use</th>
+                                <th class="p-4">Available</th>
+                                <th class="p-4"></th>
+                            </tr>
+                        </thead>
+                        <tbody id="inventoryTable">
+                            <!-- Inventory Data (Replace with dynamic data later) -->
+                            <tr>
+                                <td class="p-4">Chair</td>
+                                <td class="p-4">850</td>
+                                <td class="p-4">450</td>
+                                <td class="p-4">550</td>
+                                <td class="p-4"><button class="bg-blue-500 text-white px-3 py-1 rounded-lg">+</button></td>
+                            </tr>
+                            <tr>
+                                <td class="p-4">Lamp</td>
+                                <td class="p-4">10</td>
+                                <td class="p-4">4</td>
+                                <td class="p-4">6</td>
+                                <td class="p-4"><button class="bg-blue-500 text-white px-3 py-1 rounded-lg">+</button></td>
+                            </tr>
+                            <tr>
+                                <td class="p-4">Projector</td>
+                                <td class="p-4">5</td>
+                                <td class="p-4">2</td>
+                                <td class="p-4">3</td>
+                                <td class="p-4"><button class="bg-blue-500 text-white px-3 py-1 rounded-lg">+</button></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Event Resources Section -->
+            <div class="mb-12">
+                <h2 class="text-xl font-bold mb-4">Event Resources</h2>
+                <div class="overflow-x-auto">
+                    <table class="min-w-full bg-white border border-gray-300 rounded-lg">
+                        <thead>
+                            <tr class="bg-gray-100 text-gray-600 text-left">
+                                <th class="p-4">Name</th>
+                                <th class="p-4">Count</th>
+                                <th class="p-4">Taken Date</th>
+                                <th class="p-4">Return Date</th>
+                                <th class="p-4"></th>
+                            </tr>
+                        </thead>
+                        <tbody id="eventResourcesTable">
+                            <!-- Event Resources Data -->
+                            <tr>
+                                <td class="p-4">Chair</td>
+                                <td class="p-4">50</td>
+                                <td class="p-4">24 Oct, 2024</td>
+                                <td class="p-4">24 Oct, 2024</td>
+                                <td class="p-4"><button class="bg-red-500 text-white px-3 py-1 rounded-lg">x</button></td>
+                            </tr>
+                            <tr>
+                                <td class="p-4">Lamp</td>
+                                <td class="p-4">2</td>
+                                <td class="p-4">24 Oct, 2024</td>
+                                <td class="p-4">24 Oct, 2024</td>
+                                <td class="p-4"><button class="bg-red-500 text-white px-3 py-1 rounded-lg">x</button></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="flex justify-between">
+                <button class="bg-gray-300 text-gray-700 px-6 py-2 rounded-lg">
+                    ← Back
+                </button>
+                <button class="bg-blue-600 text-white px-6 py-2 rounded-lg">
+                    Preview →
+                </button>
+            </div>
+        </main>
+
+        <!-- Footer -->
+        <footer class="bg-blue-600 p-4 mt-8">
+            <div class="text-center text-white">
+                &copy; 2024 Event Management System. All rights reserved.
+            </div>
+        </footer>
+    </div>
+
+    <!-- JavaScript for Filtering and Adding Resources -->
+    <script>
+        // Example for filtering inventory
+        document.getElementById('searchInventory').addEventListener('input', function() {
+            const searchTerm = this.value.toLowerCase();
+            const rows = document.querySelectorAll('#inventoryTable tr');
+            rows.forEach(row => {
+                const itemName = row.cells[0].innerText.toLowerCase();
+                if (itemName.includes(searchTerm)) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        });
+
+        // Functionality to add resources to event
+        document.querySelectorAll('#inventoryTable button').forEach(button => {
+            button.addEventListener('click', function() {
+                const row = this.closest('tr');
+                const name = row.cells[0].innerText;
+                const count = row.cells[3].innerText;
+                const today = new Date().toLocaleDateString();
+
+                const newRow = `
+                    <tr>
+                        <td class="p-4">${name}</td>
+                        <td class="p-4">${count}</td>
+                        <td class="p-4">${today}</td>
+                        <td class="p-4">${today}</td>
+                        <td class="p-4"><button class="bg-red-500 text-white px-3 py-1 rounded-lg">x</button></td>
+                    </tr>
+                `;
+
+                document.getElementById('eventResourcesTable').innerHTML += newRow;
+            });
+        });
+    </script>
+</body>
+</html>
