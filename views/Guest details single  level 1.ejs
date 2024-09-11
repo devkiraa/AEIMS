@@ -10,6 +10,16 @@
         body {
             font-family: 'Poppins', sans-serif;
         }
+        /* Customize radio button checked state */
+        input[type="radio"]:checked {
+            background-color: #2563EB; /* Tailwind color for blue-600 */
+            border-color: #2563EB; /* Change border color to match */
+        }
+
+        /* Initially hide the external options */
+        .external-options {
+            display: none;
+        }
     </style>
 </head>
 <body class="bg-gray-100 min-h-screen">
@@ -55,37 +65,107 @@
             </div>
 
             <!-- Guest Type -->
-            <div class="mb-8">
+            <div class="mb-6">
                 <p class="text-lg font-medium text-gray-700 mb-2">Guest Type</p>
                 <div class="flex items-center space-x-6">
                     <label class="inline-flex items-center">
-                        <input type="radio" name="guestType" value="internal" class="form-radio h-5 w-5 text-blue-600" checked>
+                        <input type="radio" name="guestType" value="internal" class="form-radio h-5 w-5 text-blue-600" checked onchange="toggleGuestOptions()">
                         <span class="ml-2 text-gray-700">Internal</span>
                     </label>
                     <label class="inline-flex items-center">
-                        <input type="radio" name="guestType" value="external" class="form-radio h-5 w-5 text-gray-400">
+                        <input type="radio" name="guestType" value="external" class="form-radio h-5 w-5 text-gray-400" onchange="toggleGuestOptions()">
                         <span class="ml-2 text-gray-700">External</span>
                     </label>
                 </div>
             </div>
 
+            <!-- External Guest Options (Initially hidden) -->
+            <div id="externalOptions" class="external-options">
+                <!-- Guest Food -->
+                <div class="mb-6">
+                    <p class="text-lg font-medium text-gray-700 mb-2">Guest Food</p>
+                    <div class="flex items-center space-x-6">
+                        <label class="inline-flex items-center">
+                            <input type="radio" name="guestFood" value="veg" class="form-radio h-5 w-5 text-blue-600" checked>
+                            <span class="ml-2 text-gray-700">Veg</span>
+                        </label>
+                        <label class="inline-flex items-center">
+                            <input type="radio" name="guestFood" value="non-veg" class="form-radio h-5 w-5 text-gray-400">
+                            <span class="ml-2 text-gray-700">Non-Veg</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Guest Accommodation -->
+                <div class="mb-6">
+                    <p class="text-lg font-medium text-gray-700 mb-2">Guest Accommodation</p>
+                    <div class="flex items-center space-x-6">
+                        <label class="inline-flex items-center">
+                            <input type="radio" name="guestAccommodation" value="yes" class="form-radio h-5 w-5 text-blue-600" checked>
+                            <span class="ml-2 text-gray-700">Yes</span>
+                        </label>
+                        <label class="inline-flex items-center">
+                            <input type="radio" name="guestAccommodation" value="no" class="form-radio h-5 w-5 text-gray-400">
+                            <span class="ml-2 text-gray-700">No</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Guest Conveyance -->
+                <div class="mb-8">
+                    <p class="text-lg font-medium text-gray-700 mb-2">Guest Conveyance</p>
+                    <div class="flex items-center space-x-6">
+                        <label class="inline-flex items-center">
+                            <input type="radio" name="guestConveyance" value="yes" class="form-radio h-5 w-5 text-blue-600" checked>
+                            <span class="ml-2 text-gray-700">Yes</span>
+                        </label>
+                        <label class="inline-flex items-center">
+                            <input type="radio" name="guestConveyance" value="no" class="form-radio h-5 w-5 text-gray-400">
+                            <span class="ml-2 text-gray-700">No</span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
             <!-- Action Buttons -->
             <div class="flex flex-col space-y-4 md:flex-row md:space-x-4 md:space-y-0 justify-end">
+                <!-- Back Button with Left Arrow -->
                 <button type="button" class="bg-gray-200 text-gray-700 py-2 px-4 rounded-lg font-medium hover:bg-gray-300 flex items-center justify-center">
+                    <!-- Left Arrow SVG -->
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
-                        <path fill-rule="evenodd" d="M7 10a1 1 0 001-1V5a1 1 0 00-2 0v4a1 1 0 001 1zm-1 4h10a1 1 0 110 2H6a1 1 0 110-2zm7-4a1 1 0 100 2h2.293l-3.647 3.646a1 1 0 101.414 1.414L18.414 12l-5.354-5.354a1 1 0 00-1.414 1.414L15.293 10H6z" clip-rule="evenodd" />
+                        <path fill-rule="evenodd" d="M7.707 9l4.646-4.646a.5.5 0 00-.708-.708L6.5 9l5.146 5.146a.5.5 0 00.708-.708L7.707 9z" clip-rule="evenodd" />
                     </svg>
                     Back
                 </button>
+
+                <!-- Next Button with Right Arrow -->
                 <button type="submit" class="bg-blue-600 text-white py-2 px-6 rounded-lg font-medium hover:bg-blue-700 flex items-center justify-center">
                     Next
+                    <!-- Right Arrow SVG -->
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-2" viewBox="0 0 20 20" fill="currentColor">
-                        <path fill-rule="evenodd" d="M13 10a1 1 0 00-1-1H5a1 1 0 000 2h7a1 1 0 001-1zm4-5.293l-5.354 5.354a1 1 0 001.414 1.414L18 7.414V17a1 1 0 002 0V6a1 1 0 00-2 0v4.414l-5.354-5.354a1 1 0 00-1.414 1.414L16.293 10H5a1 1 0 100 2h9a1 1 0 100-2H5a1 1 0 000-2h9a1 1 0 001-1z" clip-rule="evenodd" />
+                        <path fill-rule="evenodd" d="M12.293 9l-4.646-4.646a.5.5 0 01.708-.708L13.5 9l-5.146 5.146a.5.5 0 01-.708-.708L12.293 9z" clip-rule="evenodd" />
                     </svg>
                 </button>
             </div>
         </form>
     </div>
+
+    <!-- JavaScript to toggle visibility of external guest options -->
+    <script>
+        function toggleGuestOptions() {
+            const externalOptions = document.getElementById('externalOptions');
+            const guestType = document.querySelector('input[name="guestType"]:checked').value;
+
+            if (guestType === 'external') {
+                externalOptions.style.display = 'block'; // Show options
+            } else {
+                externalOptions.style.display = 'none';  // Hide options
+            }
+        }
+
+        // Initialize to check state on page load
+        window.onload = toggleGuestOptions;
+    </script>
     
 </body>
 </html>
