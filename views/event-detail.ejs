@@ -10,44 +10,121 @@
         body {
             font-family: 'Poppins', sans-serif;
         }
+
+        .nav-link {
+            color: white;
+            font-weight: 500;
+            padding: 0.5rem 1rem;
+        }
+
+        .nav-link:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+            border-radius: 0.375rem;
+        }
+
+        .form-container {
+            max-width: 0 auto;
+            margin: 0 auto;
+        }
+
+        .form-title {
+            font-size: 2rem;
+            font-weight: 600;
+        }
+
+        .form-label {
+            color: #4B5563;
+        }
+
+        .radio-label {
+            display: inline-flex;
+            align-items: center;
+            margin-right: 1.5rem;
+        }
+
+        .radio-label input {
+            margin-right: 0.5rem;
+        }
+
+        .form-section {
+            margin-bottom: 1.5rem;
+        }
+
+        /* Custom styles for buttons */
+        .btn-primary {
+            background-color: #3B82F6;
+            color: white;
+            padding: 0.75rem 2rem;
+            border-radius: 0.375rem;
+            font-weight: 600;
+        }
+
+        .btn-secondary {
+            background-color: #6B7280;
+            color: white;
+            padding: 0.75rem 2rem;
+            border-radius: 0.375rem;
+            font-weight: 600;
+        }
     </style>
 </head>
-<body class="min-h-screen bg-gray-100 flex items-center justify-center">
+<body class="min-h-screen bg-gray-100 flex flex-col items-center">
+    <!-- Navbar -->
+    <nav class="bg-blue-600 w-full">
+        <div class="max-w-7xl mx-auto px-2 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex-shrink-0">
+                    <span class="text-white text-xl font-semibold">AEIMS</span>
+                </div>
+                <div class="flex space-x-4">
+                    <a href="#" class="nav-link">Home</a>
+                    <a href="#" class="nav-link">Create</a>
+                    <a href="#" class="nav-link">Users</a>
+                    <a href="#" class="nav-link">My Events</a>
+                    <a href="#" class="nav-link">About Us</a>
+                </div>
+                <div class="flex-shrink-0">
+                    <img src="https://img.icons8.com/ios-glyphs/30/ffffff/user--v1.png" alt="User Icon" class="h-8 w-8 rounded-full">
+                </div>
+            </div>
+        </div>
+    </nav>
+
     <!-- Form container -->
-    <div class="bg-white min-h-screen w-full max-w-4xl absolute top-0 flex flex-col justify-start p-6 lg:p-12 shadow-lg">
+    <div class="bg-white w-full p-8 lg:p-12 shadow-lg form-container mt-8">
         
         <!-- Header Text -->
         <div class="text-center mb-10">
-            <h2 class="text-2xl lg:text-3xl font-semibold">Add Event Details!</h2>
+            <h2 class="form-title">Add Event Details!</h2>
         </div>
         
         <!-- Form -->
         <form action="/events/create" method="POST">
             <!-- Grid Layout for Fields -->
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
                 <!-- Left Column -->
                 <div>
                     <!-- Event Title -->
-                    <div class="mb-3">
-                        <label for="event_title" class="block text-gray-700">Event Title</label>
+                    <div class="form-section">
+                        <label for="event_title" class="form-label block">Event Title</label>
                         <input type="text" name="event_title" id="event_title" placeholder="Event title...?" class="w-full p-2 border border-gray-300 rounded mt-1" required>
                     </div>
 
                     <!-- Event Start Date -->
-                    <div class="mb-3">
-                        <label for="start_date" class="block text-gray-700">Event Start Date</label>
+                    <div class="form-section">
+                        <label for="start_date" class="form-label block">Event Start Date</label>
                         <input type="date" name="start_date" id="start_date" class="w-full p-2 border border-gray-300 rounded mt-1" required>
                     </div>
 
                     <!-- Event Start Time -->
-                    <div class="mb-3">
-                        <label for="start_time" class="block text-gray-700">Event Start Time</label>
+                    <div class="form-section">
+                        <label for="start_time" class="form-label block">Event Start Time</label>
                         <input type="time" name="start_time" id="start_time" class="w-full p-2 border border-gray-300 rounded mt-1" required>
                     </div>
 
                     <!-- Venue -->
-                    <div class="mb-3">
-                        <label for="venue" class="block text-gray-700">Venue</label>
+                    <div class="form-section">
+                        <label for="venue" class="form-label block">Venue</label>
                         <select name="venue" id="venue" class="w-full p-2 border border-gray-300 rounded mt-1">
                             <option value="Data Analytics Lab">Data Analytics Lab</option>
                             <!-- Add more venue options here -->
@@ -55,30 +132,30 @@
                     </div>
 
                     <!-- Event Volunteers -->
-                    <div class="mb-3">
-                        <label class="block text-gray-700">Event Volunteers</label>
-                        <div class="flex items-center space-x-4">
-                            <label class="flex items-center">
-                                <input type="radio" name="event_volunteers" value="yes" class="mr-2" checked>
+                    <div class="form-section">
+                        <label class="form-label block">Event Volunteers</label>
+                        <div class="flex">
+                            <label class="radio-label">
+                                <input type="radio" name="event_volunteers" value="yes" checked>
                                 Yes
                             </label>
-                            <label class="flex items-center">
-                                <input type="radio" name="event_volunteers" value="no" class="mr-2">
+                            <label class="radio-label">
+                                <input type="radio" name="event_volunteers" value="no">
                                 No
                             </label>
                         </div>
                     </div>
 
                     <!-- Event Coordinators -->
-                    <div class="mb-3">
-                        <label class="block text-gray-700">Event Coordinators</label>
-                        <div class="flex items-center space-x-4">
-                            <label class="flex items-center">
-                                <input type="radio" name="event_coordinators" value="single" class="mr-2" checked>
+                    <div class="form-section">
+                        <label class="form-label block">Event Coordinators</label>
+                        <div class="flex">
+                            <label class="radio-label">
+                                <input type="radio" name="event_coordinators" value="single" checked>
                                 Single
                             </label>
-                            <label class="flex items-center">
-                                <input type="radio" name="event_coordinators" value="multiple" class="mr-2">
+                            <label class="radio-label">
+                                <input type="radio" name="event_coordinators" value="multiple">
                                 Multiple
                             </label>
                         </div>
@@ -88,58 +165,58 @@
                 <!-- Right Column -->
                 <div>
                     <!-- Event Description -->
-                    <div class="mb-3">
-                        <label for="event_description" class="block text-gray-700">Event Description</label>
+                    <div class="form-section">
+                        <label for="event_description" class="form-label block">Event Description</label>
                         <input type="text" name="event_description" id="event_description" placeholder="Event description...?" class="w-full p-2 border border-gray-300 rounded mt-1" required>
                     </div>
 
                     <!-- Event End Date -->
-                    <div class="mb-3">
-                        <label for="end_date" class="block text-gray-700">Event End Date</label>
+                    <div class="form-section">
+                        <label for="end_date" class="form-label block">Event End Date</label>
                         <input type="date" name="end_date" id="end_date" class="w-full p-2 border border-gray-300 rounded mt-1" required>
                     </div>
 
                     <!-- Event End Time -->
-                    <div class="mb-3">
-                        <label for="end_time" class="block text-gray-700">Event End Time</label>
+                    <div class="form-section">
+                        <label for="end_time" class="form-label block">Event End Time</label>
                         <input type="time" name="end_time" id="end_time" class="w-full p-2 border border-gray-300 rounded mt-1" required>
                     </div>
 
                     <!-- Event Poster -->
-                    <div class="mb-3">
-                        <label for="event_poster" class="block text-gray-700">Event Poster</label>
+                    <div class="form-section">
+                        <label for="event_poster" class="form-label block">Event Poster</label>
                         <input type="file" name="event_poster" id="event_poster" class="w-full p-2 border border-gray-300 rounded mt-1">
                     </div>
 
                     <!-- Event Food -->
-                    <div class="mb-3">
-                        <label class="block text-gray-700">Event Food</label>
-                        <div class="flex items-center space-x-4">
-                            <label class="flex items-center">
-                                <input type="radio" name="event_food" value="yes" class="mr-2" checked>
+                    <div class="form-section">
+                        <label class="form-label block">Event Food</label>
+                        <div class="flex">
+                            <label class="radio-label">
+                                <input type="radio" name="event_food" value="yes" checked>
                                 Yes
                             </label>
-                            <label class="flex items-center">
-                                <input type="radio" name="event_food" value="no" class="mr-2">
+                            <label class="radio-label">
+                                <input type="radio" name="event_food" value="no">
                                 No
                             </label>
                         </div>
                     </div>
 
                     <!-- Event Guests -->
-                    <div class="mb-3">
-                        <label class="block text-gray-700">Event Guests</label>
-                        <div class="flex items-center space-x-4">
-                            <label class="flex items-center">
-                                <input type="radio" name="event_guests" value="none" class="mr-2" checked>
+                    <div class="form-section">
+                        <label class="form-label block">Event Guests</label>
+                        <div class="flex">
+                            <label class="radio-label">
+                                <input type="radio" name="event_guests" value="none" checked>
                                 None
                             </label>
-                            <label class="flex items-center">
-                                <input type="radio" name="event_guests" value="single" class="mr-2">
+                            <label class="radio-label">
+                                <input type="radio" name="event_guests" value="single">
                                 Single
                             </label>
-                            <label class="flex items-center">
-                                <input type="radio" name="event_guests" value="multiple" class="mr-2">
+                            <label class="radio-label">
+                                <input type="radio" name="event_guests" value="multiple">
                                 Multiple
                             </label>
                         </div>
@@ -147,10 +224,10 @@
                 </div>
             </div>
 
-            <!-- Navigation Buttons -->
-            <div class="flex justify-between mt-6">
-                <button type="button" class="bg-gray-500 text-white py-2 px-4 rounded">Back</button>
-                <button type="submit" class="bg-blue-500 text-white py-2 px-4 rounded">Next</button>
+            <!-- Navigation Buttons (Right Aligned) -->
+            <div class="flex justify-end mt-6 space-x-4">
+                <button type="button" class="btn-secondary">Back</button>
+                <button type="submit" class="btn-primary">Next</button>
             </div>
         </form>
     </div>
