@@ -9,6 +9,29 @@
     <style>
         body {
             font-family: 'Poppins', sans-serif;
+            margin: 0;
+        }
+
+        /* Make the navbar fixed at the top */
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+        }
+
+        /* Add padding to the top to avoid content being hidden under the fixed nav */
+        .page-container {
+            padding-left: 4rem;
+            padding-top: 6rem; /* Add padding to push the content below the navbar */
+        }
+
+        /* Ensure buttons are fixed at the bottom-right */
+        .form-buttons {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
         }
 
         /* Customize radio button checked state */
@@ -22,16 +45,11 @@
             display: none;
         }
 
-        /* Add more left padding to the container for alignment */
-        .page-container {
-            padding-left: 4rem; /* Increase padding on the left side */
-        }
-
-        /* Ensure buttons are fixed at the bottom-right */
-        .form-buttons {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
+        /* Handle scroll only for content */
+        .content-wrapper {
+            overflow-y: auto;
+            height: 100vh;
+            padding-bottom: 6rem; /* Ensure there's space for the fixed buttons */
         }
     </style>
 </head>
@@ -58,109 +76,111 @@
         </div>
     </nav>
 
-    <!-- Main Content -->
-    <div class="container mx-auto px-4 py-8 page-container">
-        <!-- Form Heading -->
-        <h1 class="text-2xl font-semibold mb-6">Add Guest Details!</h1>
+    <!-- Main Content Wrapper to handle scrolling -->
+    <div class="content-wrapper">
+        <div class="container mx-auto px-4 py-8 page-container">
+            <!-- Form Heading -->
+            <h1 class="text-2xl font-semibold mb-6">Add Guest Details!</h1>
 
-        <!-- Form Section -->
-        <form>
-            <!-- Guest Name -->
-            <div class="mb-6">
-                <label for="guestName" class="block text-gray-700 text-lg font-medium">Guest Name</label>
-                <input type="text" id="guestName" placeholder="Guest Name...?" class="w-full max-w-full md:w-64 mt-2 p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-            </div>
-
-            <!-- About Guest -->
-            <div class="mb-6">
-                <label for="aboutGuest" class="block text-gray-700 text-lg font-medium">About Guest</label>
-                <input type="text" id="aboutGuest" placeholder="About the guest...?" class="w-full max-w-full md:w-64 mt-2 p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-            </div>
-
-            <!-- Guest Type -->
-            <div class="mb-6">
-                <p class="text-lg font-medium text-gray-700 mb-2">Guest Type</p>
-                <div class="flex items-center space-x-6">
-                    <label class="inline-flex items-center">
-                        <input type="radio" name="guestType" value="internal" class="form-radio h-5 w-5 text-blue-600" checked onchange="toggleGuestOptions()">
-                        <span class="ml-2 text-gray-700">Internal</span>
-                    </label>
-                    <label class="inline-flex items-center">
-                        <input type="radio" name="guestType" value="external" class="form-radio h-5 w-5 text-gray-400" onchange="toggleGuestOptions()">
-                        <span class="ml-2 text-gray-700">External</span>
-                    </label>
-                </div>
-            </div>
-
-            <!-- External Guest Options (Initially hidden) -->
-            <div id="externalOptions" class="external-options">
-                <!-- Guest Food (Yes/No) -->
+            <!-- Form Section -->
+            <form>
+                <!-- Guest Name -->
                 <div class="mb-6">
-                    <p class="text-lg font-medium text-gray-700 mb-2">Guest Food</p>
-                    <div class="flex items-center space-x-6">
-                        <label class="inline-flex items-center">
-                            <input type="radio" name="guestFood" value="yes" class="form-radio h-5 w-5 text-blue-600" checked>
-                            <span class="ml-2 text-gray-700">Yes</span>
-                        </label>
-                        <label class="inline-flex items-center">
-                            <input type="radio" name="guestFood" value="no" class="form-radio h-5 w-5 text-gray-400">
-                            <span class="ml-2 text-gray-700">No</span>
-                        </label>
-                    </div>
+                    <label for="guestName" class="block text-gray-700 text-lg font-medium">Guest Name</label>
+                    <input type="text" id="guestName" placeholder="Guest Name...?" class="w-full max-w-full md:w-64 mt-2 p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
                 </div>
 
-                <!-- Guest Accommodation -->
+                <!-- About Guest -->
                 <div class="mb-6">
-                    <p class="text-lg font-medium text-gray-700 mb-2">Guest Accommodation</p>
+                    <label for="aboutGuest" class="block text-gray-700 text-lg font-medium">About Guest</label>
+                    <input type="text" id="aboutGuest" placeholder="About the guest...?" class="w-full max-w-full md:w-64 mt-2 p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+
+                <!-- Guest Type -->
+                <div class="mb-6">
+                    <p class="text-lg font-medium text-gray-700 mb-2">Guest Type</p>
                     <div class="flex items-center space-x-6">
                         <label class="inline-flex items-center">
-                            <input type="radio" name="guestAccommodation" value="yes" class="form-radio h-5 w-5 text-blue-600" checked>
-                            <span class="ml-2 text-gray-700">Yes</span>
+                            <input type="radio" name="guestType" value="internal" class="form-radio h-5 w-5 text-blue-600" checked onchange="toggleGuestOptions()">
+                            <span class="ml-2 text-gray-700">Internal</span>
                         </label>
                         <label class="inline-flex items-center">
-                            <input type="radio" name="guestAccommodation" value="no" class="form-radio h-5 w-5 text-gray-400">
-                            <span class="ml-2 text-gray-700">No</span>
+                            <input type="radio" name="guestType" value="external" class="form-radio h-5 w-5 text-gray-400" onchange="toggleGuestOptions()">
+                            <span class="ml-2 text-gray-700">External</span>
                         </label>
                     </div>
                 </div>
 
-                <!-- Guest Conveyance -->
-                <div class="mb-8">
-                    <p class="text-lg font-medium text-gray-700 mb-2">Guest Conveyance</p>
-                    <div class="flex items-center space-x-6">
-                        <label class="inline-flex items-center">
-                            <input type="radio" name="guestConveyance" value="yes" class="form-radio h-5 w-5 text-blue-600" checked>
-                            <span class="ml-2 text-gray-700">Yes</span>
-                        </label>
-                        <label class="inline-flex items-center">
-                            <input type="radio" name="guestConveyance" value="no" class="form-radio h-5 w-5 text-gray-400">
-                            <span class="ml-2 text-gray-700">No</span>
-                        </label>
+                <!-- External Guest Options (Initially hidden) -->
+                <div id="externalOptions" class="external-options">
+                    <!-- Guest Food (Yes/No) -->
+                    <div class="mb-6">
+                        <p class="text-lg font-medium text-gray-700 mb-2">Guest Food</p>
+                        <div class="flex items-center space-x-6">
+                            <label class="inline-flex items-center">
+                                <input type="radio" name="guestFood" value="yes" class="form-radio h-5 w-5 text-blue-600" checked>
+                                <span class="ml-2 text-gray-700">Yes</span>
+                            </label>
+                            <label class="inline-flex items-center">
+                                <input type="radio" name="guestFood" value="no" class="form-radio h-5 w-5 text-gray-400">
+                                <span class="ml-2 text-gray-700">No</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Guest Accommodation -->
+                    <div class="mb-6">
+                        <p class="text-lg font-medium text-gray-700 mb-2">Guest Accommodation</p>
+                        <div class="flex items-center space-x-6">
+                            <label class="inline-flex items-center">
+                                <input type="radio" name="guestAccommodation" value="yes" class="form-radio h-5 w-5 text-blue-600" checked>
+                                <span class="ml-2 text-gray-700">Yes</span>
+                            </label>
+                            <label class="inline-flex items-center">
+                                <input type="radio" name="guestAccommodation" value="no" class="form-radio h-5 w-5 text-gray-400">
+                                <span class="ml-2 text-gray-700">No</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Guest Conveyance -->
+                    <div class="mb-8">
+                        <p class="text-lg font-medium text-gray-700 mb-2">Guest Conveyance</p>
+                        <div class="flex items-center space-x-6">
+                            <label class="inline-flex items-center">
+                                <input type="radio" name="guestConveyance" value="yes" class="form-radio h-5 w-5 text-blue-600" checked>
+                                <span class="ml-2 text-gray-700">Yes</span>
+                            </label>
+                            <label class="inline-flex items-center">
+                                <input type="radio" name="guestConveyance" value="no" class="form-radio h-5 w-5 text-gray-400">
+                                <span class="ml-2 text-gray-700">No</span>
+                            </label>
+                        </div>
                     </div>
                 </div>
-            </div>
 
-            <!-- Action Buttons (Always at Bottom Right) -->
-            <div class="form-buttons flex flex-col space-y-4 md:flex-row md:space-x-4 md:space-y-0">
-                <!-- Back Button with Left Arrow -->
-                <button type="button" class="bg-gray-200 text-gray-700 py-2 px-4 rounded-lg font-medium hover:bg-gray-300 flex items-center justify-center">
-                    <!-- Left Arrow SVG -->
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
-                        <path fill-rule="evenodd" d="M7.707 9l4.646-4.646a.5.5 0 00-.708-.708L6.5 9l5.146 5.146a.5.5 0 00.708-.708L7.707 9z" clip-rule="evenodd" />
-                    </svg>
-                    Back
-                </button>
+                <!-- Action Buttons (Always at Bottom Right) -->
+                <div class="form-buttons flex flex-col space-y-4 md:flex-row md:space-x-4 md:space-y-0">
+                    <!-- Back Button with Left Arrow -->
+                    <button type="button" class="bg-gray-200 text-gray-700 py-2 px-4 rounded-lg font-medium hover:bg-gray-300 flex items-center justify-center">
+                        <!-- Left Arrow SVG -->
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M7.707 9l4.646-4.646a.5.5 0 00-.708-.708L6.5 9l5.146 5.146a.5.5 0 00.708-.708L7.707 9z" clip-rule="evenodd" />
+                        </svg>
+                        Back
+                    </button>
 
-                <!-- Next Button with Right Arrow -->
-                <button type="submit" class="bg-blue-600 text-white py-2 px-6 rounded-lg font-medium hover:bg-blue-700 flex items-center justify-center">
-                    Next
-                    <!-- Right Arrow SVG -->
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-2" viewBox="0 0 20 20" fill="currentColor">
-                        <path fill-rule="evenodd" d="M12.293 10.707l-4.646 4.646a.5.5 0 01-.708-.708L11.293 10l-4.646-4.646a.5.5 0 01.708-.708l4.646 4.646a.5.5 0 010 .708z" clip-rule="evenodd" />
-                    </svg>
-                </button>
-            </div>
-        </form>
+                    <!-- Next Button with Right Arrow -->
+                    <button type="submit" class="bg-blue-600 text-white py-2 px-4 rounded-lg font-medium hover:bg-blue-700 flex items-center justify-center">
+                        Next
+                        <!-- Right Arrow SVG -->
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-2" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M12.293 10.707l-5.146 5.146a.5.5 0 01-.708-.708L11.293 10 6.44 5.146a.5.5 0 01.708-.708l5.146 5.146a.5.5 0 010 .708z" clip-rule="evenodd" />
+                        </svg>
+                    </button>
+                </div>
+            </form>
+        </div>
     </div>
 
     <script>
