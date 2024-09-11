@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Book an Event</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+        }
+        .venue-available {
+            background-color: #1E5631; /* Darker Green */
+            color: white;
+        }
+        .venue-waiting {
+            background-color: #D4A017; /* Darker Yellow */
+            color: white;
+        }
+        .venue-booked {
+            background-color: #8B0000; /* Darker Red */
+            color: white;
+        }
+        .venue {
+            padding: 15px 25px;
+            margin: 10px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .venue-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-top: 30px;
+        }
+        .legend {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+        }
+        .legend-item {
+            display: flex;
+            align-items: center;
+            margin-right: 20px;
+        }
+        .legend-color {
+            width: 20px;
+            height: 20px;
+            margin-right: 8px;
+            border-radius: 50%;
+        }
+    </style>
+</head>
+<body class="min-h-screen bg-gray-100">
+    <div class="container mx-auto px-4 py-10">
+        <h1 class="text-3xl font-bold text-center mb-6">Book an Event!</h1>
+        
+        <!-- Date and Time Selection -->
+        <div class="flex justify-center mb-6">
+            <div class="mx-2">
+                <label for="start_date" class="block text-gray-700">Start Date</label>
+                <input type="date" id="start_date" value="2024-12-05" class="p-2 border border-gray-300 rounded w-full">
+            </div>
+            <div class="mx-2">
+                <label for="end_date" class="block text-gray-700">End Date</label>
+                <input type="date" id="end_date" value="2024-12-05" class="p-2 border border-gray-300 rounded w-full">
+            </div>
+        </div>
+        
+        <div class="flex justify-center mb-6">
+            <div class="mx-2">
+                <label for="start_time" class="block text-gray-700">Start Time</label>
+                <input type="time" id="start_time" value="13:00" class="p-2 border border-gray-300 rounded w-full">
+            </div>
+            <div class="mx-2">
+                <label for="end_time" class="block text-gray-700">End Time</label>
+                <input type="time" id="end_time" value="14:00" class="p-2 border border-gray-300 rounded w-full">
+            </div>
+        </div>
+
+        <!-- Venue Selection -->
+        <div class="venue-container">
+            <div class="venue venue-available">CS Lab 1</div>
+            <div class="venue venue-available">CS Lab 2</div>
+            <div class="venue venue-waiting">CS Lab 3</div>
+            <div class="venue venue-waiting">CS Lab 4</div>
+            <div class="venue venue-available">CS Lab 5</div>
+            <div class="venue venue-booked">CS Lab 6</div>
+            <div class="venue venue-available">Auditorium</div>
+            <div class="venue venue-waiting">Seminar Hall</div>
+            <div class="venue venue-waiting">Conference Room</div>
+            <div class="venue venue-booked">Prayer Hall</div>
+            <div class="venue venue-booked">Library</div>
+            <div class="venue venue-booked">Data Analytics Lab</div>
+        </div>
+
+        <!-- Next Button -->
+        <div class="flex justify-center mt-8">
+            <button class="bg-blue-600 text-white py-2 px-8 rounded-full font-medium hover:bg-blue-700">Next</button>
+        </div>
+
+        <!-- Legend for Status -->
+        <div class="legend">
+            <div class="legend-item">
+                <div class="legend-color" style="background-color: #1E5631;"></div>
+                <span>Available</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background-color: #D4A017;"></div>
+                <span>Waiting</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background-color: #8B0000;"></div>
+                <span>Booked</span>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
