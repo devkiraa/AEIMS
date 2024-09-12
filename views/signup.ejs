@@ -19,6 +19,9 @@
         .invalid {
             color: rgb(238, 66, 66);
         }
+        .error {
+            color: rgb(238, 66, 66);
+        }
     </style>
 </head>
 <body class="min-h-screen bg-gray-100 flex items-center justify-end">
@@ -30,8 +33,7 @@
             <h2 class="text-2xl lg:text-3xl font-semibold">Welcome to <span class="text-blue-600">AEIMS</span></h2>
         </div>
         
-        <!-- Form -->
-        <form action="/auth/signup" method="POST">
+        <form id="signup-form" action="/auth/signup" method="POST">
             <!-- Full Name Field -->
             <div class="mb-3">
                 <label for="full_name" class="block text-gray-700">Name</label>
@@ -48,6 +50,7 @@
             <div class="mb-3">
                 <label for="email" class="block text-gray-700">Official Mail ID</label>
                 <input type="email" name="email" id="email" placeholder="Email" class="w-full p-2 border border-gray-300 rounded mt-1" required>
+                <p id="email-error" class="error text-xs mt-1"></p>
             </div>
 
             <!-- Club Association Dropdown -->
@@ -72,6 +75,7 @@
             <div class="mb-3">
                 <label for="confirm_password" class="block text-gray-700">Confirm Password</label>
                 <input type="password" name="confirm_password" id="confirm_password" placeholder="Confirm password" class="w-full p-2 border border-gray-300 rounded mt-1" required>
+                <p id="password-match-error" class="error text-xs mt-1"></p>
             </div>
 
             <!-- Password Criteria (Initially Hidden) -->
@@ -146,6 +150,32 @@
             } else {
                 specialCharacters.classList.remove('valid');
                 specialCharacters.classList.add('invalid');
+            }
+        });
+
+        // Validate all the inputs when submit is clicked
+        document.getElementById('signup-form').addEventListener('submit', function(event) {
+            var email = document.getElementById('email').value;
+            var password = document.getElementById('password').value;
+            var confirmPassword = document.getElementById('confirm_password').value;
+            var emailError = document.getElementById('email-error');
+            var passwordMatchError = document.getElementById('password-match-error');
+
+            var emailValid = /^(.+@kh\.students\.amrita\.edu|.+@kh\.amrita\.edu)$/.test(email);
+            var passwordsMatch = password === confirmPassword;
+
+            if (!emailValid) {
+                emailError.textContent = 'Email must be @kh.students.amrita.edu or @kh.amrita.edu';
+                event.preventDefault();
+            } else {
+                emailError.textContent = '';
+            }
+
+            if (!passwordsMatch) {
+                passwordMatchError.textContent = 'Passwords do not match';
+                event.preventDefault();
+            } else {
+                passwordMatchError.textContent = '';
             }
         });
     </script>
