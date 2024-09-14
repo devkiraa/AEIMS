@@ -1,3 +1,5 @@
+CREATE SCHEMA `aeims` ;
+
 CREATE TABLE `users` (
   `usr_id` int NOT NULL,
   `usr_name` varchar(100) NOT NULL,
