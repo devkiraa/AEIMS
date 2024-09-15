@@ -10,6 +10,14 @@
         body {
             font-family: 'Poppins', sans-serif;
         }
+        /* Initially hide the toggle button */
+        #togglePassword {
+            display: none;
+        }
+        /* Show toggle button when the password field is focused */
+        .peer:focus ~ #togglePassword {
+            display: flex;
+        }
     </style>
 </head>
 <body class="min-h-screen bg-gray-100 relative">
@@ -20,9 +28,15 @@
                 <label for="email" class="block text-gray-700">Email ID</label>
                 <input type="email" name="email" id="email" class="w-full p-2 border border-gray-300 rounded mt-1" required>
             </div>
-            <div class="mb-6">
+            <div class="mb-6 relative">
                 <label for="password" class="block text-gray-700">Password</label>
-                <input type="password" name="password" id="password" class="w-full p-2 border border-gray-300 rounded mt-1" required>
+                <div class="relative">
+                    <input type="password" name="password" id="password" class="w-full p-2 border border-gray-300 rounded mt-1 peer pr-10" required>
+                    <!-- Eye icon for toggling password visibility -->
+                    <button type="button" id="togglePassword" class="absolute inset-y-0 right-3 flex items-center text-gray-600 p-1">
+                        <img src="/assets/icons/visibility_20dp_4B5563_FILL0_wght500_GRAD0_opsz20.svg" alt="Show Password" id="eyeIcon" class="w-5 h-5">
+                    </button>
+                </div>
             </div>
             <div class="w-full flex justify-end mb-4">
                 <a href="/auth/forgot-password" class="text-sm text-blue-500 hover:underline">Forgot password?</a>
@@ -33,5 +47,35 @@
             Don’t have an account? <a href="/auth/signup" class="text-blue-500">Sign up now</a>
         </p>
     </div>
+
+    <script>
+        const togglePassword = document.querySelector('#togglePassword');
+        const password = document.querySelector('#password');
+        const eyeIcon = document.querySelector('#eyeIcon');
+
+        // Toggle password visibility
+        togglePassword.addEventListener('click', function () {
+            const type = password.getAttribute('type') === 'password' ? 'text' : 'password';
+            password.setAttribute('type', type);
+
+            // Change the eye icon based on visibility state
+            if (type === 'text') {
+                eyeIcon.src = '/assets/icons/visibility_off_20dp_4B5563_FILL0_wght500_GRAD0_opsz20.svg'; // Use the "eye-off" SVG for hiding password
+                eyeIcon.alt = 'Hide Password';
+            } else {
+                eyeIcon.src = '/assets/icons/visibility_20dp_4B5563_FILL0_wght500_GRAD0_opsz20.svg'; // Use the "eye" SVG for showing password
+                eyeIcon.alt = 'Show Password';
+            }
+        });
+
+        // Show the eye icon if the input has text
+        password.addEventListener('input', function () {
+            if (password.value) {
+                togglePassword.style.display = 'flex'; // Show the eye icon
+            } else {
+                togglePassword.style.display = 'none'; // Hide the eye icon when there's no text
+            }
+        });
+    </script>
 </body>
 </html>
