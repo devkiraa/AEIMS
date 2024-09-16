@@ -22,6 +22,14 @@
         .error {
             color: rgb(238, 66, 66);
         }
+        /* Initially hide the toggle button */
+        #toggleConfirmPassword {
+            display: none;
+        }
+        /* Show toggle button when the confirm password field is focused */
+        .peer:focus ~ #toggleConfirmPassword {
+            display: flex;
+        }
     </style>
 </head>
 <body class="min-h-screen bg-gray-100 flex items-center justify-end">
@@ -72,9 +80,15 @@
             </div>
 
             <!-- Confirm Password Field -->
-            <div class="mb-3">
+            <div class="mb-3 relative">
                 <label for="confirm_password" class="block text-gray-700">Confirm Password</label>
-                <input type="password" name="confirm_password" id="confirm_password" placeholder="Confirm password" class="w-full p-2 border border-gray-300 rounded mt-1" required>
+                <div class="relative">
+                    <input type="password" name="confirm_password" id="confirm_password" placeholder="Confirm password" class="w-full p-2 border border-gray-300 rounded mt-1 peer pr-10" required>
+                    <!-- Eye icon for toggling password visibility -->
+                    <button type="button" id="toggleConfirmPassword" class="absolute inset-y-0 right-3 flex items-center text-gray-600 p-1">
+                        <img src="/assets/icons/visibility_20dp_4B5563_FILL0_wght500_GRAD0_opsz20.svg" alt="Show Password" id="confirmEyeIcon" class="w-5 h-5">
+                    </button>
+                </div>
                 <p id="password-match-error" class="error text-xs mt-1"></p>
             </div>
 
@@ -176,6 +190,34 @@
                 event.preventDefault();
             } else {
                 passwordMatchError.textContent = '';
+            }
+        });
+
+        const toggleConfirmPassword = document.querySelector('#toggleConfirmPassword');
+        const confirmPassword = document.querySelector('#confirm_password');
+        const confirmEyeIcon = document.querySelector('#confirmEyeIcon');
+
+        // Toggle confirm password visibility
+        toggleConfirmPassword.addEventListener('click', function () {
+            const type = confirmPassword.getAttribute('type') === 'password' ? 'text' : 'password';
+            confirmPassword.setAttribute('type', type);
+
+            // Change the eye icon based on visibility state
+            if (type === 'text') {
+                confirmEyeIcon.src = '/assets/icons/visibility_off_20dp_4B5563_FILL0_wght500_GRAD0_opsz20.svg'; // Use the "eye-off" SVG for hiding password
+                confirmEyeIcon.alt = 'Hide Password';
+            } else {
+                confirmEyeIcon.src = '/assets/icons/visibility_20dp_4B5563_FILL0_wght500_GRAD0_opsz20.svg'; // Use the "eye" SVG for showing password
+                confirmEyeIcon.alt = 'Show Password';
+            }
+        });
+
+        // Show the eye icon if the input has text
+        confirmPassword.addEventListener('input', function () {
+            if (confirmPassword.value) {
+                toggleConfirmPassword.style.display = 'flex'; // Show the eye icon
+            } else {
+                toggleConfirmPassword.style.display = 'none'; // Hide the eye icon when there's no text
             }
         });
     </script>
