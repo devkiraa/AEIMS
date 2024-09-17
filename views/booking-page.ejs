@@ -122,17 +122,25 @@
     </style>
 </head>
 <body class="min-h-screen bg-gray-100">
-    <!-- Blue header with navigation and profile icon -->
-    <div class="top-border">
-        <ul class="nav-links">
-            <li><a href="#">Home</a></li>
-            <li><a href="#">Create</a></li>
-            <li><a href="#">Users</a></li>
-            <li><a href="#">My Events</a></li>
-            <li><a href="#">About Us</a></li>
-        </ul>
-        <div class="profile-icon"></div>
-    </div>
+    <!-- Navbar -->
+    <nav class="bg-blue-600 p-4">
+        <div class="container mx-auto flex justify-between items-center">
+            <!-- Move header elements to the left -->
+            <div class="flex items-center space-x-6">
+                <ul class="flex space-x-6 text-white">
+                    <li><a href="#" class="hover:text-gray-300">Home</a></li>
+                    <li><a href="#" class="hover:text-gray-300">Create</a></li>
+                    <li><a href="#" class="hover:text-gray-300">Users</a></li>
+                    <li><a href="#" class="hover:text-gray-300">My Events</a></li>
+                    <li><a href="#" class="hover:text-gray-300">About Us</a></li>
+                </ul>
+            </div>
+            <!-- User icon in rounded background -->
+            <div class="bg-white rounded-full p-2">
+                <a href="#"><img src="/assets/icons/avatar.svg" alt="User Icon" class="w-6 h-6"></a>
+            </div>
+        </div>
+    </nav>
 
     <!-- Main container -->
     <div class="max-w-7xl mx-auto px-8 py-12">

@@ -4,51 +4,36 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Add Resources</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+        }
+    </style>
 </head>
 <body class="bg-gray-50">
     <div class="min-h-screen flex flex-col">
-        <!-- Header -->
-        <nav class="bg-blue-600 shadow">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="flex justify-between h-16">
-                    <div class="flex">
-                        <div class="hidden sm:-my-px sm:ml-6 sm:flex sm:space-x-8">
-                            <a href="#" class="text-white no-underline hover:text-gray-200 inline-flex items-center px-1 pt-1 text-sm font-medium">
-                                Home
-                            </a>
-                            <a href="#" class="text-white no-underline hover:text-gray-200 inline-flex items-center px-1 pt-1 text-sm font-medium">
-                                Events
-                            </a>
-                            <a href="#" class="text-white no-underline hover:text-gray-200 inline-flex items-center px-1 pt-1 text-sm font-medium">
-                                Inventory
-                            </a>
-                            <a href="#" class="text-white no-underline hover:text-gray-200 inline-flex items-center px-1 pt-1 text-sm font-medium">
-                                Services
-                            </a>
-                            <a href="#" class="text-white no-underline hover:text-gray-200 inline-flex items-center px-1 pt-1 text-sm font-medium">
-                                About Us
-                            </a>
-                        </div>
-                    </div>
-
-                    <!-- Profile Dropdown -->
-                    <div class="relative">
-                        <a href="#" class="text-white inline-flex items-center">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.121 17.804A10.972 10.972 0 0112 16c2.617 0 5.035.926 6.879 2.804M12 14a5 5 0 100-10 5 5 0 000 10zm0 0v1m0 4a10.97 10.97 0 01-6.879-2.804M5.121 17.804a10.972 10.972 0 011.879-2.804m12 0a10.972 10.972 0 011.879 2.804M5.121 17.804L4 19m16-1.196L19.879 17.804M12 12v10" />
-                            </svg>
-                        </a>
-                        <!-- Dropdown Menu -->
-                        <div class="hidden absolute right-0 mt-2 w-48 bg-white shadow-lg rounded-lg py-2 z-20">
-                            <a href="#" class="block px-4 py-2 text-gray-800 hover:bg-gray-200">Profile</a>
-                            <a href="#" class="block px-4 py-2 text-gray-800 hover:bg-gray-200">Settings</a>
-                            <a href="/logout" class="block px-4 py-2 text-gray-800 hover:bg-gray-200">Logout</a>
-                        </div>
-                    </div>
-                </div>
+        <!-- Navbar -->
+    <nav class="bg-blue-600 p-4">
+        <div class="container mx-auto flex justify-between items-center">
+            <!-- Move header elements to the left -->
+            <div class="flex items-center space-x-6">
+                <ul class="flex space-x-6 text-white">
+                    <li><a href="#" class="hover:text-gray-300">Home</a></li>
+                    <li><a href="#" class="hover:text-gray-300">Create</a></li>
+                    <li><a href="#" class="hover:text-gray-300">Users</a></li>
+                    <li><a href="#" class="hover:text-gray-300">My Events</a></li>
+                    <li><a href="#" class="hover:text-gray-300">About Us</a></li>
+                </ul>
             </div>
-        </nav>
+            <!-- User icon in rounded background -->
+            <div class="bg-white rounded-full p-2">
+                <a href="#"><img src="/assets/icons/avatar.svg" alt="User Icon" class="w-6 h-6"></a>
+            </div>
+        </div>
+    </nav>
 
         <!-- Main Content -->
         <main class="flex-grow container mx-auto p-6 max-w-5xl">

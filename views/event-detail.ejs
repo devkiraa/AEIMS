@@ -11,7 +11,7 @@
             font-family: 'Poppins', sans-serif;
         }
 
-        .nav-link {
+        /*.nav-link {
             color: white;
             font-weight: 500;
             padding: 0.5rem 1rem;
@@ -20,7 +20,7 @@
         .nav-link:hover {
             background-color: rgba(255, 255, 255, 0.2);
             border-radius: 0.375rem;
-        }
+        }*/
 
         .form-container {
             max-width: 100%;
@@ -97,24 +97,23 @@
         });
     </script>
 </head>
-<body class="min-h-screen bg-gray-100 flex flex-col items-center">
+<body class="min-h-screen bg-gray-100">
     <!-- Navbar -->
-    <nav class="bg-blue-600 w-full">
-        <div class="max-w-7xl mx-auto px-2 sm:px-6 lg:px-8">
-            <div class="flex items-center justify-between h-16">
-                <div class="flex-shrink-0">
-                    <span class="text-white text-xl font-semibold">AEIMS</span>
-                </div>
-                <div class="flex space-x-4">
-                    <a href="#" class="nav-link">Home</a>
-                    <a href="#" class="nav-link">Create</a>
-                    <a href="#" class="nav-link">Users</a>
-                    <a href="#" class="nav-link">My Events</a>
-                    <a href="#" class="nav-link">About Us</a>
-                </div>
-                <div class="flex-shrink-0">
-                    <img src="https://img.icons8.com/ios-glyphs/30/ffffff/user--v1.png" alt="User Icon" class="h-8 w-8 rounded-full">
-                </div>
+    <nav class="bg-blue-600 p-4">
+        <div class="container mx-auto flex justify-between items-center">
+            <!-- Move header elements to the left -->
+            <div class="flex items-center space-x-6">
+                <ul class="flex space-x-6 text-white">
+                    <li><a href="#" class="hover:text-gray-300">Home</a></li>
+                    <li><a href="#" class="hover:text-gray-300">Create</a></li>
+                    <li><a href="#" class="hover:text-gray-300">Users</a></li>
+                    <li><a href="#" class="hover:text-gray-300">My Events</a></li>
+                    <li><a href="#" class="hover:text-gray-300">About Us</a></li>
+                </ul>
+            </div>
+            <!-- User icon in rounded background -->
+            <div class="bg-white rounded-full p-2">
+                <a href="#"><img src="/assets/icons/avatar.svg" alt="User Icon" class="w-6 h-6"></a>
             </div>
         </div>
     </nav>
