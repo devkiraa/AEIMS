@@ -103,7 +103,7 @@
             padding: 8px;
             border: 1px solid #ccc;
             border-radius: 6px;
-            margin: 10px 0;
+            margin: 0px 0;
         }
 
         /* Adjusting spacing and alignment between date and time fields */
@@ -119,7 +119,70 @@
             display: flex;
             flex-direction: column;
         }
+
+        .quick-row {
+            display: flex;
+            justify-content: flex-start; /* Align to left */
+            align-items: center;
+            gap: 40px; /* Space equal to the width of one input */
+            margin-bottom: 20px; /* Optional: Add some space below each row */
+            margin-top: 35px;
+        }
+
+        .event-row {
+            display: none; /* Initially hidden */
+            justify-content: flex-start; /* Align to left */
+            align-items: center;
+            gap: 50px; /* Space equal to the width of one input */
+            margin-bottom: 20px; /* Optional: Add some space below each row */
+        }
+
+        .radio-label {
+            display: inline-flex;
+            align-items: center;
+            margin-right: 1.5rem;
+        }
+
+        /* Fixed position for buttons */
+        .form-buttons {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+        }
+
+        /* Next button styling similar to the Add Guest Details page */
+        .next-btn {
+            background-color: #2563EB; /* Tailwind blue-600 */
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .next-btn:hover {
+            background-color: #1D4ED8; /* Tailwind blue-700 */
+        }
     </style>
+
+    <script>
+        function toggleEventTitle() 
+        {
+            const eventTitleRow = document.getElementById('event-row');
+            const quickEventRow = document.querySelector('.quick-row');
+            const isQuickEvent = document.querySelector('input[name="quick_event"]:checked').value === 'yes';
+
+            if (isQuickEvent) {
+                eventTitleRow.style.display = 'flex'; // Show the event title row
+                quickEventRow.style.marginBottom = '15px'; // Reduce the margin when 'Yes' is selected
+            } else {
+                eventTitleRow.style.display = 'none'; // Hide the event title row
+                quickEventRow.style.marginBottom = '20px'; // Add a 30px margin when 'No' is selected
+            }
+        }
+    </script>
 </head>
 <body class="min-h-screen bg-gray-100">
     <!-- Navbar -->
@@ -143,7 +206,7 @@
     </nav>
 
     <!-- Main container -->
-    <div class="max-w-7xl mx-auto px-8 py-12">
+    <div class="max-w-7xl mx-auto px-8 py-6">
         <h1 class="text-3xl font-semibold mb-6">Book an Event!</h1>
 
         <!-- Date and time selection -->
@@ -169,6 +232,26 @@
             </div>
         </div>
 
+        <div class="quick-row">
+            <label class="block text-gray-700">Quick Event?</label>
+            <div class="flex">
+                <label class="radio-label">
+                    <input type="radio" name="quick_event" value="yes" onclick="toggleEventTitle()">
+                    Yes
+                </label>
+                <label class="radio-label">
+                    <input type="radio" name="quick_event" value="no" checked onclick="toggleEventTitle()">
+                    No
+                </label>
+            </div>
+        </div>
+
+        <!-- Event title, hidden by default -->
+        <div id="event-row" class="event-row">
+            <label for="event_title" class="block text-gray-700">Event Title</label>
+            <input type="text" name="event_title" id="event_title" placeholder="Event title...?" class="w-96 p-2 border border-gray-300 rounded mt-1" required>
+        </div>
+
         <!-- Venue buttons -->
         <div class="mb-6">
             <div class="flex flex-wrap">
@@ -184,6 +267,7 @@
                 <button class="venue-btn booked">Prayer Hall</button>
                 <button class="venue-btn booked">Library</button>
                 <button class="venue-btn booked">Data Analytics Lab</button>
+                <button class="venue-btn available">CIR Seminar Hall</button>
             </div>
         </div>
 
@@ -200,10 +284,15 @@
             </div>
         </div>
 
-        <!-- Next button -->
-        <div class="mt-6 flex justify-end">
-            <button class="bg-blue-500 text-white py-2 px-4 rounded">Next</button>
-        </div>
+    <!-- Fixed Back and Next buttons -->
+    <div class="form-buttons flex space-x-4">
+        <button class="next-btn">
+            Next
+            <!-- Right Arrow SVG -->
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-2" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M12.293 10.707l-5.146 5.146a.5.5 0 01-.708-.708L11.293 10 6.44 5.146a.5.5 0 01.708-.708l5.146 5.146a.5.5 0 010 .708z" clip-rule="evenodd" />
+            </svg>
+        </button>
     </div>
 </body>
 </html>
