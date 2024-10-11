@@ -72,6 +72,20 @@
             display: none;
             margin-left: 1rem; /* Space between radio and search bar */
         }
+
+        /* Hide guest number counter by default */
+        #guest-counter {
+            display: none;
+            margin-left: 1rem;
+            width: 100px;
+        }
+
+        /* Hide guest number counter by default */
+        #volunteer-counter {
+            display: none;
+            margin-left: 1rem;
+            width: 100px;
+        }
     </style>
     <script>
         function toggleCoordinatorSearch() {
@@ -85,6 +99,34 @@
             }
         }
 
+        function toggleGuestCounter() {
+            const guestRadios = document.querySelectorAll('input[name="event_guests"]');
+            const guestCounter = document.getElementById("guest-counter");
+
+            // Check if 'Multiple' is selected, then show the guest counter
+            guestRadios.forEach(radio => {
+                if (radio.value === 'multiple' && radio.checked) {
+                    guestCounter.style.display = "inline-block";
+                } else if (radio.value !== 'multiple' && radio.checked) {
+                    guestCounter.style.display = "none";
+                }
+            });
+        }
+
+        function toggleVolunteerCounter() {
+            const volunteerRadios = document.querySelectorAll('input[name="event_volunteers"]');
+            const volunteerCounter = document.getElementById("volunteer-counter");
+
+            // Check if 'Multiple' is selected, then show the guest counter
+            volunteerRadios.forEach(radio => {
+                if (radio.value === 'yes' && radio.checked) {
+                    volunteerCounter.style.display = "inline-block";
+                } else if (radio.value === 'no' && radio.checked) {
+                    volunteerCounter.style.display = "none";
+                }
+            });
+        }
+
         document.addEventListener("DOMContentLoaded", function() {
             // Attach event listeners to the radio buttons
             const coordinatorRadios = document.querySelectorAll('input[name="event_coordinators"]');
@@ -92,8 +134,24 @@
                 radio.addEventListener('change', toggleCoordinatorSearch);
             });
 
+            const guestRadios = document.querySelectorAll('input[name="event_guests"]');
+            guestRadios.forEach(radio => {
+                radio.addEventListener('change', toggleGuestCounter);
+            });
+
+            const volunteerRadios = document.querySelectorAll('input[name="event_volunteers"]');
+            volunteerRadios.forEach(radio => {
+                radio.addEventListener('change', toggleVolunteerCounter);
+            });
+
             // Initial check to display search bar if 'multiple' is pre-selected
             toggleCoordinatorSearch();
+
+            // Initial check to display guest counter if 'multiple' is pre-selected
+            toggleGuestCounter();
+
+            // Initial check to display guest counter if 'multiple' is pre-selected
+            toggleVolunteerCounter();
         });
     </script>
 </head>
@@ -163,13 +221,15 @@
                         <label class="form-label block">Event Volunteers</label>
                         <div class="flex">
                             <label class="radio-label">
-                                <input type="radio" name="event_volunteers" value="yes" checked>
+                                <input type="radio" name="event_volunteers" value="yes">
                                 Yes
                             </label>
                             <label class="radio-label">
-                                <input type="radio" name="event_volunteers" value="no">
+                                <input type="radio" name="event_volunteers" value="no" checked>
                                 No
                             </label>
+                            <!-- Volunteer Counter (shown when 'Multiple' is selected) -->
+                            <input type="number" id="volunteer-counter" name="volunteer_counter" placeholder="Number of Volunteers" min="1" value="1" class="w-full p-2 border border-gray-300 rounded">
                         </div>
                     </div>
 
@@ -248,6 +308,8 @@
                                 <input type="radio" name="event_guests" value="multiple">
                                 Multiple
                             </label>
+                            <!-- Guest Counter (shown when 'Multiple' is selected) -->
+                            <input type="number" id="guest-counter" name="guest_counter" placeholder="Number of Guests" min="2" value="2" class="w-full p-2 border border-gray-300 rounded">
                         </div>
                     </div>
                 </div>
