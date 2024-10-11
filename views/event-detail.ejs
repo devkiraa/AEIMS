@@ -80,7 +80,7 @@
             width: 100px;
         }
 
-        /* Hide guest number counter by default */
+        /* Hide volunteer number counter by default */
         #volunteer-counter {
             display: none;
             margin-left: 1rem;
@@ -117,7 +117,7 @@
             const volunteerRadios = document.querySelectorAll('input[name="event_volunteers"]');
             const volunteerCounter = document.getElementById("volunteer-counter");
 
-            // Check if 'Multiple' is selected, then show the guest counter
+            // Check if 'yes' is selected, then show the volunteer counter
             volunteerRadios.forEach(radio => {
                 if (radio.value === 'yes' && radio.checked) {
                     volunteerCounter.style.display = "inline-block";
@@ -150,7 +150,7 @@
             // Initial check to display guest counter if 'multiple' is pre-selected
             toggleGuestCounter();
 
-            // Initial check to display guest counter if 'multiple' is pre-selected
+            // Initial check to display guest counter if 'yes' is pre-selected
             toggleVolunteerCounter();
         });
     </script>
@@ -228,7 +228,7 @@
                                 <input type="radio" name="event_volunteers" value="no" checked>
                                 No
                             </label>
-                            <!-- Volunteer Counter (shown when 'Multiple' is selected) -->
+                            <!-- Volunteer Counter (shown when 'yes' is selected) -->
                             <input type="number" id="volunteer-counter" name="volunteer_counter" placeholder="Number of Volunteers" min="1" value="1" class="w-full p-2 border border-gray-300 rounded">
                         </div>
                     </div>
