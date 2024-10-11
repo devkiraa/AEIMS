@@ -173,13 +173,16 @@
             const eventTitleRow = document.getElementById('event-row');
             const quickEventRow = document.querySelector('.quick-row');
             const isQuickEvent = document.querySelector('input[name="quick_event"]:checked').value === 'yes';
+            const nextButton = document.querySelector('.next-btn');
 
             if (isQuickEvent) {
                 eventTitleRow.style.display = 'flex'; // Show the event title row
                 quickEventRow.style.marginBottom = '15px'; // Reduce the margin when 'Yes' is selected
+                nextButton.innerHTML = 'Submit'; // Change the text to 'Submit'
             } else {
                 eventTitleRow.style.display = 'none'; // Hide the event title row
                 quickEventRow.style.marginBottom = '20px'; // Add a 30px margin when 'No' is selected
+                nextButton.innerHTML = 'Next <!-- Right Arrow SVG --> <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-2" viewBox="0 0 20 20" fill="currentColor"> <path fill-rule="evenodd" d="M12.293 10.707l-5.146 5.146a.5.5 0 01-.708-.708L11.293 10 6.44 5.146a.5.5 0 01.708-.708l5.146 5.146a.5.5 0 010 .708z" clip-rule="evenodd" /> </svg>'; // Change the text to 'Next'
             }
         }
     </script>
