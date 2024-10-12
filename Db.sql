@@ -159,3 +159,67 @@ CREATE TABLE `notification_tb` (
   KEY `noti_evn_ref_idx` (`evn_id`),
   CONSTRAINT `noti_evn_ref` FOREIGN KEY (`evn_id`) REFERENCES `event_tb` (`evn_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+DROP TABLE `aeims`.`event_volunteers`;
+
+ALTER TABLE `aeims`.`event_tb` 
+ADD COLUMN `evn_vol_cnt` INT NOT NULL AFTER `event_et`;
+
+ALTER TABLE `aeims`.`event_modification_histroy` 
+RENAME TO  `aeims`.`event_modification_log` ;
+
+
+CREATE TABLE `mail_log` (
+  `log_id` int NOT NULL,
+  `mail_kind` varchar(100) DEFAULT NULL,
+  `mail_date` date DEFAULT NULL,
+  `mail_time` time DEFAULT NULL,
+  `mail_stat` varchar(15) DEFAULT NULL,
+  `usr_id` int DEFAULT NULL,
+  PRIMARY KEY (`log_id`),
+  KEY `mail_recipient_idx` (`usr_id`),
+  CONSTRAINT `mail_recipient` FOREIGN KEY (`usr_id`) REFERENCES `users` (`usr_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+CREATE TABLE `event_quick` (
+  `evn_qk_id` int NOT NULL,
+  `evn_qk_name` varchar(100) NOT NULL,
+  `ven_id` int NOT NULL,
+  `evn_qk_sd` date NOT NULL,
+  `evn_qk_ed` date NOT NULL,
+  `evn_qk_st` time NOT NULL,
+  `evn_qk_et` time NOT NULL,
+  `usr_id` int NOT NULL,
+  PRIMARY KEY (`evn_qk_id`),
+  KEY `quick_event_usr_idx` (`usr_id`),
+  KEY `quick_event_ven_idx` (`ven_id`),
+  CONSTRAINT `quick_event_usr` FOREIGN KEY (`usr_id`) REFERENCES `users` (`usr_id`),
+  CONSTRAINT `quick_event_ven` FOREIGN KEY (`ven_id`) REFERENCES `venues` (`ven_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+CREATE TABLE `aeims`.`user_login_log` (
+  `login_id` INT NOT NULL,
+  `usr_id` INT NOT NULL,
+  `usr_log_dt` DATE NOT NULL,
+  `usr_log_time` TIME NOT NULL,
+  PRIMARY KEY (`login_id`),
+  INDEX `usr_login_log_idx` (`usr_id` ASC) VISIBLE,
+  CONSTRAINT `usr_login_log`
+    FOREIGN KEY (`usr_id`)
+    REFERENCES `aeims`.`users` (`usr_id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION);
+
+CREATE TABLE `aeims`.`user_password_memory` (
+  `usr_pwd_mem_id` INT NOT NULL,
+  `usr_id` INT NOT NULL,
+  `usr_pwd` VARCHAR(100) NOT NULL,
+  `usr_pwd_creation_dt` DATE NOT NULL,
+  PRIMARY KEY (`usr_pwd_mem_id`),
+  INDEX `usr_pwd_mem_idx` (`usr_id` ASC) VISIBLE,
+  CONSTRAINT `usr_pwd_mem`
+    FOREIGN KEY (`usr_id`)
+    REFERENCES `aeims`.`users` (`usr_id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION);
+  
