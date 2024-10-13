@@ -168,6 +168,18 @@ ADD COLUMN `evn_vol_cnt` INT NOT NULL AFTER `event_et`;
 ALTER TABLE `aeims`.`event_modification_histroy` 
 RENAME TO  `aeims`.`event_modification_log` ;
 
+ALTER TABLE `aeims`.`notification_tb` 
+DROP FOREIGN KEY `noti_evn_ref`;
+ALTER TABLE `aeims`.`notification_tb` 
+ADD COLUMN `noti_message` VARCHAR(150) NOT NULL AFTER `noti_id`,
+CHANGE COLUMN `evn_id` `evn_id` INT NULL ,
+CHANGE COLUMN `evn_date` `noti_date` DATE NOT NULL ,
+CHANGE COLUMN `evn_time` `noti_time` TIME NOT NULL ;
+ALTER TABLE `aeims`.`notification_tb` 
+ADD CONSTRAINT `noti_evn_ref`
+  FOREIGN KEY (`evn_id`)
+  REFERENCES `aeims`.`event_tb` (`evn_id`);
+
 
 CREATE TABLE `mail_log` (
   `log_id` int NOT NULL,
