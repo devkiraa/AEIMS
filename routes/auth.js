@@ -116,6 +116,10 @@ router.get('/forgot-password/:Token', (req, res) => {
     res.render('forgot-password-request');
 });
 
+router.get('/signup-waiting', (req, res) => {
+    res.render('signup-waiting');
+});
+
 router.post('/signup', async (req, res) => {
     const { full_name, mobile, email, password, club, dept } = req.body;
     const hashedPassword = await bcrypt.hash(password, 10);
