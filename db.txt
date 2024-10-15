@@ -234,4 +234,8 @@ CREATE TABLE `aeims`.`user_password_memory` (
     REFERENCES `aeims`.`users` (`usr_id`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION);
-  
+
+-- Change as on 15/10/2024
+
+ALTER TABLE `aeims`.`user_details` 
+CHANGE COLUMN `usr_mob` `usr_mob` VARCHAR(12) NOT NULL ;
