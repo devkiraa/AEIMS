@@ -1,8 +1,38 @@
 const express = require('express');
+const session = require('express-session');
+const crypto = require('crypto');
 const path = require('path');
 const app = express();
+const dotenv = require('dotenv');
 
-// Middleware
+// // Middleware
+// dotenv.config();
+// app.use(session({
+//     secret: process.env.SESSION_SECRET,
+//     resave: false,
+//     saveUninitialized: false,
+//     cookie: {
+//         maxAge: 1000 * 60 * 60, // 1 hour expiration
+//         secure: process.env.NODE_ENV === 'production', // Secure in production
+//         httpOnly: true // Prevent client-side JS access
+//     }
+// }));
+
+// Generate a secure secret for session signing
+const sessionSecret = crypto.randomBytes(64).toString('hex'); 
+
+// MiddleWare
+app.use(session({
+    secret: sessionSecret, // Secure session secret
+    resave: false, // Save session only if modified
+    saveUninitialized: false, // Avoid saving uninitialized sessions
+    cookie: {
+        maxAge: 1000 * 60 * 60, // 1 hour expiration
+        secure: process.env.NODE_ENV === 'production', // Secure in production
+        httpOnly: true // Prevent client-side JS access
+    }
+}));
+
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
