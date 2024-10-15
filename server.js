@@ -47,7 +47,12 @@ const authRoutes = require('./routes/auth');
 app.use('/auth', authRoutes);
 
 app.get('/dashboard', (req, res) => {
-    res.render('dashboard'); // A placeholder dashboard page
+    if (!req.session.user_name) {
+        return res.redirect('/auth/login'); // Redirect if user is not logged in
+    }
+    
+    // Render the dashboard with the user's name
+    res.render('dashboard', { user_name: req.session.user_name });
 });
 
 const PORT = process.env.PORT || 3000;

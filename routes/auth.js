@@ -23,7 +23,7 @@ router.post('/login', (req, res) => {
 
         // Check if user exists
         if (results.length === 0) {
-            return res.status(401).send('Invalid email or password');
+            return res.render('login', { error: 'Invalid email or password' });
         }
 
         const user = results[0]; // Get the user object from the query result
@@ -31,15 +31,24 @@ router.post('/login', (req, res) => {
         // Verify the password
         const isMatch = await bcrypt.compare(password, user.usr_pass);
         if (!isMatch) {
-            return res.status(401).send('Invalid email or password');
+            return res.render('login', { error: 'Invalid email or password' });
         }
 
-        // Set user session
-        req.session.user_id = user.usr_id;
-        req.session.user_name = user.usr_name;
+        // Fetch the user's full name from user_details
+        const userDetailsSql = 'SELECT usr_aname FROM user_details WHERE usr_id = ?';
+        db.query(userDetailsSql, [user.usr_id], (err, userDetails) => {
+            if (err) {
+                console.error(err);
+                return res.status(500).send('Error fetching user details');
+            }
 
-        // Redirect to dashboard or appropriate page
-        res.redirect('/dashboard');
+            // Store the full name in the session
+            req.session.user_id = user.usr_id;
+            req.session.user_name = userDetails[0].usr_aname;
+
+            // Redirect to dashboard
+            res.redirect('/dashboard');
+        });
     });
 });
 

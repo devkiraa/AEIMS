@@ -38,6 +38,10 @@
                     </button>
                 </div>
             </div>
+            <!-- Error Message -->
+            <% if (typeof error !== 'undefined') { %>
+                <div class="text-red-500 text-sm mb-4"><%= error %></div>
+            <% } %>
             <div class="w-full flex justify-end mb-4">
                 <a href="/auth/forgot-password" class="text-sm text-blue-500 hover:underline">Forgot password?</a>
             </div>
