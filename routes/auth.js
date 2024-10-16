@@ -3,11 +3,6 @@ const router = express.Router();
 const bcrypt = require('bcryptjs');
 const db = require('../models/db');
 
-// Login route
-router.get('/login', (req, res) => {
-    res.render('login');
-});
-
 router.post('/login', (req, res) => {
     const { email, password } = req.body;
 
@@ -96,30 +91,6 @@ router.post('/login', (req, res) => {
 //     });
 // });
 
-// Signup route
-router.get('/signup', (req, res) => {
-    res.render('signup');
-});
-
-// forgot-passowrd route
-router.get('/forgot-password', (req, res) => {
-    res.render('forgot-password');
-});
-
-// forgot-passowrd route
-//router.get('/forgot-password/contact', (req, res) => {
-//    res.render('forgot-password-request');
-//});
-
-// forgot-passowrd route
-router.get('/forgot-password/:Token', (req, res) => {
-    res.render('forgot-password-request');
-});
-
-router.get('/signup-waiting', (req, res) => {
-    res.render('signup-waiting');
-});
-
 router.post('/signup', async (req, res) => {
     const { full_name, mobile, email, password, club, dept } = req.body;
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -151,12 +122,6 @@ router.post('/signup', async (req, res) => {
             });
         });
     });
-});
-
-
-// Registration waiting page
-router.get('/waiting', (req, res) => {
-    res.render('waiting');
 });
 
 module.exports = router;

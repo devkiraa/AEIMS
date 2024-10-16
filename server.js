@@ -44,7 +44,9 @@ app.set('views', path.join(__dirname, 'views'));
 
 // Routes
 const authRoutes = require('./routes/auth');
+const vRoutes = require('./routes/vroutes');
 app.use('/auth', authRoutes);
+app.use('/', vRoutes);
 
 app.get('/dashboard', (req, res) => {
     if (!req.session.user_name) {
