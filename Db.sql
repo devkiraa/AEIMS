@@ -243,4 +243,4 @@ CHANGE COLUMN `usr_mob` `usr_mob` VARCHAR(12) NOT NULL ;
 -- Change as on 16/10/2024
 
 ALTER TABLE `aeims`.`user_details` 
-ADD COLUMN `usr_creation_date` DATE NOT NULL AFTER `usr_club`;
+ADD COLUMN `usr_cre_date` DATE NOT NULL AFTER `usr_mob`;
