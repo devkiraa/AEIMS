@@ -1,0 +1,6 @@
+usr_id,usr_name,usr_pass,usr_role,usr_dept,usr_stat
+1,kh.en.u3cds22029@kh.students.amrita.edu,$2a$10$D4HmrKbQeNyjNI/5PkiG6eYLIngv5Bxv8ZwAbTlgE07evUrz8d/GG,admin,cs,0
+2,kh.en.u3cds22051@kh.students.amrita.edu,$2a$10$TxDsi618IKQcw8HCGJB.Petr/Qsrgi2A9p2VsW7SpJuE6iBPkSQBS,regw,cs,0
+3,kh.en.u3cds22014@kh.students.amrita.edu,$2a$10$NRxga7KkQQkOrDA.Vo0goe8SLAlh8IcYUy3FDPZK6ndGj3ifDq6Pa,regw,cs,0
+4,kh.en.u3cds22034@kh.students.amrita.edu,$2a$10$9J7yzO5/8l1xbcSYINPYBeTj28GRTzLPU4FNuQkfI/CX9hrpt6kSO,regw,com,0
+5,kh.en.i5mca22105@kh.students.amrita.edu,$2a$10$8GZz3Tf011ksLMFqucLWRu6DNVH.CThxggQFqUk4LTS7n1XdL29qe,regw,cs,0
