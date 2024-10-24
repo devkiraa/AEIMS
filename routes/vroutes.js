@@ -26,9 +26,14 @@ router.get('/signup-waiting', (req, res) => {
     res.render('signup-waiting');
 });
 
-// Signup-waiting page
+// User-management page
 router.get('/user-management', (req, res) => {
     res.render('user-management');
+});
+
+// Inventory-management page
+router.get('/inventory', (req, res) => {
+    res.render('inventory');
 });
 
 module.exports = router;
