@@ -59,26 +59,7 @@
                         </tr>
                     </thead>
                     <tbody id="inventoryBody">
-                        <tr>
-                            <td class="p-4">Projector</td>
-                            <td class="p-4">21 July, 2020</td>
-                            <td class="p-4">10</td>
-                            <td class="p-4 text-center">
-                                <button class="text-blue-500 hover:text-blue-700" onclick="addToService(this)">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
-                                    </svg>
-                                </button>
-                            </td>
-                            <td class="p-4 text-center">
-                                <button class="text-gray-500 hover:text-red-600" onclick="deleteRow(this)">
-                                    <img src="/assets/icons/delete_24dp_6B7280_FILL0_wght500_GRAD0_opsz24.svg" alt="User Icon" class="w-6 h-6">
-                                </button>
-                                <button class="text-gray-500 hover:text-red-600">
-                                    <img src="/assets/icons/edit_24dp_6B7280_FILL0_wght500_GRAD0_opsz24.svg" alt="User Icon" class="w-6 h-6">
-                                </button>
-                            </td>
-                        </tr>
+                        <!-- Inventory items will be dynamically inserted here -->
                     </tbody>
                 </table>
             </div>
@@ -97,68 +78,86 @@
                         </tr>
                     </thead>
                     <tbody id="serviceBody">
-                        <tr>
-                            <td class="p-4">Beat The Clock</td>
-                            <td class="p-4">24 July, 2024</td>
-                            <td class="p-4 text-center">
-                                <button class="text-gray-500 hover:text-red-600" onclick="removeService(this)">
-                                    <img src="/assets/icons/cancel_24dp_6B7280_FILL0_wght500_GRAD0_opsz24.svg" alt="User Icon" class="w-6 h-6">
-                                </button>
-                            </td>
-                        </tr>
+                        <!-- Service items will be dynamically inserted here -->
                     </tbody>
                 </table>
             </div>
         </section>
     </main>
 
+    <!-- Modal for adding inventory -->
+    <div id="addInventoryModal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 hidden">
+        <div class="bg-white p-6 rounded-lg shadow-lg w-96">
+            <h2 class="text-2xl font-semibold mb-4">Add New Inventory Item</h2>
+            <form id="addInventoryForm">
+                <div class="mb-4">
+                    <label for="inv_prd_name" class="block text-gray-700">Product Name:</label>
+                    <input type="text" id="inv_prd_name" class="w-full px-3 py-2 border border-gray-300 rounded" required>
+                </div>
+                <div class="mb-4">
+                    <label for="inv_item_count" class="block text-gray-700">Item Count:</label>
+                    <input type="number" id="inv_item_count" class="w-full px-3 py-2 border border-gray-300 rounded" required>
+                </div>
+                <div class="mb-4">
+                    <label for="inv_service_count" class="block text-gray-700">Service Count:</label>
+                    <input type="number" id="inv_service_count" class="w-full px-3 py-2 border border-gray-300 rounded" required>
+                </div>
+                <!-- Hidden fields for auto-generated values -->
+                <input type="hidden" id="inv_id">
+                <input type="hidden" id="inv_first_added">
+                <div class="flex justify-end space-x-4">
+                    <button type="button" class="bg-gray-500 text-white py-2 px-4 rounded" onclick="closeModal()">Cancel</button>
+                    <button type="submit" class="bg-blue-500 text-white py-2 px-4 rounded">Add</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <script>
-        // Function to delete a row from inventory
-        function deleteRow(button) {
-            button.closest('tr').remove();
-        }
-
-        // Function to add an item from inventory to "In Service"
-        function addToService(button) {
-            const row = button.closest('tr');
-            const item = row.cells[0].innerText;
-            const serviceDate = new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
-
-            const newServiceRow = document.createElement('tr');
-            newServiceRow.innerHTML = `
-                <td class="p-4">${item}</td>
-                <td class="p-4">${serviceDate}</td>
-                <td class="p-4 text-center">
-                    <button class="text-gray-500 hover:text-red-600" onclick="removeService(this)">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-7 7-7-7"/>
-                        </svg>
-                    </button>
-                </td>
-            `;
-
-            document.getElementById('serviceBody').appendChild(newServiceRow);
-            row.remove(); // Remove from inventory after adding to service
-        }
-
-        // Function to remove a service item
-        function removeService(button) {
-            button.closest('tr').remove();
-        }
-
-        // Function to add new item to the inventory
+        // Open the modal when the "Add" button is clicked
         document.getElementById('addInventoryBtn').addEventListener('click', function () {
-            const item = prompt("Enter the item name:");
-            const quantity = prompt("Enter the quantity:");
+            openModal();
+        });
 
-            if (item && quantity) {
-                const addedDate = new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
+        function openModal() {
+            // Auto-generate inv_id (e.g., using a timestamp or a random number)
+            const inv_id = 'INV' + Date.now(); // This will generate a unique ID based on timestamp
+            document.getElementById('inv_id').value = inv_id;
 
-                const newRow = document.createElement('tr');
-                newRow.innerHTML = `
-                    <td class="p-4">${item}</td>
-                    <td class="p-4">${addedDate}</td>
-                    <td class="p-4">${quantity}</td>
+            // Auto-generate inv_first_added with the current date
+            const currentDate = new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
+            document.getElementById('inv_first_added').value = currentDate;
+
+            // Show the modal
+            document.getElementById('addInventoryModal').classList.remove('hidden');
+        }
+
+        // Close the modal
+        function closeModal() {
+            document.getElementById('addInventoryModal').classList.add('hidden');
+        }
+
+        // Handle the form submission
+        document.getElementById('addInventoryForm').addEventListener('submit', function (e) {
+            e.preventDefault();
+
+            // Get the values from the form
+            const inv_prd_name = document.getElementById('inv_prd_name').value;
+            const inv_item_count = document.getElementById('inv_item_count').value;
+            const inv_service_count = document.getElementById('inv_service_count').value;
+            const inv_id = document.getElementById('inv_id').value;
+            const inv_first_added = document.getElementById('inv_first_added').value;
+
+            // You can also generate inv_remove_count and inv_stat based on your needs
+            const inv_remove_count = 0; // Assuming it's initially 0
+            const inv_stat = "Available"; // Assuming status is 'Available' by default
+
+            // Now add the new inventory item to the table
+            const newRow = `
+                <tr>
+                    <td class="p-4">${inv_prd_name}</td>
+                    <td class="p-4">${inv_first_added}</td>
+                    <td class="p-4">${inv_item_count}</td>
                     <td class="p-4 text-center">
                         <button class="text-blue-500 hover:text-blue-700" onclick="addToService(this)">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -168,17 +167,22 @@
                     </td>
                     <td class="p-4 text-center">
                         <button class="text-gray-500 hover:text-red-600" onclick="deleteRow(this)">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-7 7-7-7"/>
-                            </svg>
+                            <img src="/assets/icons/delete_24dp_6B7280_FILL0_wght500_GRAD0_opsz24.svg" alt="Delete Icon" class="w-6 h-6">
+                        </button>
+                        <button class="text-gray-500 hover:text-red-600">
+                            <img src="/assets/icons/edit_24dp_6B7280_FILL0_wght500_GRAD0_opsz24.svg" alt="Edit Icon" class="w-6 h-6">
                         </button>
                     </td>
-                `;
+                </tr>
+            `;
 
-                document.getElementById('inventoryBody').appendChild(newRow);
-            } else {
-                alert("Please enter valid item and quantity.");
-            }
+            document.getElementById('inventoryBody').innerHTML += newRow;
+
+            // Close the modal
+            closeModal();
+
+            // Reset the form
+            document.getElementById('addInventoryForm').reset();
         });
     </script>
 </body>
