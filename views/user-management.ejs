@@ -10,24 +10,6 @@
         body {
             font-family: 'Poppins', sans-serif;
         }
-
-        /* Custom search bar style */
-        .search-bar {
-            display: flex;
-            align-items: center;
-            background-color: #f3f4f6;
-            border-radius: 9999px;
-            padding-left: 1rem;
-            padding-right: 1rem;
-        }
-
-        .search-bar input {
-            background: transparent;
-            border: none;
-            outline: none;
-            padding: 0.5rem;
-            width: 100%;
-        }
     </style>
 </head>
 <body class="bg-gray-50">
@@ -35,15 +17,13 @@
         <!-- Navbar -->
         <nav class="bg-blue-600 p-4">
             <div class="container mx-auto flex justify-between items-center">
-                <div class="flex items-center space-x-6">
-                    <ul class="flex space-x-6 text-white">
-                        <li><a href="#" class="hover:text-gray-300">Home</a></li>
-                        <li><a href="#" class="hover:text-gray-300">Events</a></li>
-                        <li><a href="#" class="hover:text-gray-300">Users</a></li>
-                        <li><a href="#" class="hover:text-gray-300">Inventory</a></li>
-                        <li><a href="#" class="hover:text-gray-300">About Us</a></li>
-                    </ul>
-                </div>
+                <ul class="flex space-x-6 text-white">
+                    <li><a href="#" class="hover:text-gray-300">Home</a></li>
+                    <li><a href="#" class="hover:text-gray-300">Events</a></li>
+                    <li><a href="#" class="hover:text-gray-300">Users</a></li>
+                    <li><a href="#" class="hover:text-gray-300">Inventory</a></li>
+                    <li><a href="#" class="hover:text-gray-300">About Us</a></li>
+                </ul>
                 <div class="bg-white rounded-full p-2">
                     <a href="#"><img src="/assets/icons/avatar.svg" alt="User Icon" class="w-6 h-6"></a>
                 </div>
@@ -56,11 +36,12 @@
 
             <!-- Search bar -->
             <div class="mb-6 flex justify-end">
-                <div class="search-bar w-full md:w-1/2">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 4a7 7 0 00-7 7 7 7 0 1014 0 7 7 0 00-7-7zM21 21l-4.35-4.35"/>
-                    </svg>
-                    <input type="text" placeholder="Search User..." class="ml-2" id="searchUser">
+                <div class="w-full md:w-1/2">
+                    <input 
+                        type="text" 
+                        placeholder="Search User..." 
+                        class="w-full p-2 border rounded-lg" 
+                        id="searchUser">
                 </div>
             </div>
 
@@ -77,25 +58,7 @@
                         </tr>
                     </thead>
                     <tbody id="userTable">
-                        <!-- Example rows -->
-                        <tr>
-                            <td class="p-4">
-                                <div class="text-base font-semibold">Victoria Perez</div>
-                                <div class="text-sm text-gray-500">terrill.wiza@hotmail.com</div>
-                            </td>
-                            <td class="p-4">Victoria Perez</td>
-                            <td class="p-4">12 Jan, 2019</td>
-                            <td class="p-4">Computer Science</td>
-                            <td class="p-4 text-right">
-                                <button class="text-gray-500 hover:text-blue-600 mr-4">
-                                    <img src="/assets/icons/edit_24dp_6B7280_FILL0_wght500_GRAD0_opsz24.svg" alt="edit" class="w-6 h-6">
-                                </button>
-                                <button class="text-gray-500 hover:text-red-600">
-                                    <img src="/assets/icons/delete_24dp_6B7280_FILL0_wght500_GRAD0_opsz24.svg" alt="User Icon" class="w-6 h-6">
-                                </button>
-                            </td>
-                        </tr>
-                        <!-- Add more rows as necessary -->
+                        <!-- User rows will be populated dynamically -->
                     </tbody>
                 </table>
             </div>
@@ -109,20 +72,58 @@
         </footer>
     </div>
 
-    <!-- JavaScript for Search Functionality -->
     <script>
-        document.getElementById('searchUser').addEventListener('input', function() {
+        // Fetch and display users from the backend
+        async function fetchUsers() {
+            try {
+                const response = await fetch('/api/users');
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const users = await response.json();
+
+                const userTable = document.getElementById('userTable');
+                userTable.innerHTML = ''; // Clear existing rows
+
+                users.forEach(user => {
+                    const row = `
+                        <tr>
+                            <td class="p-4">
+                                <div class="text-base font-semibold">${user.usr_aname}</div>
+                                <div class="text-sm text-gray-500">${user.usr_name}</div>
+                            </td>
+                            <td class="p-4">${user.usr_role}</td>
+                            <td class="p-4">${new Date(user.usr_cre_date).toLocaleDateString()}</td>
+                            <td class="p-4">${user.usr_dept}</td>
+                            <td class="p-4 text-right">
+                                <button class="text-gray-500 hover:text-blue-600 mr-4">
+                                    <img src="/assets/icons/edit_24dp_6B7280_FILL0_wght500_GRAD0_opsz24.svg" alt="edit" class="w-6 h-6">
+                                </button>
+                                <button class="text-gray-500 hover:text-red-600">
+                                    <img src="/assets/icons/delete_24dp_6B7280_FILL0_wght500_GRAD0_opsz24.svg" alt="delete" class="w-6 h-6">
+                                </button>
+                            </td>
+                        </tr>
+                    `;
+                    userTable.insertAdjacentHTML('beforeend', row);
+                });
+            } catch (error) {
+                console.error('Failed to fetch users:', error);
+            }
+        }
+
+        // Search functionality
+        document.getElementById('searchUser').addEventListener('input', function () {
             const searchTerm = this.value.toLowerCase();
             const rows = document.querySelectorAll('#userTable tr');
             rows.forEach(row => {
                 const userName = row.cells[0].innerText.toLowerCase();
-                if (userName.includes(searchTerm)) {
-                    row.style.display = '';
-                } else {
-                    row.style.display = 'none';
-                }
+                row.style.display = userName.includes(searchTerm) ? '' : 'none';
             });
         });
+
+        // Fetch users on page load
+        fetchUsers();
     </script>
 </body>
 </html>

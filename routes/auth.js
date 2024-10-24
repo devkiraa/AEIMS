@@ -8,7 +8,7 @@ router.post('/login', (req, res) => {
 
     // SQL to find user by email
     const sql = 'SELECT * FROM users WHERE usr_name = ?';
-    
+
     // Query the database for the user
     db.query(sql, [email], async (err, results) => {
         if (err) {
@@ -22,6 +22,11 @@ router.post('/login', (req, res) => {
         }
 
         const user = results[0]; // Get the user object from the query result
+
+        // Check if the user registration is still pending
+        if (user.usr_role === 'regw') {
+            return res.render('login', { error: 'User registration is pending approval' });
+        }
 
         // Verify the password
         const isMatch = await bcrypt.compare(password, user.usr_pass);
@@ -105,20 +110,23 @@ router.post('/signup', async (req, res) => {
 
         // Insert into `users` table
         const sql = `INSERT INTO users (usr_id, usr_name, usr_pass, usr_role, usr_dept, usr_stat) VALUES (?, ?, ?, ?, ?, ?)`;
-        db.query(sql, [user_id, email, hashedPassword, 'regw', dept, '0'], (err, result) => {
+        db.query(sql, [user_id, email, hashedPassword, 'regw', dept, '0'], (err) => {
             if (err) {
                 console.error(err);
                 return res.status(500).send('Server Error');
             }
 
-            // Insert into `user_details` table
-            const sql2 = 'INSERT INTO user_details (usr_id, usr_aname, usr_mob, usr_club) VALUES (?, ?, ?, ?)';
-            db.query(sql2, [user_id, full_name, mobile, club], (err, result) => {
+            // Insert into `user_details` table, including the creation date
+            const sql2 = `
+                INSERT INTO user_details (usr_id, usr_aname, usr_mob, usr_cre_date, usr_club) 
+                VALUES (?, ?, ?, CURDATE(), ?)`;
+
+            db.query(sql2, [user_id, full_name, mobile, club], (err) => {
                 if (err) {
                     console.error(err);
                     return res.status(500).send('Server Error');
                 }
-                res.redirect('/auth/signup-waiting');
+                res.redirect('/signup-waiting');
             });
         });
     });

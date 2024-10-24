@@ -1,5 +1,4 @@
 const express = require('express');
-const { route } = require('./auth');
 const router = express.Router();
 
 // Login route
@@ -17,7 +16,7 @@ router.get('/forgot-password', (req, res) => {
     res.render('forgot-password');
 });
 
-// forgot-passowrd route
+// forgot-passowrd reset using token route
 router.get('/forgot-password/:Token', (req, res) => {
     res.render('forgot-password-request');
 });
@@ -27,11 +26,9 @@ router.get('/signup-waiting', (req, res) => {
     res.render('signup-waiting');
 });
 
-// Registration waiting page
-router.get('/waiting', (req, res) => {
-    res.render('waiting');
+// Signup-waiting page
+router.get('/user-management', (req, res) => {
+    res.render('user-management');
 });
-
-// 
 
 module.exports = router;

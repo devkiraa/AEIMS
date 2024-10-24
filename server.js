@@ -45,12 +45,16 @@ app.set('views', path.join(__dirname, 'views'));
 // Routes
 const authRoutes = require('./routes/auth');
 const vRoutes = require('./routes/vroutes');
-app.use('/auth', authRoutes);
+const userRoutes = require('./routes/user-management'); // Adjust path if necessary
+
+// Use the user routes with '/api' as prefix to avoid conflicts
+app.use('/api', userRoutes);
+app.use('/', authRoutes);
 app.use('/', vRoutes);
 
 app.get('/dashboard', (req, res) => {
     if (!req.session.user_name) {
-        return res.redirect('/auth/login'); // Redirect if user is not logged in
+        return res.redirect('/login'); // Redirect if user is not logged in
     }
     
     // Render the dashboard with the user's name
