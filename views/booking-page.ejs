@@ -168,8 +168,7 @@
     </style>
 
     <script>
-        function toggleEventTitle() 
-        {
+        function toggleEventTitle() {
             const eventTitleRow = document.getElementById('event-row');
             const quickEventRow = document.querySelector('.quick-row');
             const isQuickEvent = document.querySelector('input[name="quick_event"]:checked').value === 'yes';
@@ -184,6 +183,18 @@
                 quickEventRow.style.marginBottom = '20px'; // Add a 30px margin when 'No' is selected
                 nextButton.innerHTML = 'Next <!-- Right Arrow SVG --> <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-2" viewBox="0 0 20 20" fill="currentColor"> <path fill-rule="evenodd" d="M12.293 10.707l-5.146 5.146a.5.5 0 01-.708-.708L11.293 10 6.44 5.146a.5.5 0 01.708-.708l5.146 5.146a.5.5 0 010 .708z" clip-rule="evenodd" /> </svg>'; // Change the text to 'Next'
             }
+        }
+
+        // Function to set today's date as the minimum for Start Date and End Date
+        function setMinDate() {
+            const today = new Date().toISOString().split('T')[0]; // Get today's date in YYYY-MM-DD format
+            document.getElementById('start-date').setAttribute('min', today); // Set min attribute for start date
+            document.getElementById('end-date').setAttribute('min', today);   // Set min attribute for end date
+        }
+
+        // Call the function when the page loads
+        window.onload = function() {
+            setMinDate();
         }
     </script>
 </head>
@@ -216,11 +227,11 @@
         <div class="form-row">
             <div class="input-group">
                 <label class="block mb-2 text-gray-700">Start Date</label>
-                <input type="date" class="input-field" required>
+                <input type="date" id="start-date" class="input-field" required>
             </div>
             <div class="input-group">
                 <label class="block mb-2 text-gray-700">End Date</label>
-                <input type="date" class="input-field" required>
+                <input type="date" id="end-date" class="input-field" required>
             </div>
         </div>
 
@@ -236,8 +247,8 @@
         </div>
 
         <div class="quick-row">
-            <label class="block text-gray-700">Quick Event?</label>
-            <div class="flex">
+            <label class="block text-gray-700">Quick Event</label>
+            <div>
                 <label class="radio-label">
                     <input type="radio" name="quick_event" value="yes" onclick="toggleEventTitle()">
                     Yes
