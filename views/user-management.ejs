@@ -10,6 +10,10 @@
         body {
             font-family: 'Poppins', sans-serif;
         }
+        /* Popup Styles */
+        .popup-overlay {
+            background-color: rgba(0, 0, 0, 0.5);
+        }
     </style>
 </head>
 <body class="bg-gray-50">
@@ -72,6 +76,21 @@
         </footer>
     </div>
 
+    <!-- Popup Modal -->
+    <div id="userPopup" class="fixed inset-0 hidden flex items-center justify-center popup-overlay">
+        <div class="bg-white p-6 rounded-lg shadow-lg max-w-lg w-full">
+            <h2 class="text-xl font-semibold mb-4">User Details</h2>
+            <div id="popupContent">
+                <!-- User details will be populated dynamically -->
+            </div>
+            <div class="mt-4 text-right">
+                <button onclick="closePopup()" class="bg-blue-600 text-white px-4 py-2 rounded-lg">
+                    Close
+                </button>
+            </div>
+        </div>
+    </div>
+
     <script>
         // Fetch and display users from the backend
         async function fetchUsers() {
@@ -96,7 +115,7 @@
                             <td class="p-4">${new Date(user.usr_cre_date).toLocaleDateString()}</td>
                             <td class="p-4">${user.usr_dept}</td>
                             <td class="p-4 text-right">
-                                <button class="text-gray-500 hover:text-blue-600 mr-4">
+                                <button class="text-gray-500 hover:text-blue-600 mr-4" onclick='openPopup(${JSON.stringify(user)})'>
                                     <img src="/assets/icons/edit_24dp_6B7280_FILL0_wght500_GRAD0_opsz24.svg" alt="edit" class="w-6 h-6">
                                 </button>
                                 <button class="text-gray-500 hover:text-red-600">
@@ -110,6 +129,42 @@
             } catch (error) {
                 console.error('Failed to fetch users:', error);
             }
+        }
+
+        // Open Popup and populate user details
+        function openPopup(user) {
+            const popupContent = document.getElementById('popupContent');
+            popupContent.innerHTML = `
+                <p><strong>Name:</strong> ${user.usr_aname}</p>
+                <p><strong>Email:</strong> ${user.usr_name}</p>
+                <p><strong>Mobile:</strong> ${user.usr_mob}</p>
+                <p><strong>Joined On:</strong> ${new Date(user.usr_cre_date).toLocaleDateString()}</p>
+                <p><strong>Club Association:</strong> ${user.usr_club || 'N/A'}</p>
+                <label><strong>Role:</strong></label>
+                <select class="w-full p-2 border rounded-lg mb-2">
+                    <option value="${user.usr_role}" selected>${user.usr_role}</option>
+                    <option value="Admin">Admin</option>
+                    <option value="User">User</option>
+                </select>
+                <label><strong>Department:</strong></label>
+                <select class="w-full p-2 border rounded-lg mb-2">
+                    <option value="${user.usr_dept}" selected>${user.usr_dept}</option>
+                    <option value="IT">IT</option>
+                    <option value="HR">HR</option>
+                </select>
+                <label><strong>Status:</strong></label>
+                <select class="w-full p-2 border rounded-lg">
+                    <option value="${user.usr_stat}" selected>${user.usr_stat}</option>
+                    <option value="Active">Active</option>
+                    <option value="Inactive">Inactive</option>
+                </select>
+            `;
+            document.getElementById('userPopup').classList.remove('hidden');
+        }
+
+        // Close Popup
+        function closePopup() {
+            document.getElementById('userPopup').classList.add('hidden');
         }
 
         // Search functionality
