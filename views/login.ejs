@@ -23,7 +23,7 @@
 <body class="min-h-screen bg-gray-100 relative">
     <div class="bg-white h-screen w-full max-w-md absolute right-0 top-0 flex flex-col justify-center p-12 rounded-l-lg shadow-lg">
         <h2 class="text-2xl font-bold mb-6 text-center">Nice to see you again</h2>
-        <form action="/auth/login" method="POST">
+        <form action="/login" method="POST">
             <div class="mb-4">
                 <label for="email" class="block text-gray-700">Email ID</label>
                 <input type="email" name="email" id="email" class="w-full p-2 border border-gray-300 rounded mt-1" required>
@@ -43,12 +43,12 @@
                 <div class="text-red-500 text-sm mb-4"><%= error %></div>
             <% } %>
             <div class="w-full flex justify-end mb-4">
-                <a href="/auth/forgot-password" class="text-sm text-blue-500 hover:underline">Forgot password?</a>
+                <a href="/forgot-password" class="text-sm text-blue-500 hover:underline">Forgot password?</a>
             </div>
             <button type="submit" class="bg-blue-500 text-white py-2 px-4 rounded w-full font-medium">Sign In</button>
         </form>
         <p class="mt-6 text-gray-500 text-center">
-            Don’t have an account? <a href="/auth/signup" class="text-blue-500">Sign up now</a>
+            Don’t have an account? <a href="/signup" class="text-blue-500">Sign up now</a>
         </p>
     </div>
 
