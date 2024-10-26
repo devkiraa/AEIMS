@@ -14,6 +14,21 @@
         .popup-overlay {
             background-color: rgba(0, 0, 0, 0.5);
         }
+        .popup-content {
+            position: relative;
+        }
+        .popup-close {
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
+            cursor: pointer;
+            font-size: 1.5rem;
+            color: #4B5563;
+            transition: color 0.3s;
+        }
+        .popup-close:hover {
+            color: #EF4444;
+        }
     </style>
 </head>
 <body class="bg-gray-50">
@@ -78,20 +93,28 @@
 
     <!-- Popup Modal -->
     <div id="userPopup" class="fixed inset-0 hidden flex items-center justify-center popup-overlay">
-        <div class="bg-white p-6 rounded-lg shadow-lg max-w-lg w-full">
+        <div class="bg-white p-6 rounded-lg shadow-lg max-w-lg w-full popup-content">
+            <!-- Close Icon -->
+            <span class="popup-close" onclick="closePopup()">&times;</span>
+
             <h2 class="text-xl font-semibold mb-4">User Details</h2>
             <div id="popupContent">
                 <!-- User details will be populated dynamically -->
             </div>
             <div class="mt-4 text-right">
-                <button onclick="closePopup()" class="bg-blue-600 text-white px-4 py-2 rounded-lg">
-                    Close
+                <button onclick="saveUser()" class="bg-blue-600 text-white px-4 py-2 rounded-lg">
+                    Save
+                </button>
+                <button onclick="closePopup()" class="bg-gray-200 text-gray-700 px-4 py-2 rounded-lg mr-2">
+                    Cancel
                 </button>
             </div>
         </div>
     </div>
 
     <script>
+        let currentUserId;
+
         // Fetch and display users from the backend
         async function fetchUsers() {
             try {
@@ -111,10 +134,10 @@
                                 <div class="text-base font-semibold">${user.usr_aname}</div>
                                 <div class="text-sm text-gray-500">${user.usr_name}</div>
                             </td>
-                            <td class="p-4">${user.usr_role}</td>
+                            <td class="p-4 ${user.usr_role === 'Pending' ? 'text-yellow-500' : ''}">${user.usr_role}</td>
                             <td class="p-4">${new Date(user.usr_cre_date).toLocaleDateString()}</td>
                             <td class="p-4">${user.usr_dept}</td>
-                            <td class="p-4 text-right">
+                            <td class="p-4 text-left">
                                 <button class="text-gray-500 hover:text-blue-600 mr-4" onclick='openPopup(${JSON.stringify(user)})'>
                                     <img src="/assets/icons/edit_24dp_6B7280_FILL0_wght500_GRAD0_opsz24.svg" alt="edit" class="w-6 h-6">
                                 </button>
@@ -133,35 +156,76 @@
 
         // Open Popup and populate user details
         function openPopup(user) {
+            currentUserId = user.usr_id; // Store the current user ID
             const popupContent = document.getElementById('popupContent');
             popupContent.innerHTML = `
-                <p><strong>Name:</strong> ${user.usr_aname}</p>
-                <p><strong>Email:</strong> ${user.usr_name}</p>
-                <p><strong>Mobile:</strong> ${user.usr_mob}</p>
-                <p><strong>Joined On:</strong> ${new Date(user.usr_cre_date).toLocaleDateString()}</p>
-                <p><strong>Club Association:</strong> ${user.usr_club || 'N/A'}</p>
+                <p class=" mb-1"><strong>Name:</strong> ${user.usr_aname}</p>
+                <p class=" mb-1"><strong>Email:</strong> ${user.usr_name}</p>
+                <p class=" mb-1"><strong>Mobile:</strong> +91${user.usr_mob}</p>
+                <p class=" mb-1"><strong>Joined On:</strong> ${new Date(user.usr_cre_date).toLocaleDateString()}</p>
+                <p class=" mb-2"><strong>Club Association:</strong> 
+                    ${
+                        user.usr_club === 'sic' ? 'Software Innovater\'s Club' : 
+                        user.usr_club === 'iedc' ? 'IEDC' : 
+                        user.usr_club === 'iic' ? 'Institution\'s Innovation Council' : 
+                        user.usr_club === 'csi' ? 'Computer Society of India' : 'None' 
+                    }
+                </p>
                 <label><strong>Role:</strong></label>
-                <select class="w-full p-2 border rounded-lg mb-2">
-                    <option value="${user.usr_role}" selected>${user.usr_role}</option>
-                    <option value="Admin">Admin</option>
-                    <option value="User">User</option>
+                <select id="userRole" class="w-full p-2 border rounded-lg mb-2">
+                    ${user.usr_role === 'Pending' ? '<option value="regw" selected>Pending</option>' : ''}
+                    <option value="admin" ${user.usr_role === 'Admin' ? 'selected' : ''}>Admin</option>
+                    <option value="hod" ${user.usr_role === 'HOD' ? 'selected' : ''}>HOD</option>
+                    <option value="em" ${user.usr_role === 'Manager' ? 'selected' : ''}>Manager</option>
+                    <option value="ev" ${user.usr_role === 'Viewer' ? 'selected' : ''}>Viewer</option>
                 </select>
                 <label><strong>Department:</strong></label>
-                <select class="w-full p-2 border rounded-lg mb-2">
-                    <option value="${user.usr_dept}" selected>${user.usr_dept}</option>
-                    <option value="IT">IT</option>
-                    <option value="HR">HR</option>
+                <select id="userDept" class="w-full p-2 border rounded-lg mb-2">
+                    <option value="cs" ${user.usr_dept === 'CS & IT' ? 'selected' : ''}>CS & IT</option>
+                    <option value="math" ${user.usr_dept === 'Mathematics' ? 'selected' : ''}>Mathematics</option>
+                    <option value="com" ${user.usr_dept === 'Commerce' ? 'selected' : ''}>Commerce</option>
+                    <option value="vm" ${user.usr_dept === 'VM' ? 'selected' : ''}>VIsual Media</option>
+                    <option value="phs" ${user.usr_dept === 'PS' ? 'selected' : ''}>Physical Science</option>
+                    <option value="eng" ${user.usr_dept === 'English' ? 'selected' : ''}>English</option>
                 </select>
                 <label><strong>Status:</strong></label>
-                <select class="w-full p-2 border rounded-lg">
-                    <option value="${user.usr_stat}" selected>${user.usr_stat}</option>
-                    <option value="Active">Active</option>
-                    <option value="Inactive">Inactive</option>
+                <select id="userStatus" class="w-full p-2 border rounded-lg">
+                    <option value="1" ${user.usr_stat === 'Active' ? 'selected' : ''}>Active</option>
+                    <option value="0" ${user.usr_stat === 'Disabled' ? 'selected' : ''}>Disabled</option>
                 </select>
             `;
             document.getElementById('userPopup').classList.remove('hidden');
         }
 
+        // Save user details
+        async function saveUser() {
+            const updatedUser = {
+                usr_id: currentUserId,
+                usr_role: document.getElementById('userRole').value,
+                usr_dept: document.getElementById('userDept').value,
+                usr_stat: document.getElementById('userStatus').value,
+            };
+
+            try {
+                const response = await fetch(`/api/users/${currentUserId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(updatedUser),
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`); 
+                }
+                
+                fetchUsers(); // Refresh the user list
+                closePopup();
+            } catch (error) {
+                console.error('Failed to update user:', error);
+            }
+        }
+        
         // Close Popup
         function closePopup() {
             document.getElementById('userPopup').classList.add('hidden');
