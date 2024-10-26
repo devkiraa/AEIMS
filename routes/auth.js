@@ -47,7 +47,7 @@ router.post('/login', (req, res) => {
             req.session.user_name = userDetails[0].usr_aname;
 
             // Redirect to dashboard
-            res.redirect('/dashboard');
+            res.redirect('/');
         });
     });
 });

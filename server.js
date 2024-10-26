@@ -52,7 +52,7 @@ app.use('/api', userRoutes);
 app.use('/', authRoutes);
 app.use('/', vRoutes);
 
-app.get('/dashboard', (req, res) => {
+app.get('/', (req, res) => {
     if (!req.session.user_name) {
         return res.redirect('/login'); // Redirect if user is not logged in
     }
@@ -62,4 +62,4 @@ app.get('/dashboard', (req, res) => {
 });
 
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`Server running at http://localhost:${PORT}/login`));
+app.listen(PORT, () => console.log(`Server running at http://localhost:${PORT}`));
