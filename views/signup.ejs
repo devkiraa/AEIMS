@@ -52,6 +52,7 @@
             <div class="mb-3">
                 <label for="mobile" class="block text-gray-700">Mobile</label>
                 <input type="text" name="mobile" id="mobile" placeholder="+91" class="w-full p-2 border border-gray-300 rounded mt-1" required>
+                <p id="mobile-error" class="error text-xs mt-1"></p>
             </div>
 
             <!-- Email Field -->
@@ -129,6 +130,21 @@
 
     <!-- JavaScript to Validate Password and Show Criteria -->
     <script>
+
+        document.getElementById('signup-form').addEventListener('submit', function(event) {
+        const mobileInput = document.getElementById('mobile');
+        const mobileError = document.getElementById('mobile-error');
+        const mobileValue = mobileInput.value;
+
+        // Check if the mobile number is exactly 10 digits
+        if (!/^\d{10}$/.test(mobileValue)) {
+            mobileError.textContent = 'Mobile number must be exactly 10 digits';
+            event.preventDefault(); // Prevent form submission
+        } else {
+            mobileError.textContent = ''; // Clear the error message
+        }
+        });
+
         document.getElementById('password').addEventListener('input', function() {
             var password = this.value;
             var passwordCriteria = document.getElementById('password-criteria');
