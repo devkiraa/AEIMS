@@ -244,3 +244,19 @@ CHANGE COLUMN `usr_mob` `usr_mob` VARCHAR(12) NOT NULL ;
 
 ALTER TABLE `aeims`.`user_details` 
 ADD COLUMN `usr_cre_date` DATE NOT NULL AFTER `usr_mob`;
+
+-- Change as on 27/10/2024
+
+ALTER TABLE `aeims`.`notification_tb` 
+ADD COLUMN `usr_id` INT NOT NULL AFTER `noti_stat`,
+ADD INDEX `noti_usr_ref_idx` (`usr_id` ASC) VISIBLE;
+
+ALTER TABLE `aeims`.`notification_tb` 
+ADD CONSTRAINT `noti_usr_ref`
+  FOREIGN KEY (`usr_id`)
+  REFERENCES `aeims`.`users` (`usr_id`)
+  ON DELETE NO ACTION
+  ON UPDATE NO ACTION;
+
+ALTER TABLE `aeims`.`user_details` 
+ADD COLUMN `usr_del_date` DATE NULL AFTER `usr_cre_date`;
