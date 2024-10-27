@@ -52,9 +52,20 @@
         <!-- Main Content -->
         <main class="flex-grow container mx-auto p-6 max-w-5xl">
             <h1 class="text-3xl font-bold mb-8">User Management</h1>
-
-            <!-- Search bar -->
-            <div class="mb-6 flex justify-end">
+        
+            <!-- Flex container to align tabs and search bar -->
+            <div class="mb-6 flex justify-between items-center">
+                <!-- Tab navigation -->
+                <ul class="flex divide-x divide-gray-300">
+                    <li id="all-tab" class="px-4 text-blue-600 cursor-pointer" onclick="switchTab('all')">
+                        All Users
+                    </li>
+                    <li id="deleted-tab" class="px-4 text-gray-500 hover:text-gray-700 cursor-pointer" onclick="switchTab('deleted')">
+                        Deleted Users
+                    </li>
+                </ul>
+        
+                <!-- Search bar -->
                 <div class="w-full md:w-1/2">
                     <input 
                         type="text" 
@@ -63,25 +74,50 @@
                         id="searchUser">
                 </div>
             </div>
-
-            <!-- User Table -->
-            <div class="overflow-x-auto">
-                <table class="min-w-full bg-white border border-gray-300 rounded-lg">
-                    <thead>
-                        <tr class="bg-gray-100 text-gray-600 text-left">
-                            <th class="p-4">Name</th>
-                            <th class="p-4">Role</th>
-                            <th class="p-4">Create Date</th>
-                            <th class="p-4">Department</th>
-                            <th class="p-4">Action</th>
-                        </tr>
-                    </thead>
-                    <tbody id="userTable">
-                        <!-- User rows will be populated dynamically -->
-                    </tbody>
-                </table>
+        
+            <!-- User Tables for Tabs -->
+            <div id="all" class="tab-content">
+                <h2 class="text-xl font-semibold mb-4">All Users</h2>
+                <div class="overflow-x-auto">
+                    <table class="min-w-full bg-white border border-gray-300 rounded-lg">
+                        <thead>
+                            <tr class="bg-gray-100 text-gray-600 text-left">
+                                <th class="p-4">Name</th>
+                                <th class="p-4">Role</th>
+                                <th class="p-4">Create Date</th>
+                                <th class="p-4">Department</th>
+                                <th class="p-4">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="userTable">
+                            <!-- User rows will be populated dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        
+            <div id="deleted" class="tab-content hidden">
+                <h2 class="text-xl font-semibold mb-4">Deleted Users</h2>
+                <div class="overflow-x-auto">
+                    <table class="min-w-full bg-white border border-gray-300 rounded-lg">
+                        <thead>
+                            <tr class="bg-gray-100 text-gray-600 text-left">
+                                <th class="p-4">Name</th>
+                                <th class="p-4">Role</th>
+                                <th class="p-4">Created Date</th>
+                                <th class="p-4">Delete Date</th>
+                                <th class="p-4">Department</th>
+                                <th class="p-4">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="deletedUserTable">
+                            <!-- Deleted user rows will be populated dynamically -->
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </main>
+        
 
         <!-- Footer -->
         <footer class="bg-blue-600 p-4 mt-8">
@@ -91,11 +127,11 @@
         </footer>
     </div>
 
-    <!-- Popup Modal -->
+    <!-- Popup Modal Edit -->
     <div id="userPopup" class="fixed inset-0 hidden flex items-center justify-center popup-overlay">
         <div class="bg-white p-6 rounded-lg shadow-lg max-w-lg w-full popup-content">
             <!-- Close Icon -->
-            <span class="popup-close" onclick="closePopup()">&times;</span>
+            <span class="popup-close" onclick="closePopup(0)">&times;</span>
 
             <h2 class="text-xl font-semibold mb-4">User Details</h2>
             <div id="popupContent">
@@ -105,54 +141,136 @@
                 <button onclick="saveUser()" class="bg-blue-600 text-white px-4 py-2 rounded-lg">
                     Save
                 </button>
-                <button onclick="closePopup()" class="bg-gray-200 text-gray-700 px-4 py-2 rounded-lg mr-2">
+                <button onclick="closePopup(0)" class="bg-gray-200 text-gray-700 px-4 py-2 rounded-lg mr-2">
                     Cancel
                 </button>
             </div>
         </div>
     </div>
 
+    <!-- Popup Model for Delete -->
+    <div id="deleteUserPopup" class="fixed inset-0 hidden flex items-center justify-center popup-overlay">
+        <div class="bg-white p-6 rounded-lg shadow-lg max-w-lg w-full popup-content">
+            <!-- Close Icon -->
+            <span class="popup-close" onclick="closePopup(1)">&times;</span>
+
+            <h2 class="text-xl font-semibold mb-4">Delete User</h2>
+            <!-- Dynamic Content -->
+            <div id="deletePopupContent">
+                <!-- User details or delete confirmation will be populated here -->
+            </div>
+
+            <div class="mt-4 text-right">
+                <button onclick="deleteUser()" class="bg-blue-600 text-white px-4 py-2 rounded-lg ">
+                    Yes
+                </button>
+                <button onclick="closePopup(1)" class="bg-gray-200 text-gray-700 px-4 py-2 rounded-lg mr-2">
+                    No
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Popup Model for Restore -->
+    <div id="restoreUserPopup" class="fixed inset-0 hidden flex items-center justify-center popup-overlay">
+        <div class="bg-white p-6 rounded-lg shadow-lg max-w-lg w-full popup-content">
+            <!-- Close Icon -->
+            <span class="popup-close" onclick="closePopup(2)">&times;</span>
+
+            <h2 class="text-xl font-semibold mb-4">Restore User</h2>
+            <!-- Dynamic Content -->
+            <div id="restorePopupContent">
+                <!-- User details or delete confirmation will be populated here -->
+            </div>
+
+            <div class="mt-4 text-right">
+                <button onclick="restoreUser()" class="bg-blue-600 text-white px-4 py-2 rounded-lg ">
+                    Yes
+                </button>
+                <button onclick="closePopup(2)" class="bg-gray-200 text-gray-700 px-4 py-2 rounded-lg mr-2">
+                    No
+                </button>
+            </div>
+        </div>
+    </div>
+
     <script>
-        let currentUserId;
+        function switchTab(tabId) {
+            const tabs = ['all', 'deleted'];
+
+            // Hide all tab content and reset tab styles
+            tabs.forEach(tab => {
+                document.getElementById(tab).classList.add('hidden');
+                document.getElementById(`${tab}-tab`).classList.remove('text-blue-600');
+                document.getElementById(`${tab}-tab`).classList.add('text-gray-500');
+            });
+
+            // Show the selected tab's content and update tab style
+            document.getElementById(tabId).classList.remove('hidden');
+            document.getElementById(`${tabId}-tab`).classList.add('text-blue-600');
+            document.getElementById(`${tabId}-tab`).classList.remove('text-gray-500');
+        }
+
+        // Fetch users on page load
+        fetchUsers();
 
         // Fetch and display users from the backend
         async function fetchUsers() {
             try {
                 const response = await fetch('/api/users');
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
+                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+
                 const users = await response.json();
 
-                const userTable = document.getElementById('userTable');
-                userTable.innerHTML = ''; // Clear existing rows
+                // Separate active and deleted users
+                const activeUsers = users.filter(user => user.usr_stat === 'Active' || user.usr_stat === 'Disabled');
+                const deletedUsers = users.filter(user => user.usr_stat === 'Deleted');
 
-                users.forEach(user => {
-                    const row = `
-                        <tr>
-                            <td class="p-4">
-                                <div class="text-base font-semibold">${user.usr_aname}</div>
-                                <div class="text-sm text-gray-500">${user.usr_name}</div>
-                            </td>
-                            <td class="p-4 ${user.usr_role === 'Pending' ? 'text-yellow-500' : ''}">${user.usr_role}</td>
-                            <td class="p-4">${new Date(user.usr_cre_date).toLocaleDateString()}</td>
-                            <td class="p-4">${user.usr_dept}</td>
-                            <td class="p-4 text-left">
-                                <button class="text-gray-500 hover:text-blue-600 mr-4" onclick='openPopup(${JSON.stringify(user)})'>
-                                    <img src="/assets/icons/edit_24dp_6B7280_FILL0_wght500_GRAD0_opsz24.svg" alt="edit" class="w-6 h-6">
-                                </button>
-                                <button class="text-gray-500 hover:text-red-600">
-                                    <img src="/assets/icons/delete_24dp_6B7280_FILL0_wght500_GRAD0_opsz24.svg" alt="delete" class="w-6 h-6">
-                                </button>
-                            </td>
-                        </tr>
-                    `;
-                    userTable.insertAdjacentHTML('beforeend', row);
-                });
+                populateTable('userTable', activeUsers);
+                populateTable('deletedUserTable', deletedUsers);
             } catch (error) {
                 console.error('Failed to fetch users:', error);
             }
         }
+
+        // Populate a table with user data
+        function populateTable(tableId, users) {
+            const tableBody = document.getElementById(tableId);
+            tableBody.innerHTML = ''; // Clear existing rows
+
+            users.forEach(user => {
+                const row = `
+                    <tr>
+                        <td class="p-4">
+                            <div class="text-base font-semibold">${user.usr_aname}</div>
+                            <div class="text-sm text-gray-500">${user.usr_name}</div>
+                        </td>
+                        <td class="p-4 ${user.usr_role === 'Pending' ? 'text-yellow-500' : ''}">${user.usr_role}</td>
+                        <td class="p-4">${new Date(user.usr_cre_date).toLocaleDateString()}</td>
+                        ${tableId === 'deletedUserTable' ? `<td class="p-4">${new Date(user.usr_del_date).toLocaleDateString()}</td>` : ''}
+                        <td class="p-4">${user.usr_dept}</td>
+                        ${tableId === 'userTable' ? `
+                            <td class="p-4 text-left">
+                                <button class="text-gray-500 hover:text-blue-600 mr-4" onclick='openPopup(${JSON.stringify(user)})'>
+                                    <img src="/assets/icons/edit_24dp_6B7280_FILL0_wght500_GRAD0_opsz24.svg" alt="edit" class="w-6 h-6">
+                                </button>
+                                <button class="text-gray-500 hover:text-red-600" onclick='openDeletePopup(${JSON.stringify(user)})'>
+                                    <img src="/assets/icons/delete_24dp_6B7280_FILL0_wght500_GRAD0_opsz24.svg" alt="delete" class="w-6 h-6">
+                                </button>
+                            </td>
+                        ` : `
+                            <td class="p-4 text-left">
+                                <button class="text-gray-500 hover:text-blue-600 mr-4" onclick='openRestorePopup(${JSON.stringify(user)})'>
+                                    <img src="/assets/icons/restore_from_trash_24dp_6B7280_FILL0_wght500_GRAD0_opsz24.svg" alt="restore" class="w-6 h-6">
+                                </button>
+                            </td>
+                        `}
+                    </tr>
+                `;
+                tableBody.insertAdjacentHTML('beforeend', row);
+            });
+        }
+
 
         // Open Popup and populate user details
         function openPopup(user) {
@@ -168,7 +286,7 @@
                         user.usr_club === 'sic' ? 'SIC' : 
                         user.usr_club === 'iedc' ? 'IEDC' : 
                         user.usr_club === 'iic' ? 'IIC' : 
-                        user.usr_club === 'csi' ? 'CSI' : 'None' 
+                        user.usr_club === 'csi' ? 'CSI' : 'N/A' 
                     }
                 </p>
                 <label><strong>Role:</strong></label>
@@ -181,7 +299,7 @@
                 </select>
                 <label><strong>Department:</strong></label>
                 <select id="userDept" class="w-full p-2 border rounded-lg mb-2">
-                    <option value="cs" ${user.usr_dept === 'CS & IT' ? 'selected' : ''}>CS & IT</option>
+                    <option value="cs" ${user.usr_dept === 'CS & IT' ? 'selected' : ''}>Computer Science & IT</option>
                     <option value="math" ${user.usr_dept === 'Mathematics' ? 'selected' : ''}>Mathematics</option>
                     <option value="com" ${user.usr_dept === 'Commerce' ? 'selected' : ''}>Commerce</option>
                     <option value="vm" ${user.usr_dept === 'VM' ? 'selected' : ''}>VIsual Media</option>
@@ -220,15 +338,77 @@
                 }
                 
                 fetchUsers(); // Refresh the user list
-                closePopup();
+                closePopup(0);
             } catch (error) {
                 console.error('Failed to update user:', error);
             }
         }
-        
+
+        // Open Delete Confirmation Popup
+        function openDeletePopup(user) {
+            currentUserId = user.usr_id; // Store the current user ID
+            const popupContent = document.getElementById('deletePopupContent');
+            popupContent.innerHTML = `
+                <p>Are you sure you want to delete <strong>${user.usr_aname}</strong>?</p>
+            `;
+            document.getElementById('deleteUserPopup').classList.remove('hidden');
+        }
+
+        // Delete User
+        async function deleteUser() {
+            try {
+                const response = await fetch(`/api/users/${currentUserId}`, { method: 'DELETE' });
+                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+
+                fetchUsers(); // Refresh the user list
+                closePopup(1);
+            } catch (error) {
+                console.error('Failed to delete user:', error);
+            }
+        }
+
+        // Open Restore Confirmation Popup
+        function openRestorePopup(user) {
+            currentUserId = user.usr_id; // Store the current user ID
+            const popupContent = document.getElementById('restorePopupContent');
+            popupContent.innerHTML = `
+                <p>Restore user <strong>${user.usr_aname}</strong>?</p>
+            `;
+            document.getElementById('restoreUserPopup').classList.remove('hidden');
+        }
+
+        // Restore User
+        async function restoreUser() {
+            try {
+                const response = await fetch(`/api/users/${currentUserId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ restore: true }), // Send restore flag
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                fetchUsers(); // Refresh the user list
+                closePopup(2); // Close the restore popup
+            } catch (error) {
+                console.error('Failed to restore user:', error);
+            }
+        }
+
+
         // Close Popup
-        function closePopup() {
-            document.getElementById('userPopup').classList.add('hidden');
+        function closePopup(popup) {
+            if (popup === 0) {
+                document.getElementById('userPopup').classList.add('hidden');
+            }else if (popup === 1){
+                document.getElementById('deleteUserPopup').classList.add('hidden');
+            }else{
+                document.getElementById('restoreUserPopup').classList.add('hidden');
+            }
         }
 
         // Search functionality

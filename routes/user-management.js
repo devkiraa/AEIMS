@@ -34,7 +34,8 @@ router.get('/users', (req, res) => {
             ud.usr_aname, 
             ud.usr_mob, 
             ud.usr_club,
-            ud.usr_cre_date 
+            ud.usr_cre_date, 
+            ud.usr_del_date
         FROM users u 
         JOIN user_details ud 
         ON u.usr_id = ud.usr_id
@@ -49,25 +50,77 @@ router.get('/users', (req, res) => {
     });
 });
 
-// Route to update user details
+// Route to update user details or restore a user
 router.put('/users/:id', (req, res) => {
     const userId = req.params.id;
-    const { usr_role, usr_dept, usr_stat } = req.body;
+    const { usr_role, usr_dept, usr_stat, restore } = req.body; // Check if it's a restore request
 
-    const sql = `
-        UPDATE users 
-        SET usr_role = ?, usr_dept = ?, usr_stat = ? 
-        WHERE usr_id = ?`;
+    let sql, values;
+    
+    if (restore) {
+        // Restore logic: Update status to '1' (Active) and clear delete date
+        sql = `UPDATE users SET usr_stat = '1' WHERE usr_id = ?`;
+        values = [userId];
 
-    db.query(sql, [usr_role, usr_dept, usr_stat, userId], (err, result) => {
+        db.query(sql, values, (err, result) => {
+            if (err) {
+                console.error(err);
+                return res.status(500).json({ error: 'Failed to restore user' });
+            }
+
+            const sql2 = `UPDATE user_details SET usr_del_date = NULL WHERE usr_id = ?`;
+            db.query(sql2, values, (err) => {
+                if (err) {
+                    console.error(err);
+                    return res.status(500).send('Failed to clear delete date');
+                }
+                res.json({ message: 'User restored successfully' });
+            });
+        });
+    } else {
+        // Update user details logic
+        sql = `
+            UPDATE users 
+            SET usr_role = ?, usr_dept = ?, usr_stat = ? 
+            WHERE usr_id = ?`;
+        values = [usr_role, usr_dept, usr_stat, userId];
+
+        db.query(sql, values, (err, result) => {
+            if (err) {
+                console.error(err);
+                return res.status(500).json({ error: 'Failed to update user data' });
+            }
+            if (result.affectedRows === 0) {
+                return res.status(404).json({ error: 'User not found' });
+            }
+            res.json({ message: 'User updated successfully' });
+        });
+    }
+});
+
+// Route to delete a user
+router.delete('/users/:id', (req, res) => {
+    const userId = req.params.id;
+
+    const sql = `UPDATE users SET usr_stat = '-1' WHERE usr_id = ?`;
+    const sql2 = `UPDATE user_details SET usr_del_date = CURRENT_DATE WHERE usr_id = ?`;
+
+    db.query(sql, [userId], (err, result) => {
         if (err) {
             console.error(err);
-            return res.status(500).json({ error: 'Failed to update user data' });
+            return res.status(500).json({ error: 'Failed to delete user' });
         }
         if (result.affectedRows === 0) {
             return res.status(404).json({ error: 'User not found' });
         }
-        res.json({ message: 'User updated successfully' });
+
+        db.query(sql2, [userId], (err) => {
+            if (err) {
+                console.error(err);
+                return res.status(500).send('Failed to set delete date');
+            }
+            res.json({ message: 'User deleted successfully' });
+        });
     });
 });
 
