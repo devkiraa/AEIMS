@@ -26,6 +26,26 @@ router.get('/signup-waiting', (req, res) => {
     res.render('signup-waiting');
 });
 
+// Booking page
+router.get('/book-event', (req, res) => {
+    res.render('booking-page');
+});
+
+// Event details page
+router.get('/book-event/event-details', (req, res) => {
+    res.render('event-detail');
+});
+
+// Guest details page
+router.get('/book-event/guest-details', (req, res) => {
+    res.render('guest-details');
+});
+
+// Resource selection page
+router.get('/book-event/resource', (req, res) => {
+    res.render('resource-selection');
+});
+
 // User-management page
 router.get('/user-management', (req, res) => {
     res.render('user-management');
