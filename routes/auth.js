@@ -44,7 +44,10 @@ router.post('/login', (req, res) => {
 
             // Store the full name in the session
             req.session.user_id = user.usr_id;
+            req.session.user_role = user.usr_role;
             req.session.user_name = userDetails[0].usr_aname;
+            req.session.user_dept = user.usr_dept;
+            req.session.user_status = user.usr_stat;
 
             // Redirect to dashboard
             res.redirect('/');
