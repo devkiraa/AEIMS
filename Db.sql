@@ -260,3 +260,11 @@ ADD CONSTRAINT `noti_usr_ref`
 
 ALTER TABLE `aeims`.`user_details` 
 ADD COLUMN `usr_del_date` DATE NULL AFTER `usr_cre_date`;
+
+-- Change as on 28/10/2024
+
+ALTER TABLE `aeims`.`event_tb`
+ADD UNIQUE INDEX `idx_evn_name` (`evn_name`);
+
+ALTER TABLE `aeims`.`venues_bookings` 
+ADD COLUMN `ven_stat` VARCHAR(10) NOT NULL AFTER `end_time`;
