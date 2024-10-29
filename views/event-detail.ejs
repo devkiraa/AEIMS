@@ -10,47 +10,28 @@
         body {
             font-family: 'Poppins', sans-serif;
         }
-
-        /*.nav-link {
-            color: white;
-            font-weight: 500;
-            padding: 0.5rem 1rem;
-        }
-
-        .nav-link:hover {
-            background-color: rgba(255, 255, 255, 0.2);
-            border-radius: 0.375rem;
-        }*/
-
         .form-container {
             max-width: 100%;
             margin: 0 auto;
         }
-
         .form-title {
             font-size: 2rem;
             font-weight: 600;
         }
-
         .form-label {
             color: #4B5563;
         }
-
         .radio-label {
             display: inline-flex;
             align-items: center;
             margin-right: 1.5rem;
         }
-
         .radio-label input {
             margin-right: 0.5rem;
         }
-
         .form-section {
             margin-bottom: 1.5rem;
         }
-
-        /* Custom styles for buttons */
         .btn-primary {
             background-color: #3B82F6;
             color: white;
@@ -58,7 +39,6 @@
             border-radius: 0.375rem;
             font-weight: 600;
         }
-
         .btn-secondary {
             background-color: #6B7280;
             color: white;
@@ -66,21 +46,15 @@
             border-radius: 0.375rem;
             font-weight: 600;
         }
-
-        /* Hide search bar by default */
         #coordinator-search {
             display: none;
-            margin-left: 1rem; /* Space between radio and search bar */
+            margin-left: 1rem;
         }
-
-        /* Hide guest number counter by default */
         #guest-counter {
             display: none;
             margin-left: 1rem;
             width: 100px;
         }
-
-        /* Hide volunteer number counter by default */
         #volunteer-counter {
             display: none;
             margin-left: 1rem;
@@ -103,7 +77,6 @@
             const guestRadios = document.querySelectorAll('input[name="event_guests"]');
             const guestCounter = document.getElementById("guest-counter");
 
-            // Check if 'Multiple' is selected, then show the guest counter
             guestRadios.forEach(radio => {
                 if (radio.value === 'multiple' && radio.checked) {
                     guestCounter.style.display = "inline-block";
@@ -117,7 +90,6 @@
             const volunteerRadios = document.querySelectorAll('input[name="event_volunteers"]');
             const volunteerCounter = document.getElementById("volunteer-counter");
 
-            // Check if 'yes' is selected, then show the volunteer counter
             volunteerRadios.forEach(radio => {
                 if (radio.value === 'yes' && radio.checked) {
                     volunteerCounter.style.display = "inline-block";
@@ -128,7 +100,6 @@
         }
 
         document.addEventListener("DOMContentLoaded", function() {
-            // Attach event listeners to the radio buttons
             const coordinatorRadios = document.querySelectorAll('input[name="event_coordinators"]');
             coordinatorRadios.forEach(radio => {
                 radio.addEventListener('change', toggleCoordinatorSearch);
@@ -144,22 +115,15 @@
                 radio.addEventListener('change', toggleVolunteerCounter);
             });
 
-            // Initial check to display search bar if 'multiple' is pre-selected
             toggleCoordinatorSearch();
-
-            // Initial check to display guest counter if 'multiple' is pre-selected
             toggleGuestCounter();
-
-            // Initial check to display guest counter if 'yes' is pre-selected
             toggleVolunteerCounter();
         });
     </script>
 </head>
 <body class="min-h-screen bg-gray-100">
-    <!-- Navbar -->
     <nav class="bg-blue-600 p-4">
         <div class="container mx-auto flex justify-between items-center">
-            <!-- Move header elements to the left -->
             <div class="flex items-center space-x-6">
                 <ul class="flex space-x-6 text-white">
                     <li><a href="#" class="hover:text-gray-300">Home</a></li>
@@ -169,54 +133,43 @@
                     <li><a href="#" class="hover:text-gray-300">About Us</a></li>
                 </ul>
             </div>
-            <!-- User icon in rounded background -->
             <div class="bg-white rounded-full p-2">
                 <a href="#"><img src="/assets/icons/avatar.svg" alt="User Icon" class="w-6 h-6"></a>
             </div>
         </div>
     </nav>
 
-    <!-- Form container -->
     <div class="bg-white w-full max-w-4xl p-8 lg:p-12 shadow-lg form-container mt-8">
-        <!-- Header Text -->
         <div class="text-left mb-10">
             <h2 class="form-title">Add Event Details!</h2>
         </div>
         
-        <!-- Form -->
-        <form action="/events/create" method="POST">
-            <!-- Grid Layout for Fields -->
+        <!-- Update the form to use multipart/form-data for file uploads -->
+        <form action="/events/create" method="POST" enctype="multipart/form-data">
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                <!-- Left Column -->
                 <div>
-                    <!-- Event Title -->
                     <div class="form-section">
                         <label for="event_title" class="form-label block">Event Title</label>
                         <input type="text" name="event_title" id="event_title" placeholder="Event title...?" class="w-full p-2 border border-gray-300 rounded mt-1" required>
                     </div>
 
-                    <!-- Event Start Date -->
                     <div class="form-section">
                         <label for="start_date" class="form-label block">Event Start Date</label>
                         <input type="date" name="start_date" id="start_date" class="w-full p-2 border border-gray-300 rounded mt-1" required>
                     </div>
 
-                    <!-- Event Start Time -->
                     <div class="form-section">
                         <label for="start_time" class="form-label block">Event Start Time</label>
                         <input type="time" name="start_time" id="start_time" class="w-full p-2 border border-gray-300 rounded mt-1" required>
                     </div>
 
-                    <!-- Venue -->
                     <div class="form-section">
                         <label for="venue" class="form-label block">Venue</label>
                         <select name="venue" id="venue" class="w-full p-2 border border-gray-300 rounded mt-1">
                             <option value="Data Analytics Lab">Data Analytics Lab</option>
-                            <!-- Add more venue options here -->
                         </select>
                     </div>
 
-                    <!-- Event Volunteers -->
                     <div class="form-section">
                         <label class="form-label block">Event Volunteers</label>
                         <div class="flex">
@@ -228,12 +181,10 @@
                                 <input type="radio" name="event_volunteers" value="no" checked>
                                 No
                             </label>
-                            <!-- Volunteer Counter (shown when 'yes' is selected) -->
                             <input type="number" id="volunteer-counter" name="volunteer_counter" placeholder="Number of Volunteers" min="1" value="1" class="w-full p-2 border border-gray-300 rounded">
                         </div>
                     </div>
 
-                    <!-- Event Coordinators -->
                     <div class="form-section">
                         <label class="form-label block">Event Coordinators</label>
                         <div class="flex items-center">
@@ -245,98 +196,68 @@
                                 <input type="radio" name="event_coordinators" value="multiple">
                                 Multiple
                             </label>
-                            <!-- Search Bar for Multiple Coordinators -->
                             <input type="text" id="coordinator-search" name="coordinator_search" placeholder="Search for Coordinators..." class="w-full p-2 border border-gray-300 rounded">
                         </div>
                     </div>
                 </div>
 
-                <!-- Right Column -->
                 <div>
-                    <!-- Event Description -->
                     <div class="form-section">
                         <label for="event_description" class="form-label block">Event Description</label>
                         <input type="text" name="event_description" id="event_description" placeholder="Event description...?" class="w-full p-2 border border-gray-300 rounded mt-1" required>
                     </div>
 
-                    <!-- Event End Date -->
                     <div class="form-section">
                         <label for="end_date" class="form-label block">Event End Date</label>
                         <input type="date" name="end_date" id="end_date" class="w-full p-2 border border-gray-300 rounded mt-1" required>
                     </div>
 
-                    <!-- Event End Time -->
                     <div class="form-section">
                         <label for="end_time" class="form-label block">Event End Time</label>
                         <input type="time" name="end_time" id="end_time" class="w-full p-2 border border-gray-300 rounded mt-1" required>
                     </div>
 
-                    <!-- Event Poster -->
-                    <div class="form-section">
-                        <label for="event_poster" class="form-label block">Event Poster</label>
-                        <input type="file" name="event_poster" id="event_poster" class="w-full p-2 border border-gray-300 rounded mt-1">
-                    </div>
-
-                    <!-- Event Food -->
-                    <div class="form-section">
-                        <label class="form-label block">Event Food</label>
-                        <div class="flex">
-                            <label class="radio-label">
-                                <input type="radio" name="event_food" value="yes" checked>
-                                Yes
-                            </label>
-                            <label class="radio-label">
-                                <input type="radio" name="event_food" value="no">
-                                No
-                            </label>
-                        </div>
-                    </div>
-
-                    <!-- Event Guests -->
                     <div class="form-section">
                         <label class="form-label block">Event Guests</label>
                         <div class="flex">
                             <label class="radio-label">
-                                <input type="radio" name="event_guests" value="none" checked>
-                                None
-                            </label>
-                            <label class="radio-label">
-                                <input type="radio" name="event_guests" value="single">
+                                <input type="radio" name="event_guests" value="single" checked>
                                 Single
                             </label>
                             <label class="radio-label">
                                 <input type="radio" name="event_guests" value="multiple">
                                 Multiple
                             </label>
-                            <!-- Guest Counter (shown when 'Multiple' is selected) -->
-                            <input type="number" id="guest-counter" name="guest_counter" placeholder="Number of Guests" min="2" value="2" class="w-full p-2 border border-gray-300 rounded">
+                            <input type="number" id="guest-counter" name="guest_counter" placeholder="Number of Guests" min="1" value="1" class="w-full p-2 border border-gray-300 rounded">
                         </div>
+                    </div>
+
+                    <div class="form-section">
+                        <label class="form-label block">Event Food</label>
+                        <div class="flex">
+                            <label class="radio-label">
+                                <input type="radio" name="event_food" value="yes">
+                                Yes
+                            </label>
+                            <label class="radio-label">
+                                <input type="radio" name="event_food" value="no" checked>
+                                No
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- File upload for event poster -->
+                    <div class="form-section">
+                        <label for="event_poster" class="form-label block">Event Poster</label>
+                        <input type="file" name="event_poster" id="event_poster" class="w-full p-2 border border-gray-300 rounded mt-1">
                     </div>
                 </div>
             </div>
-
-            <!-- Navigation Buttons (Right Aligned) -->
-            <div class="flex justify-end mt-6 space-x-4">
-                <!-- Action Buttons (Always at Bottom Right) -->
-                <div class="form-buttons flex flex-col space-y-4 md:flex-row md:space-x-4 md:space-y-0">
-                    <!-- Back Button with Left Arrow -->
-                    <button type="button" class="bg-gray-200 text-gray-700 py-2 px-4 rounded-lg font-medium hover:bg-gray-300 flex items-center justify-center">
-                        <!-- Left Arrow SVG -->
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
-                            <path fill-rule="evenodd" d="M7.707 9l4.646-4.646a.5.5 0 00-.708-.708L6.5 9l5.146 5.146a.5.5 0 00.708-.708L7.707 9z" clip-rule="evenodd" />
-                        </svg>
-                        Back
-                    </button>
-
-                    <!-- Next Button with Right Arrow -->
-                    <button type="submit" class="bg-blue-600 text-white py-2 px-4 rounded-lg font-medium hover:bg-blue-700 flex items-center justify-center">
-                        Next
-                        <!-- Right Arrow SVG -->
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-2" viewBox="0 0 20 20" fill="currentColor">
-                            <path fill-rule="evenodd" d="M12.293 10.707l-5.146 5.146a.5.5 0 01-.708-.708L11.293 10 6.44 5.146a.5.5 0 01.708-.708l5.146 5.146a.5.5 0 010 .708z" clip-rule="evenodd" />
-                        </svg>
-                    </button>
-                </div>
+            
+            <div class="flex justify-end mt-6">
+                <!-- Keeping your buttons intact as per your original request -->
+                <button type="submit" class="bg-indigo-500 text-white px-4 py-2 rounded-md mr-4">Submit</button>
+                <button type="button" class="bg-gray-500 text-white px-4 py-2 rounded-md" onclick="window.location.href='/events'">Back</button>
             </div>
         </form>
     </div>
