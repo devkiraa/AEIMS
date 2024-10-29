@@ -37,12 +37,14 @@ const authRoutes = require('./routes/auth');
 const vRoutes = require('./routes/vroutes');
 const userRoutes = require('./routes/user-management'); // Adjust path if necessary
 const mailer = require('./routes/mailer');
+const bookingRoutes = require('./routes/venue-availability');
 
 // Use the user routes with '/api' as prefix to avoid conflicts
 app.use('/api', userRoutes);
 app.use('/', authRoutes);
 app.use('/', vRoutes);
 app.use('/api', mailer);
+app.use('/api', bookingRoutes);
 
 app.get('/', (req, res) => {
     if (!req.session.user_name) {
