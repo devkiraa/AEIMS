@@ -55,6 +55,7 @@
         .booked {
             background-color: #EB5757;
             color: white;
+            cursor: not-allowed;
         }
 
         /* Button styles */
@@ -165,6 +166,11 @@
         .next-btn:hover {
             background-color: #1D4ED8; /* Tailwind blue-700 */
         }
+
+        .venue-btn[disabled] {
+            background-color: #cccccc; /* Light gray to indicate disabled state */
+            cursor: not-allowed;
+        }
     </style>
 
     <script>
@@ -191,11 +197,78 @@
             document.getElementById('start-date').setAttribute('min', today); // Set min attribute for start date
             document.getElementById('end-date').setAttribute('min', today);   // Set min attribute for end date
         }
+        
+        async function checkAvailability() {
+            const startDate = document.getElementById('start-date').value;
+            const endDate = document.getElementById('end-date').value;
+            const startTime = document.getElementById('start-time').value;
+            const endTime = document.getElementById('end-time').value;
 
-        // Call the function when the page loads
-        window.onload = function() {
-            setMinDate();
+            if (!startDate || !endDate || !startTime || !endTime) return;
+
+            try {
+                const response = await fetch('/api/check-availability', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ startDate, endDate, startTime, endTime }),
+                });
+
+                if (!response.ok) throw new Error('Failed to fetch venue availability');
+                const venues = await response.json(); // Await the JSON parsing
+
+                updateVenues(venues); // Update the venue buttons
+            } catch (error) {
+                console.error('Error fetching availability:', error);
+            }
         }
+
+
+        function updateVenues(venues) {
+            document.querySelectorAll('.venue-btn').forEach((button) => {
+                const venueName = button.id; // Extract venue name from button text
+                const status = venues[venueName] || 'booked'; // Default to 'booked' if not found
+
+                // Reset any previous status classes
+                button.classList.remove('available', 'waiting', 'booked');
+
+                // Apply the new status class
+                button.classList.add(status);
+            });
+        }
+
+        function toggleVenueButtons() {
+            const startDate = document.getElementById('start-date').value;
+            const endDate = document.getElementById('end-date').value;
+            const startTime = document.getElementById('start-time').value;
+            const endTime = document.getElementById('end-time').value;
+
+            const allFilled = startDate && endDate && startTime && endTime;
+
+            // Enable or disable the venue buttons based on whether all fields are filled
+            document.querySelectorAll('.venue-btn').forEach((button) => {
+                button.disabled = !allFilled;
+            });
+
+            if (allFilled) checkAvailability(); // Check availability if all inputs are filled
+        }
+
+        // Attach event listeners for input changes to trigger availability check and button enablement
+        document.addEventListener('DOMContentLoaded', () => {
+            ['start-date', 'end-date', 'start-time', 'end-time'].forEach((id) => {
+                document.getElementById(id).addEventListener('input', toggleVenueButtons);
+            });
+        });
+
+        document.addEventListener('DOMContentLoaded', () => {
+            ['start-date', 'end-date', 'start-time', 'end-time'].forEach((id) => {
+                document.getElementById(id).addEventListener('input', toggleVenueButtons);
+            });
+        });
+
+
+        window.onload = function () {
+            setMinDate();
+        };
     </script>
 </head>
 <body class="min-h-screen bg-gray-100">
@@ -238,11 +311,11 @@
         <div class="form-row">
             <div class="input-group">
                 <label class="block mb-2 text-gray-700">Start Time</label>
-                <input type="time" class="input-field" required>
+                <input type="time" id="start-time" class="input-field" required>
             </div>
             <div class="input-group">
                 <label class="block mb-2 text-gray-700">End Time</label>
-                <input type="time" class="input-field" required>
+                <input type="time" id="end-time" class="input-field" required>
             </div>
         </div>
 
@@ -269,19 +342,19 @@
         <!-- Venue buttons -->
         <div class="mb-6">
             <div class="flex flex-wrap">
-                <button class="venue-btn available">CS Lab 1</button>
-                <button class="venue-btn available">CS Lab 2</button>
-                <button class="venue-btn waiting">CS Lab 3</button>
-                <button class="venue-btn waiting">CS Lab 4</button>
-                <button class="venue-btn available">CS Lab 5</button>
-                <button class="venue-btn booked">CS Lab 6</button>
-                <button class="venue-btn available">Auditorium</button>
-                <button class="venue-btn waiting">Seminar Hall</button>
-                <button class="venue-btn waiting">Conference Room</button>
-                <button class="venue-btn booked">Prayer Hall</button>
-                <button class="venue-btn booked">Library</button>
-                <button class="venue-btn booked">Data Analytics Lab</button>
-                <button class="venue-btn available">CIR Seminar Hall</button>
+                <button class="venue-btn available" id="cslb1" disabled>CS Lab 1</button>
+                <button class="venue-btn available" id="cslb2" disabled>CS Lab 2</button>
+                <button class="venue-btn waiting" id="cslb3" disabled>CS Lab 3</button>
+                <button class="venue-btn waiting" id="cslb4" disabled>CS Lab 4</button>
+                <button class="venue-btn available" id="cslb5" disabled>CS Lab 5</button>
+                <button class="venue-btn booked" id="cslb6" disabled>CS Lab 6</button>
+                <button class="venue-btn available" id="audt" disabled>Auditorium</button>
+                <button class="venue-btn waiting" id="semh" disabled>Seminar Hall</button>
+                <button class="venue-btn waiting" id="confh" disabled>Conference Room</button>
+                <button class="venue-btn booked" id="prah" disabled>Prayer Hall</button>
+                <button class="venue-btn booked" id="lib" disabled>Library</button>
+                <button class="venue-btn booked" id="dal" disabled>Data Analytics Lab</button>
+                <button class="venue-btn available" id="cirsh" disabled>CIR Seminar Hall</button>
             </div>
         </div>
 
