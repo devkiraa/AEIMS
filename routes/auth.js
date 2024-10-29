@@ -196,6 +196,7 @@ router.post('/signup', async (req, res) => {
         console.error("Error:", error);
         res.status(500).send('Server Error');
     }
+    
 });
 
 module.exports = router;
