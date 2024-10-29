@@ -99,40 +99,103 @@ router.post('/login', (req, res) => {
 //     });
 // });
 
+// router.post('/signup', async (req, res) => {
+//     const { full_name, mobile, email, password, club, dept } = req.body;
+//     const hashedPassword = await bcrypt.hash(password, 10);
+
+//     // Fetch the latest user ID
+//     db.query('SELECT MAX(usr_id) AS max_id FROM users', (err, result) => {
+//         if (err) {
+//             console.error(err);
+//             return res.status(500).send('Server Error');
+//         }
+//         const user_id = result[0].max_id + 1;
+
+//         // Insert into `users` table
+//         const sql = `INSERT INTO users (usr_id, usr_name, usr_pass, usr_role, usr_dept, usr_stat) VALUES (?, ?, ?, ?, ?, ?)`;
+//         db.query(sql, [user_id, email, hashedPassword, 'regw', dept, '0'], (err) => {
+//             if (err) {
+//                 console.error(err);
+//                 return res.status(500).send('Server Error');
+//             }
+
+//             // Insert into `user_details` table, including the creation date
+//             const sql2 = `
+//                 INSERT INTO user_details (usr_id, usr_aname, usr_mob, usr_cre_date, usr_club) 
+//                 VALUES (?, ?, ?, CURDATE(), ?)`;
+
+//             db.query(sql2, [user_id, full_name, mobile, club], (err) => {
+//                 if (err) {
+//                     console.error(err);
+//                     return res.status(500).send('Server Error');
+//                 }
+//                 res.redirect('/signup-waiting');
+//             });
+//         });
+//     });
+// });// Signup Route
 router.post('/signup', async (req, res) => {
     const { full_name, mobile, email, password, club, dept } = req.body;
-    const hashedPassword = await bcrypt.hash(password, 10);
+    try {
+        const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Fetch the latest user ID
-    db.query('SELECT MAX(usr_id) AS max_id FROM users', (err, result) => {
-        if (err) {
-            console.error(err);
-            return res.status(500).send('Server Error');
-        }
-        const user_id = result[0].max_id + 1;
-
-        // Insert into `users` table
-        const sql = `INSERT INTO users (usr_id, usr_name, usr_pass, usr_role, usr_dept, usr_stat) VALUES (?, ?, ?, ?, ?, ?)`;
-        db.query(sql, [user_id, email, hashedPassword, 'regw', dept, '0'], (err) => {
+        // Fetch the latest user ID
+        db.query('SELECT MAX(usr_id) AS max_id FROM users', (err, result) => {
             if (err) {
                 console.error(err);
-                return res.status(500).send('Server Error');
+                return res.status(500).send('Database Error');
             }
+            const user_id = result[0].max_id + 1;
 
-            // Insert into `user_details` table, including the creation date
-            const sql2 = `
-                INSERT INTO user_details (usr_id, usr_aname, usr_mob, usr_cre_date, usr_club) 
-                VALUES (?, ?, ?, CURDATE(), ?)`;
-
-            db.query(sql2, [user_id, full_name, mobile, club], (err) => {
+            // Insert into `users` table
+            const userSql = `INSERT INTO users (usr_id, usr_name, usr_pass, usr_role, usr_dept, usr_stat) VALUES (?, ?, ?, ?, ?, ?)`;
+            db.query(userSql, [user_id, email, hashedPassword, 'regw', dept, '0'], (err) => {
                 if (err) {
                     console.error(err);
-                    return res.status(500).send('Server Error');
+                    return res.status(500).send('Database Error');
                 }
-                res.redirect('/signup-waiting');
+
+                // Insert into `user_details` table, including creation date
+                const detailsSql = `
+                    INSERT INTO user_details (usr_id, usr_aname, usr_mob, usr_cre_date, usr_club) 
+                    VALUES (?, ?, ?, CURDATE(), ?)`;
+
+                db.query(detailsSql, [user_id, full_name, mobile, club], async (err) => {
+                    if (err) {
+                        console.error(err);
+                        return res.status(500).send('Database Error');
+                    }
+
+                    // Send welcome email after successful insertion
+                    try {
+                        const emailResponse = await fetch(`${req.protocol}://${req.get('host')}/api/send-email`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                subject: "Welcome to AEIMS!",
+                                recipient: email,
+                                body: `Hi ${full_name}, welcome to AEIMS. We're excited to have you!`
+                            })
+                        });
+
+                        if (emailResponse.ok) {
+                            return res.redirect('/signup-waiting');
+                        } else {
+                            console.error('Error sending email');
+                            console.log("Hi");
+                            return res.status(500).send('Error sending email');
+                        }
+                    } catch (error) {
+                        console.error("Error:", error);
+                        return res.status(500).send('Error processing sign-up');
+                    }
+                });
             });
         });
-    });
+    } catch (error) {
+        console.error("Error:", error);
+        res.status(500).send('Server Error');
+    }
 });
 
 module.exports = router;

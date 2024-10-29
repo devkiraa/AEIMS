@@ -2,26 +2,16 @@ const express = require('express');
 const session = require('express-session');
 const crypto = require('crypto');
 const path = require('path');
-const app = express();
 const dotenv = require('dotenv');
 
-// // Middleware
-// dotenv.config();
-// app.use(session({
-//     secret: process.env.SESSION_SECRET,
-//     resave: false,
-//     saveUninitialized: false,
-//     cookie: {
-//         maxAge: 1000 * 60 * 60, // 1 hour expiration
-//         secure: process.env.NODE_ENV === 'production', // Secure in production
-//         httpOnly: true // Prevent client-side JS access
-//     }
-// }));
+dotenv.config(); // Load environment variables
+
+const app = express();
 
 // Generate a secure secret for session signing
 const sessionSecret = crypto.randomBytes(64).toString('hex'); 
 
-// MiddleWare
+// Middleware for sessions
 app.use(session({
     secret: sessionSecret, // Secure session secret
     resave: false, // Save session only if modified
@@ -46,11 +36,13 @@ app.set('views', path.join(__dirname, 'views'));
 const authRoutes = require('./routes/auth');
 const vRoutes = require('./routes/vroutes');
 const userRoutes = require('./routes/user-management'); // Adjust path if necessary
+const mailer = require('./routes/mailer');
 
 // Use the user routes with '/api' as prefix to avoid conflicts
 app.use('/api', userRoutes);
 app.use('/', authRoutes);
 app.use('/', vRoutes);
+app.use('/api', mailer);
 
 app.get('/', (req, res) => {
     if (!req.session.user_name) {
@@ -61,5 +53,8 @@ app.get('/', (req, res) => {
     res.render('dashboard', { user_name: req.session.user_name });
 });
 
+// Start server
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`Server running at http://localhost:${PORT}`));
+app.listen(PORT, () => {
+    console.log(`Server running at http://localhost:${PORT}`);
+});
