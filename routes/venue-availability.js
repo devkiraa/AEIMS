@@ -16,57 +16,57 @@ router.post('/check-availability', (req, res) => {
                 (vb.start_date <= ? AND vb.end_date >= ?) AND 
                 ((vb.start_time <= ? AND vb.end_time >= ?) OR 
                 (vb.start_time >= ? AND vb.end_time <= ?) OR
-                (vb.start_time <= ? AND (vb.end_time <= ? AND vb.end_time >= ?) OR
-                (vb.start_time >= ? AND (vb.end_time >= ? AND vb.start_time <= ?))
+                (vb.start_time <= ? AND (vb.end_time <= ? AND vb.end_time <= ?)) OR
+                (vb.start_time >= ? AND (vb.end_time >= ? AND vb.start_time <= ?)))
             ) THEN 1 ELSE 0 END) > 0 THEN 'booked'
             WHEN SUM(CASE WHEN vb.ven_stat = '1' AND (
                 (vb.start_date >= ? AND vb.end_date <= ?) AND 
                 ((vb.start_time <= ? AND vb.end_time >= ?) OR 
                 (vb.start_time >= ? AND vb.end_time <= ?) OR
-                (vb.start_time <= ? AND (vb.end_time <= ? AND vb.end_time >= ?) OR
-                (vb.start_time >= ? AND (vb.end_time >= ? AND vb.start_time <= ?))
+                (vb.start_time <= ? AND (vb.end_time <= ? AND vb.end_time <= ?)) OR
+                (vb.start_time >= ? AND (vb.end_time >= ? AND vb.start_time <= ?)))
             ) THEN 1 ELSE 0 END) > 0 THEN 'booked'
             WHEN SUM(CASE WHEN vb.ven_stat = '1' AND (
-                (vb.start_date <= ? AND (vb.end_date <= ? AND vb.start_date >= ?)) AND 
+                (vb.start_date <= ? AND (vb.end_date <= ? AND vb.start_date <= ?)) AND 
                 ((vb.start_time <= ? AND vb.end_time >= ?) OR 
                 (vb.start_time >= ? AND vb.end_time <= ?) OR
-                (vb.start_time <= ? AND (vb.end_time <= ? AND vb.end_time >= ?) OR
-                (vb.start_time >= ? AND (vb.end_time >= ? AND vb.start_time <= ?))
+                (vb.start_time <= ? AND (vb.end_time <= ? AND vb.end_time <= ?)) OR
+                (vb.start_time >= ? AND (vb.end_time >= ? AND vb.start_time <= ?)))
             ) THEN 1 ELSE 0 END) > 0 THEN 'booked'
             WHEN SUM(CASE WHEN vb.ven_stat = '1' AND (
                 (vb.start_date >= ? AND (vb.end_date >= ? AND vb.start_date <= ?)) AND 
                 ((vb.start_time <= ? AND vb.end_time >= ?) OR 
                 (vb.start_time >= ? AND vb.end_time <= ?) OR
-                (vb.start_time <= ? AND (vb.end_time <= ? AND vb.end_time >= ?) OR
-                (vb.start_time >= ? AND (vb.end_time >= ? AND vb.start_time <= ?))
+                (vb.start_time <= ? AND (vb.end_time <= ? AND vb.end_time <= ?)) OR
+                (vb.start_time >= ? AND (vb.end_time >= ? AND vb.start_time <= ?)))
             ) THEN 1 ELSE 0 END) > 0 THEN 'booked'
             WHEN SUM(CASE WHEN vb.ven_stat = '0' AND (
                 (vb.start_date <= ? AND vb.end_date >= ?) AND 
                 ((vb.start_time <= ? AND vb.end_time >= ?) OR 
                 (vb.start_time >= ? AND vb.end_time <= ?) OR
-                (vb.start_time <= ? AND (vb.end_time <= ? AND vb.end_time >= ?) OR
-                (vb.start_time >= ? AND (vb.end_time >= ? AND vb.start_time <= ?))
+                (vb.start_time <= ? AND (vb.end_time <= ? AND vb.end_time <= ?)) OR
+                (vb.start_time >= ? AND (vb.end_time >= ? AND vb.start_time <= ?)))
             ) THEN 1 ELSE 0 END) > 0 THEN 'waiting'
             WHEN SUM(CASE WHEN vb.ven_stat = '0' AND (
                 (vb.start_date >= ? AND vb.end_date <= ?) AND 
                 ((vb.start_time <= ? AND vb.end_time >= ?) OR 
                 (vb.start_time >= ? AND vb.end_time <= ?) OR
-                (vb.start_time <= ? AND (vb.end_time <= ? AND vb.end_time >= ?) OR
-                (vb.start_time >= ? AND (vb.end_time >= ? AND vb.start_time <= ?))
+                (vb.start_time <= ? AND (vb.end_time <= ? AND vb.end_time <= ?)) OR
+                (vb.start_time >= ? AND (vb.end_time >= ? AND vb.start_time <= ?)))
             ) THEN 1 ELSE 0 END) > 0 THEN 'waiting'
             WHEN SUM(CASE WHEN vb.ven_stat = '0' AND (
-                (vb.start_date <= ? AND (vb.end_date <= ? AND vb.start_date >= ?)) AND 
+                (vb.start_date <= ? AND (vb.end_date <= ? AND vb.start_date <= ?)) AND 
                 ((vb.start_time <= ? AND vb.end_time >= ?) OR 
                 (vb.start_time >= ? AND vb.end_time <= ?) OR
-                (vb.start_time <= ? AND (vb.end_time <= ? AND vb.end_time >= ?) OR
-                (vb.start_time >= ? AND (vb.end_time >= ? AND vb.start_time <= ?))
+                (vb.start_time <= ? AND (vb.end_time <= ? AND vb.end_time <= ?)) OR
+                (vb.start_time >= ? AND (vb.end_time >= ? AND vb.start_time <= ?)))
             ) THEN 1 ELSE 0 END) > 0 THEN 'waiting'
             WHEN SUM(CASE WHEN vb.ven_stat = '0' AND (
                 (vb.start_date >= ? AND (vb.end_date >= ? AND vb.start_date <= ?)) AND 
                 ((vb.start_time <= ? AND vb.end_time >= ?) OR 
                 (vb.start_time >= ? AND vb.end_time <= ?) OR
-                (vb.start_time <= ? AND (vb.end_time <= ? AND vb.end_time >= ?) OR
-                (vb.start_time >= ? AND (vb.end_time >= ? AND vb.start_time <= ?))
+                (vb.start_time <= ? AND (vb.end_time <= ? AND vb.end_time <= ?)) OR
+                (vb.start_time >= ? AND (vb.end_time >= ? AND vb.start_time <= ?)))
             ) THEN 1 ELSE 0 END) > 0 THEN 'waiting'
             ELSE 'available'
         END AS status
@@ -75,18 +75,19 @@ router.post('/check-availability', (req, res) => {
     LEFT JOIN 
         venues_bookings vb ON v.ven_id = vb.ven_id
     GROUP BY 
-        v.ven_name;  
+        v.ven_name;      
 `;
 
     db.query(sql, [
         startDate, endDate, startTime, endTime, startTime, endTime, startTime, endTime, endTime, startTime, endTime, endTime,
         startDate, endDate, startTime, endTime, startTime, endTime, startTime, endTime, endTime, startTime, endTime, endTime,
-        startDate, endDate, endDate, startTime, endTime, endTime, startTime, endTime, startTime, endTime, endTime, startTime, endTime, endTime,
-        startDate, endDate, endDate, startTime, endTime, endTime, startTime, endTime, startTime, endTime, endTime, startTime, endTime, endTime,
+        startDate, endDate, endDate, startTime, endTime, startTime, endTime, startTime, endTime, endTime, startTime, endTime, endTime,
+        startDate, endDate, endDate, startTime, endTime, startTime, endTime, startTime, endTime, endTime, startTime, endTime, endTime,
+
         startDate, endDate, startTime, endTime, startTime, endTime, startTime, endTime, endTime, startTime, endTime, endTime,
         startDate, endDate, startTime, endTime, startTime, endTime, startTime, endTime, endTime, startTime, endTime, endTime,
-        startDate, endDate, endDate, startTime, endTime, endTime, startTime, endTime, startTime, endTime, endTime, startTime, endTime, endTime,
-        startDate, endDate, endDate, startTime, endTime, endTime, startTime, endTime, startTime, endTime, endTime, startTime, endTime, endTime
+        startDate, endDate, endDate, startTime, endTime, startTime, endTime, startTime, endTime, endTime, startTime, endTime, endTime,
+        startDate, endDate, endDate, startTime, endTime, startTime, endTime, startTime, endTime, endTime, startTime, endTime, endTime,
     ], (err, results) => {
         if (err) {
             console.error('Error checking availability:', err);
