@@ -58,6 +58,11 @@
             cursor: not-allowed;
         }
 
+        .booked[disabled] {
+            background-color: #EB5757 !important;
+            cursor: not-allowed;
+        }
+
         /* Button styles */
         .venue-btn {
             padding: 12px 24px;
@@ -169,7 +174,28 @@
 
         .venue-btn[disabled] {
             background-color: #cccccc; /* Light gray to indicate disabled state */
+            color: white;
             cursor: not-allowed;
+        }
+
+        /* Popup Styles */
+        .popup-overlay {
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+        .popup-content {
+            position: relative;
+        }
+        .popup-close {
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
+            cursor: pointer;
+            font-size: 1.5rem;
+            color: #4B5563;
+            transition: color 0.3s;
+        }
+        .popup-close:hover {
+            color: #EF4444;
         }
     </style>
 
@@ -193,18 +219,45 @@
 
         // Function to set today's date as the minimum for Start Date and End Date
         function setMinDate() {
-            const today = new Date().toISOString().split('T')[0]; // Get today's date in YYYY-MM-DD format
-            document.getElementById('start-date').setAttribute('min', today); // Set min attribute for start date
-            document.getElementById('end-date').setAttribute('min', today);   // Set min attribute for end date
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('start-date').setAttribute('min', today);
+            document.getElementById('end-date').setAttribute('min', today);
         }
-        
+
+        // Update min value of End Date based on selected Start Date
+        function updateEndDateMin() {
+            const startDate = document.getElementById('start-date').value;
+            const endDateInput = document.getElementById('end-date');
+
+            if (startDate) {
+                endDateInput.setAttribute('min', startDate);
+            } else {
+                setMinDate(); // Reset to today's date if no start date selected
+            }
+        }
+
+        // Update min value of End Time based on selected Start Time (for same day)
+        function updateEndTimeMin() {
+            const startDate = document.getElementById('start-date').value;
+            const endDate = document.getElementById('end-date').value;
+            const startTime = document.getElementById('start-time').value;
+            const endTimeInput = document.getElementById('end-time');
+
+            if (startDate && endDate && startDate === endDate && startTime) {
+                endTimeInput.setAttribute('min', startTime);
+            } else {
+                endTimeInput.removeAttribute('min'); // Reset min if not needed
+            }
+        }
+
+        // Trigger availability check only when all inputs are filled
         async function checkAvailability() {
             const startDate = document.getElementById('start-date').value;
             const endDate = document.getElementById('end-date').value;
             const startTime = document.getElementById('start-time').value;
             const endTime = document.getElementById('end-time').value;
 
-            if (!startDate || !endDate || !startTime || !endTime) return;
+            if (!(startDate && endDate && startTime && endTime)) return;
 
             try {
                 const response = await fetch('/api/check-availability', {
@@ -214,61 +267,165 @@
                 });
 
                 if (!response.ok) throw new Error('Failed to fetch venue availability');
-                const venues = await response.json(); // Await the JSON parsing
-
-                updateVenues(venues); // Update the venue buttons
+                const venues = await response.json();
+                updateVenues(venues);
             } catch (error) {
                 console.error('Error fetching availability:', error);
             }
         }
 
-
+        // Update venue buttons based on availability
         function updateVenues(venues) {
             document.querySelectorAll('.venue-btn').forEach((button) => {
-                const venueName = button.id; // Extract venue name from button text
-                const status = venues[venueName] || 'booked'; // Default to 'booked' if not found
-
-                // Reset any previous status classes
+                const status = venues[button.id] || 'booked';
                 button.classList.remove('available', 'waiting', 'booked');
-
-                // Apply the new status class
                 button.classList.add(status);
+                button.disabled = status === 'booked';
             });
         }
 
-        function toggleVenueButtons() {
-            const startDate = document.getElementById('start-date').value;
-            const endDate = document.getElementById('end-date').value;
-            const startTime = document.getElementById('start-time').value;
-            const endTime = document.getElementById('end-time').value;
+        // Highlight clicked venue button and store its ID
+        function highlightSelectedButton(event) {
+            const clickedButton = event.target;
 
-            const allFilled = startDate && endDate && startTime && endTime;
-
-            // Enable or disable the venue buttons based on whether all fields are filled
+        // Remove border from all buttons
             document.querySelectorAll('.venue-btn').forEach((button) => {
-                button.disabled = !allFilled;
+                button.style.border = 'none';
             });
 
-            if (allFilled) checkAvailability(); // Check availability if all inputs are filled
+        // Add border to the clicked button (only if not disabled)
+            if (!clickedButton.disabled) {
+                clickedButton.style.border = '2px solid #3563E9';
+                if (clickedButton.id === 'cslb1') {
+                    selectedVenue = 1;
+                } else if (clickedButton.id === 'cslb2') {
+                    selectedVenue = 2; 
+                } else if (clickedButton.id === 'cslb3') {
+                    selectedVenue = 3; 
+                } else if (clickedButton.id === 'cslb4') {
+                    selectedVenue = 4; 
+                } else if (clickedButton.id === 'cslb5') {
+                    selectedVenue = 5; 
+                } else if (clickedButton.id === 'cslb6') {
+                    selectedVenue = 6; 
+                } else if (clickedButton.id === 'audt') {
+                    selectedVenue = 7; 
+                } else if (clickedButton.id === 'semh') {
+                    selectedVenue = 8; 
+                } else if (clickedButton.id === 'confh') {
+                    selectedVenue = 9; 
+                } else if (clickedButton.id === 'prah') {
+                    selectedVenue = 10; 
+                } else if (clickedButton.id === 'lib') {
+                    selectedVenue = 11; 
+                } else if (clickedButton.id === 'dal') {
+                    selectedVenue = 12; 
+                } else if (clickedButton.id === 'cirsh') {
+                    selectedVenue = 13; 
+                } else {
+                    showErrorPopup('Unknown Venue selected!.');
+                    console.error('404 Not Found: Unknown venue selected');
+                    return;
+                }
+                // selectedVenue = clickedButton.id; // Store the ID of the selected venue
+            }
         }
 
-        // Attach event listeners for input changes to trigger availability check and button enablement
-        document.addEventListener('DOMContentLoaded', () => {
-            ['start-date', 'end-date', 'start-time', 'end-time'].forEach((id) => {
-                document.getElementById(id).addEventListener('input', toggleVenueButtons);
+        function attachVenueButtonListeners() {
+            document.querySelectorAll('.venue-btn').forEach((button) => {
+                button.addEventListener('click', highlightSelectedButton);
             });
+        }
+
+                // Handle input changes and trigger availability check
+        function handleInputChange() {
+            const allFilled = ['start-date', 'end-date', 'start-time', 'end-time']
+                .every((id) => document.getElementById(id).value);
+
+            if (allFilled) checkAvailability();
+        }
+
+        let selectedVenue = null; // To store the selected venue's ID
+
+        document.addEventListener('DOMContentLoaded', () => {
+            // Attach event listeners for input fields to trigger availability check
+            ['start-date', 'end-date', 'start-time', 'end-time'].forEach((id) => {
+                document.getElementById(id).addEventListener('input', handleInputChange);
+            });
+
+            document.getElementById('start-date').addEventListener('change', updateEndDateMin);
+            document.getElementById('start-time').addEventListener('change', updateEndTimeMin);
+            document.getElementById('end-date').addEventListener('change', updateEndTimeMin);
+
+            attachVenueButtonListeners(); // Attach venue button listeners
+
+            // Handle the next/submit button click event
+            document.querySelector('.next-btn').addEventListener('click', handleButtonClick);
+
+            window.onload = setMinDate;
         });
 
-        document.addEventListener('DOMContentLoaded', () => {
-            ['start-date', 'end-date', 'start-time', 'end-time'].forEach((id) => {
-                document.getElementById(id).addEventListener('input', toggleVenueButtons);
-            });
-        });
+        // Function to open the error popup with a message
+        function showErrorPopup(message) {
+            document.getElementById('errorPopupContent').innerText = message;
+            document.getElementById('errorPopup').classList.remove('hidden');
+        }
 
+        // Function to close the error popup
+        function closeErrorPopup() {
+            document.getElementById('errorPopup').classList.add('hidden');
+        }
 
-        window.onload = function () {
-            setMinDate();
-        };
+        // Handle button click (Next/Submit)
+        async function handleButtonClick(event) {
+            const nextButton = event.target;
+
+            if (nextButton.innerText.trim() === 'Next') {
+                // Redirect to another page if "Next" is clicked
+                window.location.href = '/book-event/event-details';
+            } else if (nextButton.innerText.trim() === 'Submit') {
+                // Gather form data
+                const startDate = document.getElementById('start-date').value;
+                const endDate = document.getElementById('end-date').value;
+                const startTime = document.getElementById('start-time').value;
+                const endTime = document.getElementById('end-time').value;
+                const eventTitle = document.getElementById('event_title').value;
+
+                // Ensure all inputs and venue selection are filled
+                if (!startDate || !endDate || !startTime || !endTime || !eventTitle || !selectedVenue) {
+                    alert('Please fill all the fields and select a venue.');
+                    return;
+                }
+
+                try {
+                    // Send POST request to backend
+                    const response = await fetch('/api/quick-event', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            startDate,
+                            endDate,
+                            startTime,
+                            endTime,
+                            eventTitle,
+                            venue: selectedVenue, // Include selected venue ID
+                        }),
+                    });
+
+                    if (response.ok) {
+                        alert('Event created successfully!');
+                        window.location.href = '/book-event/confirmation'; // Redirect on success
+                    } else {
+                        alert('Failed to create event. Please try again.');
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    alert('An error occurred. Please try again later.');
+                }
+            }
+        }
+
+        window.onload = setMinDate;
     </script>
 </head>
 <body class="min-h-screen bg-gray-100">
@@ -308,6 +465,25 @@
             </div>
         </div>
 
+        <!-- Popup Modal for Error Messages -->
+        <div id="errorPopup" class="fixed inset-0 hidden flex items-center justify-center popup-overlay">
+            <div class="bg-white p-6 rounded-lg shadow-lg max-w-lg w-full popup-content">
+                <!-- Close Icon -->
+                <span class="popup-close" onclick="closeErrorPopup()">&times;</span>
+
+                <h2 class="text-xl font-semibold mb-4">Error</h2>
+                <div id="errorPopupContent">
+                    <!-- Error message will be populated dynamically -->
+                </div>
+
+                <div class="mt-4 text-right">
+                    <button onclick="closeErrorPopup()" class="bg-blue-600 text-white px-4 py-2 rounded-lg">
+                        Close
+                    </button>
+                </div>
+            </div>
+        </div>
+
         <div class="form-row">
             <div class="input-group">
                 <label class="block mb-2 text-gray-700">Start Time</label>
@@ -342,19 +518,19 @@
         <!-- Venue buttons -->
         <div class="mb-6">
             <div class="flex flex-wrap">
-                <button class="venue-btn available" id="cslb1" disabled>CS Lab 1</button>
-                <button class="venue-btn available" id="cslb2" disabled>CS Lab 2</button>
-                <button class="venue-btn waiting" id="cslb3" disabled>CS Lab 3</button>
-                <button class="venue-btn waiting" id="cslb4" disabled>CS Lab 4</button>
-                <button class="venue-btn available" id="cslb5" disabled>CS Lab 5</button>
-                <button class="venue-btn booked" id="cslb6" disabled>CS Lab 6</button>
-                <button class="venue-btn available" id="audt" disabled>Auditorium</button>
-                <button class="venue-btn waiting" id="semh" disabled>Seminar Hall</button>
-                <button class="venue-btn waiting" id="confh" disabled>Conference Room</button>
-                <button class="venue-btn booked" id="prah" disabled>Prayer Hall</button>
-                <button class="venue-btn booked" id="lib" disabled>Library</button>
-                <button class="venue-btn booked" id="dal" disabled>Data Analytics Lab</button>
-                <button class="venue-btn available" id="cirsh" disabled>CIR Seminar Hall</button>
+                <button class="venue-btn" id="cslb1" disabled>CS Lab 1</button>
+                <button class="venue-btn" id="cslb2" disabled>CS Lab 2</button>
+                <button class="venue-btn" id="cslb3" disabled>CS Lab 3</button>
+                <button class="venue-btn" id="cslb4" disabled>CS Lab 4</button>
+                <button class="venue-btn" id="cslb5" disabled>CS Lab 5</button>
+                <button class="venue-btn" id="cslb6" disabled>CS Lab 6</button>
+                <button class="venue-btn" id="audt" disabled>Auditorium</button>
+                <button class="venue-btn" id="semh" disabled>Seminar Hall</button>
+                <button class="venue-btn" id="confh" disabled>Conference Room</button>
+                <button class="venue-btn" id="prah" disabled>Prayer Hall</button>
+                <button class="venue-btn" id="lib" disabled>Library</button>
+                <button class="venue-btn" id="dal" disabled>Data Analytics Lab</button>
+                <button class="venue-btn" id="cirsh" disabled>CIR Seminar Hall</button>
             </div>
         </div>
 

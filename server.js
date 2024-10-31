@@ -36,15 +36,17 @@ app.set('views', path.join(__dirname, 'views'));
 const authRoutes = require('./routes/auth');
 const vRoutes = require('./routes/vroutes');
 const userRoutes = require('./routes/user-management'); // Adjust path if necessary
-const mailer = require('./routes/mailer');
+const mailerRoutes = require('./routes/mailer');
 const bookingRoutes = require('./routes/venue-availability');
+const quickEventRoutes = require('./routes/quick-event');
 
 // Use the user routes with '/api' as prefix to avoid conflicts
 app.use('/api', userRoutes);
 app.use('/', authRoutes);
 app.use('/', vRoutes);
-app.use('/api', mailer);
+app.use('/api', mailerRoutes);
 app.use('/api', bookingRoutes);
+app.use('/api', quickEventRoutes);
 
 app.get('/', (req, res) => {
     if (!req.session.user_name) {

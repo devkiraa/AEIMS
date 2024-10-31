@@ -1,14 +1,14 @@
 const express = require('express');
 const router = express.Router();
-const db = require('../models/db'); // Database connection
+const db = require('../models/db');
 
 // POST route to check venue availability
-router.post('/check-availability', (req, res) => {
+router.post('/check-availability', async (req, res) => {
     const { startDate, endDate, startTime, endTime } = req.body;
 
-    // SQL to find booked venues in the specified date and time range
+    // SQL query for checking venue availability
     const sql = `
-    SELECT 
+        SELECT 
         v.ven_name, 
         CASE 
             WHEN COUNT(vb.ven_id) = 0 THEN 'available'  -- No bookings found
@@ -75,10 +75,11 @@ router.post('/check-availability', (req, res) => {
     LEFT JOIN 
         venues_bookings vb ON v.ven_id = vb.ven_id
     GROUP BY 
-        v.ven_name;      
-`;
+        v.ven_name; 
+    `;
 
-    db.query(sql, [
+    // Parameter array for SQL query
+    const params = [
         startDate, endDate, startTime, endTime, startTime, endTime, startTime, endTime, endTime, startTime, endTime, endTime,
         startDate, endDate, startTime, endTime, startTime, endTime, startTime, endTime, endTime, startTime, endTime, endTime,
         startDate, endDate, endDate, startTime, endTime, startTime, endTime, startTime, endTime, endTime, startTime, endTime, endTime,
@@ -87,12 +88,11 @@ router.post('/check-availability', (req, res) => {
         startDate, endDate, startTime, endTime, startTime, endTime, startTime, endTime, endTime, startTime, endTime, endTime,
         startDate, endDate, startTime, endTime, startTime, endTime, startTime, endTime, endTime, startTime, endTime, endTime,
         startDate, endDate, endDate, startTime, endTime, startTime, endTime, startTime, endTime, endTime, startTime, endTime, endTime,
-        startDate, endDate, endDate, startTime, endTime, startTime, endTime, startTime, endTime, endTime, startTime, endTime, endTime,
-    ], (err, results) => {
-        if (err) {
-            console.error('Error checking availability:', err);
-            return res.status(500).json({ error: 'Database query failed' });
-        }
+        startDate, endDate, endDate, startTime, endTime, startTime, endTime, startTime, endTime, endTime, startTime, endTime, endTime   // for 'waiting'
+    ];
+
+    try {
+        const [results] = await db.query(sql, params);
 
         // Transform results into a dictionary { venue_name: status }
         const venueAvailability = results.reduce((acc, row) => {
@@ -101,7 +101,10 @@ router.post('/check-availability', (req, res) => {
         }, {});
 
         res.json(venueAvailability);
-    });
+    } catch (err) {
+        console.error('Error checking availability:', err);
+        res.status(500).json({ error: 'Database query failed' });
+    }
 });
 
 module.exports = router;
