@@ -284,3 +284,6 @@ CREATE TABLE password_resets (
 
 ALTER TABLE `aeims`.`password_resets` 
 CHANGE COLUMN `reset_count` `reset_link_stat` INT NULL DEFAULT '0' ;
+
+ALTER TABLE user_login_log 
+MODIFY login_id INT NOT NULL AUTO_INCREMENT;
