@@ -1,9 +1,8 @@
 const express = require('express');
 const crypto = require('crypto');
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcryptjs');
 const db = require('../models/db');
 const router = express.Router();
-const fetch = require('node-fetch');
 
 // Calculate expiry time (10 minutes from now)
 function calculateExpiry() {
@@ -33,14 +32,17 @@ router.post('/forgot-password', async (req, res) => {
         const resetToken = crypto.randomBytes(32).toString('hex');
         const resetTokenExpiry = calculateExpiry();
 
+        // const [[{ max_id }]] = await db.query('SELECT MAX(reset_id) AS max_id FROM password_resets');
+        // const reset_id = (max_id || 0) + 1;
+
         // Insert or update the reset token, expiry, and increment reset count
         await db.query(
-            `INSERT INTO password_resets (usr_id, reset_token, reset_token_expiry, reset_count)
+            `INSERT INTO password_resets (usr_id, reset_token, reset_token_expiry, reset_link_stat)
              VALUES (?, ?, ?, 1)
              ON DUPLICATE KEY UPDATE 
                 reset_token = VALUES(reset_token), 
                 reset_token_expiry = VALUES(reset_token_expiry), 
-                reset_count = reset_count + 1`,
+                reset_link_stat = reset_link_stat + 1`,
             [usr_id, resetToken, resetTokenExpiry]
         );
 
@@ -54,7 +56,7 @@ router.post('/forgot-password', async (req, res) => {
             body: JSON.stringify({
                 subject: 'Password Reset Request',
                 recipient: email,
-                body: `Hello,You requested a password reset. Click the link below to reset your password:${resetLink} This link is valid for 10 minutes. If you did not request this, please ignore this email.`
+                body: `Hello,You requested a password reset. Click the link below to reset your password: ${resetLink} This link is valid for 10 minutes. If you did not request this, please ignore this email.`
             })
         });
 
@@ -80,7 +82,7 @@ router.get('/reset-password/:token', async (req, res) => {
 
         // Validate the token and expiry in the `password_resets` table
         const [user] = await db.query(
-            `SELECT usr_id FROM password_resets WHERE reset_token = ? AND reset_token_expiry > ?`,
+            `SELECT usr_id FROM password_resets WHERE reset_token = ? AND reset_token_expiry > ? AND reset_link_stat = 1`,
             [token, currentTime]
         );
 
@@ -105,7 +107,7 @@ router.post('/reset-password/:token', async (req, res) => {
     try {
         // Find the user by token
         const [user] = await db.query(
-            `SELECT usr_id FROM password_resets WHERE reset_token = ? AND reset_token_expiry > ?`,
+            `SELECT usr_id FROM password_resets WHERE reset_token = ? AND reset_token_expiry > ? AND reset_link_stat = 1`,
             [token, new Date()]
         );
 
@@ -125,7 +127,7 @@ router.post('/reset-password/:token', async (req, res) => {
         );
 
         // Delete reset token from `password_resets` table after successful password reset
-        await db.query('DELETE FROM password_resets WHERE usr_id = ?', [usr_id]);
+        await db.query('UPDATE password_resets SET reset_link_stat = 0 WHERE usr_id = ?', [usr_id]);
 
         // Render the reset-password page with a success message
         res.render('reset-password', {
@@ -136,6 +138,5 @@ router.post('/reset-password/:token', async (req, res) => {
         res.status(500).send("Internal server error.");
     }
 });
-
 
 module.exports = router;
