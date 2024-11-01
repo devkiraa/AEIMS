@@ -269,8 +269,7 @@ ADD UNIQUE INDEX `idx_evn_name` (`evn_name`);
 ALTER TABLE `aeims`.`venues_bookings` 
 ADD COLUMN `ven_stat` VARCHAR(10) NOT NULL AFTER `end_time`;
 
-
---Change as on 31/10/2024
+-- Change as on 31/10/2024
 
 CREATE TABLE password_resets (
     reset_id INT AUTO_INCREMENT PRIMARY KEY,
@@ -280,3 +279,8 @@ CREATE TABLE password_resets (
     reset_count INT DEFAULT 0,
     FOREIGN KEY (usr_id) REFERENCES users(usr_id)
 );
+
+-- Change as on 1/11/2024
+
+ALTER TABLE `aeims`.`password_resets` 
+CHANGE COLUMN `reset_count` `reset_link_stat` INT NULL DEFAULT '0' ;
