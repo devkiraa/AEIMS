@@ -11,7 +11,7 @@ load_dotenv()
 EMAIL_ADDRESS = os.getenv("EMAIL_ADDRESS")
 EMAIL_PASSWORD = os.getenv("EMAIL_PASSWORD")
 
-def send_email(subject, recipient, body):
+def send_email(subject, recipient, body, is_html=False):
     try:
         # Set up the MIME
         message = MIMEMultipart()
@@ -19,8 +19,11 @@ def send_email(subject, recipient, body):
         message["To"] = recipient
         message["Subject"] = subject
 
-        # Add body to the email
-        message.attach(MIMEText(body, "plain"))
+        # Check if the body should be HTML or plain text
+        if is_html:
+            message.attach(MIMEText(body, "html"))
+        else:
+            message.attach(MIMEText(body, "plain"))
 
         # SMTP session
         with smtplib.SMTP("smtp.gmail.com", 587) as server:
@@ -34,14 +37,16 @@ def send_email(subject, recipient, body):
         print(f"Error: {e}")
 
 # Example usage for testing (remove in production)
-# send_email("Test Subject", "recipient@example.com", "This is a test email")
+# send_email("Test Subject", "recipient@example.com", "<h1>This is a test email</h1>", is_html=True)
+
 if __name__ == "__main__":
-    if len(sys.argv) != 4:
-        print("Usage: email_sender.py <subject> <recipient> <body>")
+    if len(sys.argv) < 4:
+        print("Usage: email_sender.py <subject> <recipient> <body> [is_html]")
         sys.exit(1)
 
     subject = sys.argv[1]
     recipient = sys.argv[2]
     body = sys.argv[3]
+    is_html = sys.argv[4].lower() == "true" if len(sys.argv) > 4 else False
 
-    send_email(subject, recipient, body)
+    send_email(subject, recipient, body, is_html)

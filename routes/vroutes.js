@@ -11,13 +11,18 @@ router.get('/signup', (req, res) => {
     res.render('signup');
 });
 
-// forgot-passowrd route
+// Forgot-password route
 router.get('/forgot-password', (req, res) => {
     res.render('forgot-password');
 });
 
-// forgot-passowrd reset using token route
+// Forgot-password reset using token route
 router.get('/forgot-password/:Token', (req, res) => {
+    res.render('forgot-password-request');
+});
+
+// Forgot-password-request page (missing route added here)
+router.get('/forgot-password-request', (req, res) => {
     res.render('forgot-password-request');
 });
 

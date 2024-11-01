@@ -39,6 +39,8 @@ const userRoutes = require('./routes/user-management'); // Adjust path if necess
 const mailerRoutes = require('./routes/mailer');
 const bookingRoutes = require('./routes/venue-availability');
 const quickEventRoutes = require('./routes/quick-event');
+const resetPasswordRoutes = require('./routes/resetpassword');
+const resetPasswordRouter = require('./routes/resetpassword');
 
 // Use the user routes with '/api' as prefix to avoid conflicts
 app.use('/api', userRoutes);
@@ -47,6 +49,8 @@ app.use('/', vRoutes);
 app.use('/api', mailerRoutes);
 app.use('/api', bookingRoutes);
 app.use('/api', quickEventRoutes);
+app.use('/', resetPasswordRoutes);
+app.use('/', resetPasswordRouter);
 
 app.get('/', (req, res) => {
     if (!req.session.user_name) {
