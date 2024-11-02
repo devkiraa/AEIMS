@@ -102,7 +102,7 @@ function sendApprovalEmail(email, res) {
     const body = "<p>Your account has been approved! You can now access the system.</p>";
     const isHtml = true;
 
-    exec(`python3 email_sender.py "${subject}" "${email}" "${body}" "${isHtml}"`, (error, stdout, stderr) => {
+    exec(`python email_sender.py "${subject}" "${email}" "${body}" "${isHtml}"`, (error, stdout, stderr) => {
         if (error) {
             console.error(`Error sending approval email: ${error.message}`);
             return res.status(500).json({ error: 'Failed to send approval email' });

@@ -1,7 +1,6 @@
 const express = require('express');
 const router = express.Router();
 const bcrypt = require('bcryptjs');
-const fetch = require('node-fetch'); // Ensure this package is installed
 const db = require('../models/db'); // Assuming this connects to your database
 
 router.post('/login', async (req, res) => {
