@@ -36,9 +36,7 @@ def send_email(subject, recipient, body, is_html=False):
     except Exception as e:
         print(f"Error: {e}")
 
-# Example usage for testing (remove in production)
-# send_email("Test Subject", "recipient@example.com", "<h1>This is a test email</h1>", is_html=True)
-
+# CLI for execution
 if __name__ == "__main__":
     if len(sys.argv) < 4:
         print("Usage: email_sender.py <subject> <recipient> <body> [is_html]")

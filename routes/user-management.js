@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const db = require('../models/db'); // Database connection using promise-based mysql2
+const { exec } = require('child_process');
 
 // Route to fetch all users with role and department transformation
 router.get('/users', async (req, res) => {
@@ -50,14 +51,13 @@ router.get('/users', async (req, res) => {
     }
 });
 
-// Route to update user details or restore a user
 router.put('/users/:id', async (req, res) => {
     const userId = req.params.id;
     const { usr_role, usr_dept, usr_stat, restore } = req.body;
 
     try {
         if (restore) {
-            // Restore logic: Update status to '1' (Active) and clear delete date
+            // Restore logic
             const [result] = await db.query(`UPDATE users SET usr_stat = '1' WHERE usr_id = ?`, [userId]);
 
             if (result.affectedRows === 0) {
@@ -77,13 +77,44 @@ router.put('/users/:id', async (req, res) => {
                 return res.status(404).json({ error: 'User not found' });
             }
 
-            res.json({ message: 'User updated successfully' });
+            // Fetch the usr_name (email) from the database for the given userId
+            const [user] = await db.query(`SELECT usr_name FROM users WHERE usr_id = ?`, [userId]);
+            const email = user[0]?.usr_name;  // Access usr_name as the email
+
+            if (usr_stat === '1' && email) {
+                sendApprovalEmail(email, res);  // Send email if status is active and email is found
+            } else {
+                console.error('Email not found or user status is not active');  // Log for missing email or inactive status
+                res.json({ message: 'User updated successfully, but no approval email sent' });
+            }
         }
     } catch (err) {
         console.error(err);
         res.status(500).json({ error: 'Failed to update user data' });
     }
 });
+
+
+
+// Function to send approval email
+function sendApprovalEmail(email, res) {
+    const subject = "Account Approval Notification";
+    const body = "<p>Your account has been approved! You can now access the system.</p>";
+    const isHtml = true;
+
+    exec(`python3 email_sender.py "${subject}" "${email}" "${body}" "${isHtml}"`, (error, stdout, stderr) => {
+        if (error) {
+            console.error(`Error sending approval email: ${error.message}`);
+            return res.status(500).json({ error: 'Failed to send approval email' });
+        }
+        if (stderr) {
+            console.error(`Standard error: ${stderr}`);
+            return res.status(500).json({ error: 'Failed to send approval email' });
+        }
+        console.log(`Email sent successfully: ${stdout}`);
+        res.json({ message: 'User updated and approval email sent successfully' });
+    });
+}
 
 // Route to delete a user
 router.delete('/users/:id', async (req, res) => {
