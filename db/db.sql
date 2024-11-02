@@ -287,3 +287,11 @@ CHANGE COLUMN `reset_count` `reset_link_stat` INT NULL DEFAULT '0' ;
 
 ALTER TABLE user_login_log 
 MODIFY login_id INT NOT NULL AUTO_INCREMENT;
+
+-- Change as on 2/11/2024
+
+ALTER TABLE mail_log
+MODIFY log_id INT NOT NULL AUTO_INCREMENT;
+
+ALTER TABLE mail_log
+ADD COLUMN receiver_email VARCHAR(255) NULL;
