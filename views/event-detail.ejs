@@ -10,28 +10,35 @@
         body {
             font-family: 'Poppins', sans-serif;
         }
+
         .form-container {
             max-width: 100%;
             margin: 0 auto;
         }
+
         .form-title {
             font-size: 2rem;
             font-weight: 600;
         }
+
         .form-label {
             color: #4B5563;
         }
+
         .radio-label {
             display: inline-flex;
             align-items: center;
             margin-right: 1.5rem;
         }
+
         .radio-label input {
             margin-right: 0.5rem;
         }
+
         .form-section {
             margin-bottom: 1.5rem;
         }
+
         .btn-primary {
             background-color: #3B82F6;
             color: white;
@@ -39,6 +46,7 @@
             border-radius: 0.375rem;
             font-weight: 600;
         }
+
         .btn-secondary {
             background-color: #6B7280;
             color: white;
@@ -46,22 +54,315 @@
             border-radius: 0.375rem;
             font-weight: 600;
         }
+
         #coordinator-search {
             display: none;
             margin-left: 1rem;
         }
+
         #guest-counter {
             display: none;
             margin-left: 1rem;
             width: 100px;
         }
+
         #volunteer-counter {
             display: none;
             margin-left: 1rem;
             width: 100px;
         }
+
+        /* Next button styling similar to the Add Guest Details page */
+        .next-btn {
+            background-color: #2563EB; /* Tailwind blue-600 */
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: 500;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .next-btn:hover {
+            background-color: #1D4ED8; /* Tailwind blue-700 */
+        }
+
+        /* Next button styling similar to the Add Guest Details page */
+        .back-btn {
+            background-color: #6B7280; /* Tailwind blue-600 */
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            display: flex;
+            font-weight: 500;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .back-btn:hover {
+            background-color: #4B5563; /* Tailwind blue-700 */
+        }
+
+        #coordinator-search {
+            display: none;
+            margin-left: 1rem;
+        }
+
+        /* User list and selected user styles */
+        #user-list {
+            position: absolute;
+            background-color: white;
+            border: 1px solid #ccc;
+            border-radius: 0.375rem;
+            max-height: 200px;
+            overflow-y: auto;
+            width: 100%;
+            display: none;
+            z-index: 10;
+        }
+
+        #user-list li {
+            padding: 0.5rem;
+            cursor: pointer;
+        }
+
+        #user-list li:hover, .highlight {
+            background-color: #f0f0f0;
+        }
+
+        .selected-users {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+
+        .selected-user {
+            background-color: #e0f2fe;
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.375rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .remove-user {
+            cursor: pointer;
+            color: #2563eb;
+        }
     </style>
     <script>
+        let users = []; // Declare users globally
+        let searchBar; // Declare searchBar globally
+        let userList; // Declare userList globally
+        let highlightedIndex = -1; // Track the highlighted index in the user list
+        
+        document.addEventListener("DOMContentLoaded", async function() {
+            const coordinatorRadios = document.querySelectorAll('input[name="event_coordinators"]');
+            coordinatorRadios.forEach(radio => {
+                radio.addEventListener('change', toggleCoordinatorSearch);
+            });
+
+            const guestRadios = document.querySelectorAll('input[name="event_guests"]');
+            guestRadios.forEach(radio => {
+                radio.addEventListener('change', toggleGuestCounter);
+            });
+
+            const volunteerRadios = document.querySelectorAll('input[name="event_volunteers"]');
+            volunteerRadios.forEach(radio => {
+                radio.addEventListener('change', toggleVolunteerCounter);
+            });
+
+            // Retrieve event data from sessionStorage
+            const eventData = JSON.parse(sessionStorage.getItem('eventData'));
+            if (!eventData) {
+                // Redirect to the previous page if eventData is not found
+                window.location.href = '/book-event';
+                return;
+            }
+
+            // Check if eventData exists
+            if (eventData) {
+                // Populate the fields with the retrieved data
+                document.getElementById('start_date').value = eventData.startDate;
+                document.getElementById('end_date').value = eventData.endDate;
+                document.getElementById('start_time').value = eventData.startTime;
+                document.getElementById('end_time').value = eventData.endTime;
+
+                // Check if the venue value
+                const venueSelect = document.getElementById('venue');
+                let newOption;
+
+                switch (eventData.venue) {
+                    case 1:
+                        newOption = document.createElement('option');
+                        newOption.value = 'cslb1';
+                        newOption.textContent = 'CS Lab 1';
+                        break;
+                    case 2:
+                        newOption = document.createElement('option');
+                        newOption.value = 'cslb2';
+                        newOption.textContent = 'CS Lab 2';
+                        break;
+                    case 3:
+                        newOption = document.createElement('option');
+                        newOption.value = 'cslb3';
+                        newOption.textContent = 'CS Lab 3';
+                        break;
+                    case 4:
+                        newOption = document.createElement('option');
+                        newOption.value = 'cslb4';
+                        newOption.textContent = 'CS Lab 4';
+                        break;
+                    case 5:
+                        newOption = document.createElement('option');
+                        newOption.value = 'cslb5';
+                        newOption.textContent = 'CS Lab 5';
+                        break;
+                    case 6:
+                        newOption = document.createElement('option');
+                        newOption.value = 'cslb6';
+                        newOption.textContent = 'CS Lab 6';
+                        break;
+                    case 7:
+                        newOption = document.createElement('option');
+                        newOption.value = 'audt';
+                        newOption.textContent = 'Auditorium';
+                        break;
+                    case 8:
+                        newOption = document.createElement('option');
+                        newOption.value = 'semh';
+                        newOption.textContent = 'Seminar Hall';
+                        break;
+                    case 9:
+                        newOption = document.createElement('option');
+                        newOption.value = 'confh';
+                        newOption.textContent = 'Conference Room';
+                        break;
+                    case 10:
+                        newOption = document.createElement('option');
+                        newOption.value = 'prah';
+                        newOption.textContent = 'Prayer Hall';
+                        break;
+                    case 11:
+                        newOption = document.createElement('option');
+                        newOption.value = 'lib';
+                        newOption.textContent = 'Library';
+                        break;
+                    case 12:
+                        newOption = document.createElement('option');
+                        newOption.value = 'dal';
+                        newOption.textContent = 'Data Analytics Lab';
+                        break;
+                    case 13:
+                        newOption = document.createElement('option');
+                        newOption.value = 'cirsh';
+                        newOption.textContent = 'CIR Seminar Hall';
+                        break;
+                    default:
+                        // showErrorPopup('Unknown Venue selected!.');
+                        // console.error('404 Not Found: Unknown venue selected');
+                        // return;
+                        document.getElementById('venue').value = eventData.venue;
+                        console.error("Unknown");
+                }
+
+                // Append the new option to the venue dropdown and set it as selected
+                if (newOption) {
+                    venueSelect.appendChild(newOption);
+                    venueSelect.value = newOption.value;
+                }
+
+                // Disable the fields
+                document.getElementById('start_date').disabled = true;
+                document.getElementById('end_date').disabled = true;
+                document.getElementById('start_time').disabled = true;
+                document.getElementById('end_time').disabled = true;
+                document.getElementById('venue').disabled = true;
+            } else {
+                console.error('No event data found in sessionStorage.');
+            }
+
+            function toggleCoordinatorSearch() {
+                const multipleRadio = document.querySelector('input[name="event_coordinators"][value="multiple"]');
+                const searchBar = document.getElementById("coordinator-search");
+
+                if (multipleRadio.checked) {
+                    searchBar.style.display = "inline-block";
+                    searchBar.focus(); // Focus on the search bar when it appears
+                } else {
+                    searchBar.style.display = "none";
+                }
+            }
+
+            searchBar = document.getElementById("coordinator-search");
+            // searchBar.addEventListener('input', filterUsers);
+            searchBar.addEventListener('input', debounce(filterUsers, 500)); // Debounce the filter function
+
+            // Create a container for the user list
+            const userListContainer = document.createElement('div');
+            userListContainer.id = 'user-list-container';
+            userListContainer.style.display = 'inline-block'; // Display inline-block to position the user list below the search bar
+
+            userList = document.createElement('ul'); // Initialize userList here
+            userList.id = 'user-list';
+            userListContainer.appendChild(userList);
+
+            // Insert the user list container after the search bar
+            searchBar.parentNode.insertBefore(userListContainer, searchBar.nextSibling);
+
+            // Fetch users initially and store them in a variable
+            let users = await fetchUsers(); // Fetch users initially and store them
+            console.log(users);
+
+            // Show the user list when the search bar is visible
+            searchBar.addEventListener('focus', () => {
+                // Request focus on the search bar after a short delay
+                setTimeout(() => searchBar.focus(), 10);
+                userListContainer.style.display = 'inline-block';
+            });
+
+            searchBar.addEventListener('blur', () => {
+                userListContainer.style.display = 'none';
+            });
+
+            // Add event listeners for keyboard navigation
+            searchBar.addEventListener('keydown', (e) => {
+                if (e.key === 'ArrowDown') {
+                    highlightedIndex++;
+                    highlightUser ();
+                } else if (e.key === 'ArrowUp') {
+                    highlightedIndex--;
+                    highlightUser ();
+                } else if (e.key === 'Enter') {
+                    selectUser ();
+                }
+            });
+
+            // Declare searchBar here
+            searchBar = document.getElementById("coordinator-search");
+
+            // Insert the user list container after the search bar
+            searchBar.parentNode.insertBefore(userListContainer, searchBar.nextSibling);
+
+            // Show the user list when the search bar is visible
+            searchBar.addEventListener('focus', () => {
+                userListContainer.style.display = 'block';
+            });
+
+            searchBar.addEventListener('blur', () => {
+                userListContainer.style.display = 'none';
+            });
+
+            // Add the event listener for input to filter users
+            // searchBar.addEventListener('input', filterUsers);
+            
+            // Initial toggle states
+            toggleCoordinatorSearch();
+            toggleGuestCounter();
+            toggleVolunteerCounter();
+        });
+
         function toggleCoordinatorSearch() {
             const multipleRadio = document.querySelector('input[name="event_coordinators"][value="multiple"]');
             const searchBar = document.getElementById("coordinator-search");
@@ -99,26 +400,108 @@
             });
         }
 
-        document.addEventListener("DOMContentLoaded", function() {
-            const coordinatorRadios = document.querySelectorAll('input[name="event_coordinators"]');
-            coordinatorRadios.forEach(radio => {
-                radio.addEventListener('change', toggleCoordinatorSearch);
-            });
+        async function fetchUsers() {
+            try {
+                const response = await fetch('/api/users');
+                if (!response.ok) throw new Error('Failed to fetch users');
+                const data = await response.json();
+                users = data; // Assign to the global users variable
+                return data; // Return the fetched users
+            } catch (error) {
+                console.error('Error fetching users:', error);
+                return []; // Return an empty array on error
+            }
+        }
 
-            const guestRadios = document.querySelectorAll('input[name="event_guests"]');
-            guestRadios.forEach(radio => {
-                radio.addEventListener('change', toggleGuestCounter);
-            });
+        function filterUsers() {
+                const searchTerm = searchBar.value.toLowerCase();
+                const filteredUsers = users.filter(user => user.usr_aname.toLowerCase().includes(searchTerm));
 
-            const volunteerRadios = document.querySelectorAll('input[name="event_volunteers"]');
-            volunteerRadios.forEach(radio => {
-                radio.addEventListener('change', toggleVolunteerCounter);
-            });
+                userList.innerHTML = '';
+                filteredUsers.forEach((user, index) => {
+                    const listItem = document.createElement('li');
+                    listItem.textContent = user.usr_aname;
+                    listItem.className = index === highlightedIndex ? 'highlight' : '';
+                    listItem.addEventListener('click', () => addUser(user));
+                    userList.appendChild(listItem);
+                });
 
-            toggleCoordinatorSearch();
-            toggleGuestCounter();
-            toggleVolunteerCounter();
-        });
+                highlightedIndex = 0;
+            }
+        
+            function addUser(user) {
+                if (selectedUsers.some(selected => selected.usr_id === user.usr_id)) return;
+
+                selectedUsers.push(user);
+                const userElement = document.createElement('div');
+                userElement.className = 'selected-user';
+                userElement.textContent = user.usr_aname;
+
+                const removeBtn = document.createElement('span');
+                removeBtn.className = 'remove-user';
+                removeBtn.textContent = '✕';
+                removeBtn.addEventListener('click', () => removeUser(user, userElement));
+
+                userElement.appendChild(removeBtn);
+                selectedUsersContainer.appendChild(userElement);
+
+                searchBar.value = '';
+                userList.innerHTML = '';
+            }
+
+            function removeUser(user, userElement) {
+                selectedUsers = selectedUsers.filter(selected => selected.usr_id !== user.usr_id);
+                userElement.remove();
+            }
+
+            function navigateUserList(e) {
+                const items = userList.getElementsByTagName('li');
+                if (e.key === 'ArrowDown') {
+                    highlightedIndex = (highlightedIndex + 1) % items.length;
+                } else if (e.key === 'ArrowUp') {
+                    highlightedIndex = (highlightedIndex - 1 + items.length) % items.length;
+                } else if (e.key === 'Enter') {
+                    if (items[highlightedIndex]) items[highlightedIndex].click();
+                    return;
+                }
+                Array.from(items).forEach((item, idx) => item.classList.toggle('highlight', idx === highlightedIndex));
+            }
+
+        function highlightUser() {
+                const userListItems = userList.children;
+                if (highlightedIndex >= 0 && highlightedIndex < userListItems.length) {
+                    for (let i = 0; i < userListItems.length; i++) {
+                        userListItems[i].classList.remove('highlight');
+                    }
+                    userListItems[highlightedIndex].classList.add('highlight');
+                }
+            }
+
+            function selectUser() {
+                const highlightedItem = userList.children[highlightedIndex];
+                if (highlightedItem) {
+                    const selectedUser = users.find(user => user.usr_aname === highlightedItem.textContent);
+                    if (selectedUser) {
+                        // Handle the selected user (e.g., add to a list, display details, etc.)
+                        console.log(`Selected user: ${selectedUser.usr_aname}`);
+                        searchBar.value = ''; // Clear the search input
+                        highlightedIndex = -1; // Reset the highlighted index
+                    }
+                }
+            }
+
+            function debounce(func, wait) {
+                let timeout;
+                return function(...args) {
+                    const context = this;
+                    const later = function() {
+                        timeout = null;
+                        func.apply(context, args);
+                    };
+                    clearTimeout(timeout);
+                    timeout = setTimeout(later, wait);
+                };
+            }
     </script>
 </head>
 <body class="min-h-screen bg-gray-100">
@@ -166,7 +549,7 @@
                     <div class="form-section">
                         <label for="venue" class="form-label block">Venue</label>
                         <select name="venue" id="venue" class="w-full p-2 border border-gray-300 rounded mt-1">
-                            <option value="Data Analytics Lab">Data Analytics Lab</option>
+                            <!-- Venue Inserted Dynamically -->
                         </select>
                     </div>
 
@@ -198,6 +581,7 @@
                             </label>
                             <input type="text" id="coordinator-search" name="coordinator_search" placeholder="Search for Coordinators..." class="w-full p-2 border border-gray-300 rounded">
                         </div>
+                        <div id="selected-users" class="selected-users"></div>
                     </div>
                 </div>
 
@@ -256,8 +640,18 @@
             
             <div class="flex justify-end mt-6">
                 <!-- Keeping your buttons intact as per your original request -->
-                <button type="submit" class="bg-indigo-500 text-white px-4 py-2 rounded-md mr-4">Submit</button>
-                <button type="button" class="bg-gray-500 text-white px-4 py-2 rounded-md" onclick="window.location.href='/events'">Back</button>
+                <button type="button" class="back-btn mr-4 items-center" onclick="window.history.back()">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M7.707 9.293l5.146-5.146a.5.5 0 01.708.708L8.707 10l4.854 4.854a.5.5 0 01-.708.708l-5.146-5.146a.5.5 0 010-.708z" clip-rule="evenodd" />
+                    </svg>
+                    Back
+                </button>
+                <button type="submit" class="next-btn flex">
+                    Next
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-2" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M12.293 10.707l-5.146 5.146a.5.5 0 01-.708-.708L11.293 10 6.44 5.146a.5.5 0 01.708-.708l5.146 5.146a.5.5 0 010 .708z" clip-rule="evenodd" />
+                    </svg>
+                </button>
             </div>
         </form>
     </div>

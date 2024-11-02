@@ -163,7 +163,6 @@
             padding: 10px 20px;
             border-radius: 8px;
             font-weight: 500;
-            display: flex;
             align-items: center;
             justify-content: center;
         }
@@ -284,50 +283,100 @@
             });
         }
 
+        // Function to check if all required fields are filled
+        function checkRequiredFields() {
+                    const startDate = document.getElementById('start-date').value;
+            const endDate = document.getElementById('end-date').value;
+            const startTime = document.getElementById('start-time').value;
+            const endTime = document.getElementById('end-time').value;
+            const eventTitle = document.getElementById('event_title').value;
+
+            const nextButton = document.querySelector('.next-btn');
+
+            // Check if the button is for "Next" or "Submit"
+            const isNextButton = nextButton.innerHTML.includes('Next');
+
+            // Check if all fields are filled and a venue is selected
+            if (isNextButton) {
+                if (startDate && endDate && startTime && endTime && selectedVenue) {
+                    nextButton.classList.remove('hidden', 'disabled');
+                    nextButton.disabled = false;
+                } else {
+                    nextButton.classList.add('hidden', 'disabled');
+                    nextButton.disabled = true;
+                }
+            } else {
+                // For the "Submit" button
+                if (startDate && endDate && startTime && endTime && eventTitle && selectedVenue) {
+                    nextButton.classList.remove('hidden', 'disabled');
+                    nextButton.disabled = false;
+                } else {
+                    nextButton.classList.add('hidden', 'disabled');
+                    nextButton.disabled = true;
+                }
+            }
+        }
+
         // Highlight clicked venue button and store its ID
         function highlightSelectedButton(event) {
             const clickedButton = event.target;
 
-        // Remove border from all buttons
+            // Remove border from all buttons
             document.querySelectorAll('.venue-btn').forEach((button) => {
                 button.style.border = 'none';
             });
 
-        // Add border to the clicked button (only if not disabled)
+            // Add border to the clicked button (only if not disabled)
             if (!clickedButton.disabled) {
                 clickedButton.style.border = '2px solid #3563E9';
-                if (clickedButton.id === 'cslb1') {
-                    selectedVenue = 1;
-                } else if (clickedButton.id === 'cslb2') {
-                    selectedVenue = 2; 
-                } else if (clickedButton.id === 'cslb3') {
-                    selectedVenue = 3; 
-                } else if (clickedButton.id === 'cslb4') {
-                    selectedVenue = 4; 
-                } else if (clickedButton.id === 'cslb5') {
-                    selectedVenue = 5; 
-                } else if (clickedButton.id === 'cslb6') {
-                    selectedVenue = 6; 
-                } else if (clickedButton.id === 'audt') {
-                    selectedVenue = 7; 
-                } else if (clickedButton.id === 'semh') {
-                    selectedVenue = 8; 
-                } else if (clickedButton.id === 'confh') {
-                    selectedVenue = 9; 
-                } else if (clickedButton.id === 'prah') {
-                    selectedVenue = 10; 
-                } else if (clickedButton.id === 'lib') {
-                    selectedVenue = 11; 
-                } else if (clickedButton.id === 'dal') {
-                    selectedVenue = 12; 
-                } else if (clickedButton.id === 'cirsh') {
-                    selectedVenue = 13; 
-                } else {
-                    showErrorPopup('Unknown Venue selected!.');
-                    console.error('404 Not Found: Unknown venue selected');
-                    return;
+
+                switch (clickedButton.id) {
+                    case 'cslb1':
+                        selectedVenue = 1;
+                        break;
+                   case 'cslb2':
+                       selectedVenue = 2;
+                       break;
+                   case 'cslb3':
+                        selectedVenue = 3;
+                        break;
+                    case 'cslb4':
+                        selectedVenue = 4;
+                        break;
+                    case 'cslb5':
+                        selectedVenue = 5;
+                        break;
+                    case 'cslb6':
+                        selectedVenue = 6;
+                        break;
+                    case 'audt':
+                        selectedVenue = 7;
+                        break;
+                    case 'semh':
+                        selectedVenue = 8;
+                        break;
+                    case 'confh':
+                        selectedVenue = 9;
+                        break;
+                    case 'prah':
+                        selectedVenue = 10;
+                        break;
+                    case 'lib':
+                        selectedVenue = 11;
+                        break;
+                    case 'dal':
+                        selectedVenue = 12;
+                        break;
+                    case 'cirsh':
+                        selectedVenue = 13;
+                        break;
+                    default:
+                        showErrorPopup('Unknown venue selected!');
+                        console.error('404 Not Found: Unknown venue selected.');
+                        return;
                 }
-                // selectedVenue = clickedButton.id; // Store the ID of the selected venue
+
+                checkRequiredFields();
             }
         }
 
@@ -343,6 +392,7 @@
                 .every((id) => document.getElementById(id).value);
 
             if (allFilled) checkAvailability();
+            checkRequiredFields();
         }
 
         let selectedVenue = null; // To store the selected venue's ID
@@ -378,9 +428,24 @@
 
         // Handle button click (Next/Submit)
         async function handleButtonClick(event) {
-            const nextButton = event.target;
+            const nextButton = event.currentTarget; // Use currentTarget instead of target
 
             if (nextButton.innerText.trim() === 'Next') {
+                // Gather form data
+                const startDate = document.getElementById('start-date').value;
+                const endDate = document.getElementById('end-date').value;
+                const startTime = document.getElementById('start-time').value;
+                const endTime = document.getElementById('end-time').value;
+
+                // Store data in sessionStorage
+                sessionStorage.setItem('eventData', JSON.stringify({
+                    startDate,
+                    endDate,
+                    startTime,
+                    endTime,
+                    venue: selectedVenue,
+                }));
+
                 // Redirect to another page if "Next" is clicked
                 window.location.href = '/book-event/event-details';
             } else if (nextButton.innerText.trim() === 'Submit') {
@@ -549,7 +614,7 @@
 
     <!-- Fixed Back and Next buttons -->
     <div class="form-buttons flex space-x-4">
-        <button class="next-btn">
+        <button class="next-btn flex hidden disabled" disabled>
             Next
             <!-- Right Arrow SVG -->
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-2" viewBox="0 0 20 20" fill="currentColor">
