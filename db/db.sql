@@ -285,8 +285,8 @@ CREATE TABLE password_resets (
 ALTER TABLE `aeims`.`password_resets` 
 CHANGE COLUMN `reset_count` `reset_link_stat` INT NULL DEFAULT '0' ;
 
-ALTER TABLE user_login_log 
-MODIFY login_id INT NOT NULL AUTO_INCREMENT;
+ALTER TABLE `aeims`.`user_login_log` 
+CHANGE COLUMN `login_id` `login_id` INT NOT NULL AUTO_INCREMENT ;
 
 -- Change as on 2/11/2024
 
@@ -295,3 +295,13 @@ MODIFY log_id INT NOT NULL AUTO_INCREMENT;
 
 ALTER TABLE mail_log
 ADD COLUMN receiver_email VARCHAR(255) NULL;
+
+ALTER TABLE `aeims`.`event_tb` 
+DROP INDEX `idx_evn_name` ;
+;
+
+ALTER TABLE `aeims`.`event_tb` 
+CHANGE COLUMN `evn_stat` `evn_stat` INT NOT NULL ;
+
+ALTER TABLE `aeims`.`venues_bookings` 
+CHANGE COLUMN `ven_stat` `ven_stat` INT NOT NULL ;
