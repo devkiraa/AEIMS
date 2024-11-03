@@ -40,7 +40,8 @@ const mailerRoutes = require('./routes/mailer');
 const bookingRoutes = require('./routes/venue-availability');
 const quickEventRoutes = require('./routes/quick-event');
 const resetPasswordRoutes = require('./routes/resetpassword');
-const resetPasswordRouter = require('./routes/resetpassword');
+const fileHandlerRoutes = require('./routes/fileHandler');
+// const resetPasswordRouter = require('./routes/resetpassword');
 
 // Use the user routes with '/api' as prefix to avoid conflicts
 app.use('/api', userRoutes);
@@ -50,16 +51,9 @@ app.use('/api', mailerRoutes);
 app.use('/api', bookingRoutes);
 app.use('/api', quickEventRoutes);
 app.use('/', resetPasswordRoutes);
-app.use('/', resetPasswordRouter);
-
-app.get('/', (req, res) => {
-    if (!req.session.user_name) {
-        return res.redirect('/login'); // Redirect if user is not logged in
-    }
-    
-    // Render the dashboard with the user's name
-    res.render('dashboard', { user_name: req.session.user_name });
-});
+app.use('/api', fileHandlerRoutes);
+app.use('/uploads', express.static('uploads'));
+// app.use('/', resetPasswordRouter);
 
 // Start server
 const PORT = process.env.PORT || 3000;

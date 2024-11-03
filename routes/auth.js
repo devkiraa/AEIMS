@@ -50,7 +50,7 @@ router.post('/login', async (req, res) => {
             [user.usr_id, logDate, logTime]
         );
 
-        res.redirect('/dashboard');
+        res.redirect('/');
     } catch (error) {
         console.error("Login Error:", error);
         res.status(500).send('Database query failed');
@@ -110,7 +110,7 @@ router.post('/signup', async (req, res) => {
 });
 
 // GET dashboard route
-router.get('/dashboard', async (req, res) => {
+router.get('/', async (req, res) => {
     if (!req.session.user_id) {
         return res.redirect('/login');
     }
