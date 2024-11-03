@@ -305,3 +305,12 @@ CHANGE COLUMN `evn_stat` `evn_stat` INT NOT NULL ;
 
 ALTER TABLE `aeims`.`venues_bookings` 
 CHANGE COLUMN `ven_stat` `ven_stat` INT NOT NULL ;
+
+ALTER TABLE `aeims`.`event_coordinator` 
+CHANGE COLUMN `eco_id` `eco_id` INT NOT NULL AUTO_INCREMENT ;
+
+ALTER TABLE `aeims`.`event_guest_details` 
+ADD COLUMN `gst_fee` TINYINT NULL AFTER `gst_acc`;
+
+ALTER TABLE `aeims`.`event_guest_details` 
+CHANGE COLUMN `gst_type` `gst_type` TINYINT NOT NULL ;
