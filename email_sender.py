@@ -45,11 +45,11 @@ def get_user_id(email):
             cursor.close()
             connection.close()
 
-def send_email(subject, recipient, body, is_html=False):
+def send_email(subject, recipient, body, is_html):
     try:
         # Set up the MIME
         message = MIMEMultipart()
-        message["From"] = EMAIL_ADDRESS
+        message["From"] = f"AEIMS <{EMAIL_ADDRESS}>"
         message["To"] = recipient
         message["Subject"] = subject
 

@@ -5,11 +5,11 @@ const dotenv = require('dotenv');
 
 // Endpoint to trigger email sending
 router.post("/send-email", (req, res) => {
-    const { subject, recipient, body } = req.body;
+    const { subject, recipient, body, isHtml } = req.body;
     console.log("request recieved");
 
     // Command to call the Python script with arguments
-    const command = `python email_sender.py "${subject}" "${recipient}" "${body}"`;
+    const command = `python email_sender.py "${subject}" "${recipient}" "${body}" "${isHtml}"`;
 
     exec(command, (error, stdout, stderr) => {
         if (error) {

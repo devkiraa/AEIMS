@@ -89,7 +89,8 @@ router.post('/signup', async (req, res) => {
                 body: JSON.stringify({
                     subject: "Welcome to AEIMS!",
                     recipient: email,
-                    body: `Hi ${full_name}, welcome to AEIMS. We're excited to have you!`
+                    body: `<p>Hi ${full_name},</p> <p>&emsp;Welcome to AEIMS. Your account has been registered successfully. Please wait until your Administrator approves your account.</p>`,
+                    isHtml: true
                 })
             });
 
