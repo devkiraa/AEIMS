@@ -89,8 +89,8 @@
 
         /* Next button styling similar to the Add Guest Details page */
         .back-btn {
-            background-color: #6B7280; /* Tailwind blue-600 */
-            color: white;
+            background-color: #E5E7EB; /* Tailwind blue-600 */
+            color: #374151;
             padding: 10px 20px;
             border-radius: 8px;
             display: flex;
@@ -100,7 +100,7 @@
         }
 
         .back-btn:hover {
-            background-color: #4B5563; /* Tailwind blue-700 */
+            background-color: #D1D5DB; /* Tailwind blue-700 */
         }
 
         #coordinator-search {
@@ -358,9 +358,178 @@
             // searchBar.addEventListener('input', filterUsers);
             
             // Initial toggle states
+            checkRequiredFields();
             toggleCoordinatorSearch();
             toggleGuestCounter();
             toggleVolunteerCounter();
+
+            // Retrieve existing data from sessionStorage
+            const existingData = JSON.parse(sessionStorage.getItem('eventData'));
+
+            // Check if all required fields are filled
+            function checkRequiredFields() {
+                const eventTitle = document.getElementById('event_title');
+                const eventDescription = document.getElementById('event_description');
+                const fileInput = document.getElementById('event_poster');
+                const nextButton = document.querySelector('.next-btn');
+
+                // Check if all fields are filled
+                if (eventTitle.value && eventDescription.value && (fileInput.files.length > 0)) {
+                    nextButton.classList.add('enabled');
+                    nextButton.disabled = false;
+                } else {
+                    nextButton.classList.remove('enabled');
+                    nextButton.disabled = true;
+                }
+            }
+
+            // Add event listeners to input fields to trigger checkRequiredFields
+            const inputFields = [
+                'event_title',
+                'start_date',
+                'end_date',
+                'start_time',
+                'end_time',
+                'venue',
+                'event_description',
+                'event_poster'
+            ];
+
+            inputFields.forEach(id => {
+                const input = document.getElementById(id);
+                if (input) {
+                    input.addEventListener('input', checkRequiredFields);
+                } else {
+                    console.error(`Element with ID ${id} not found.`);
+                }
+            });
+
+            // Handle the next button click event
+            document.querySelector('.next-btn').addEventListener('click', async (event) => {
+                event.preventDefault();
+
+                // Gather form data
+                const eventTitle = document.getElementById('event_title').value;
+                const startDate = document.getElementById('start_date').value;
+                const endDate = document.getElementById('end_date').value;
+                const startTime = document.getElementById('start_time').value;
+                const endTime = document.getElementById('end_time').value;
+                const venue = document.getElementById('venue').value;
+                const eventDescription = document.getElementById('event_description').value;
+                const volunteerCounter = parseInt(document.getElementById('volunteer-counter').value);
+                const guestCounter = parseInt(document.getElementById('guest-counter').value);
+                const eventPoster = document.getElementById('event_poster').files[0];
+                const eventFood = 0;
+
+                const vselectedOption = document.querySelector('input[name="event_volunteers"]:checked');
+                const cselectedOption = document.querySelector('input[name="event_coordinators"]:checked');
+                const gselectedOption = document.querySelector('input[name="event_guests"]:checked');
+                const fselectedOption = document.querySelector('input[name="event_food"]:checked');
+
+                // Define a lookup table for event configurations
+                const eventConfigurations = {
+                   'no_no': {
+                        'none_single': { volunteerCount: 0, eventFood: 0, guestCount: 0 },
+                        'none_multiple': { volunteerCount: 0, eventFood: 0, guestCount: 0 },
+                        'single_single': { volunteerCount: 0, eventFood: 0, guestCount: 1 },
+                        'single_multiple': { volunteerCount: 0, eventFood: 0, guestCount: 1 },
+                        'multiple_single': { volunteerCount: 0, eventFood: 0, guestCount: guestCounter },
+                        'multiple_multiple': { volunteerCount: 0, eventFood: 0, guestCount: guestCounter }
+                    },
+                    'yes_yes': {
+                        'none_single': { volunteerCount: volunteerCounter, eventFood: 1, guestCount: 0 },
+                        'none_multiple': { volunteerCount: volunteerCounter, eventFood: 1, guestCount: 0 },
+                        'single_single': { volunteerCount: volunteerCounter, eventFood: 1, guestCount: 1 },
+                        'single_multiple': { volunteerCount: volunteerCounter, eventFood: 1, guestCount: 1 },
+                        'multiple_single': { volunteerCount: volunteerCounter, eventFood: 1, guestCount: guestCounter },
+                        'multiple_multiple': { volunteerCount: volunteerCounter, eventFood: 1, guestCount: guestCounter }
+                    },
+                    'yes_no': {
+                        'none_single': { volunteerCount: volunteerCounter, eventFood: 0, guestCount: 0 },
+                        'none_multiple': { volunteerCount: volunteerCounter, eventFood: 0, guestCount: 0 },
+                        'single_single': { volunteerCount: volunteerCounter, eventFood: 0, guestCount: 1 },
+                        'single_multiple': { volunteerCount: volunteerCounter, eventFood: 0, guestCount: 1 },
+                        'multiple_single': { volunteerCount: volunteerCounter, eventFood: 0, guestCount: guestCounter },
+                        'multiple_multiple': { volunteerCount: volunteerCounter, eventFood: 0, guestCount: guestCounter }
+                    },
+                    'no_yes': {
+                        'none_single': { volunteerCount: 0, eventFood: 1, guestCount: 0 },
+                        'none_multiple': { volunteerCount: 0, eventFood: 1, guestCount: 0 },
+                        'single_single': { volunteerCount: 0, eventFood: 1, guestCount: 1 },
+                        'single_multiple': { volunteerCount: 0, eventFood: 1, guestCount: 1 },
+                        'multiple_single': { volunteerCount: 0, eventFood: 1, guestCount: guestCounter },
+                        'multiple_multiple': { volunteerCount: 0, eventFood: 1, guestCount: guestCounter }
+                    }
+                };
+
+                // Get the values from the selected options
+                const vselected = vselectedOption.value;
+                const fselected = fselectedOption.value;
+                const gselected = gselectedOption.value;
+                const cselected = cselectedOption.value;
+
+                // Construct the keys for the lookup
+                const key = `${vselected}_${fselected}`;
+                const guestKey = `${gselected}_${cselected}`;
+
+                // Check if the configuration exists
+                if (eventConfigurations[key] && eventConfigurations[key][guestKey]) {
+                    const { volunteerCount, eventFood, guestCount } = eventConfigurations[key][guestKey];
+
+                    // Update the existing data with the new values
+                    updatedData = {
+                        eventTitle,
+                        eventDescription,
+                        volunteerCount,
+                        guestCount,
+                        eventFood
+                    };
+
+                    console.log(updatedData);
+
+                    const formData = new FormData();
+                    formData.append('eventPoster', eventPoster);
+
+                    // Save the updated data to sessionStorage
+                    sessionStorage.setItem('eventDetails', JSON.stringify(updatedData));
+
+                    // Send the FormData to the server
+                    try {
+                        const response = await fetch('/api/upload-file', { // Endpoint to handle file upload
+                            method: 'POST',
+                            body: formData
+                        });
+
+                        if (response.ok) {
+                            const result = await response.json(); // Get the response from the server
+                            const imageUrl = result.url; // Assuming the server returns the URL of the uploaded file
+
+                            // Store the URL in sessionStorage
+                            sessionStorage.setItem('eventPosterUrl', imageUrl);
+
+                            // Redirect to the next page
+                            if (eventConfigurations[key][guestKey].guestCount === 0) {
+                                window.location.href = '/book-event/resource';
+                            } else {
+                                window.location.href = '/book-event/guest-details';
+                            }
+                        } else {
+                            console.error("Upload failed.");
+                        }
+                    } catch (error) {
+                        console.error("Error uploading:", error);
+                    }
+
+                    // // Redirect to the next page
+                    // if (eventConfigurations[key][guestKey].guestCount === 0) {
+                    //     window.location.href = '/book-event/resource';
+                    // } else {
+                    //     window.location.href = '/book-event/guest-details';
+                    // }
+                } else {
+                    console.error("Critical Value Error!");
+                }
+            });
         });
 
         function toggleCoordinatorSearch() {
@@ -467,7 +636,7 @@
                 Array.from(items).forEach((item, idx) => item.classList.toggle('highlight', idx === highlightedIndex));
             }
 
-        function highlightUser() {
+            function highlightUser() {
                 const userListItems = userList.children;
                 if (highlightedIndex >= 0 && highlightedIndex < userListItems.length) {
                     for (let i = 0; i < userListItems.length; i++) {
@@ -501,6 +670,21 @@
                     clearTimeout(timeout);
                     timeout = setTimeout(later, wait);
                 };
+            }
+
+            function validateFile() {
+                const fileInput = document.getElementById('event_poster');
+                const errorMessage = document.getElementById('file-error');
+                const filePath = fileInput.value;
+                const allowedExtensions = /(\.jpg|\.jpeg|\.png)$/i;
+        
+                if (!allowedExtensions.exec(filePath)) {
+                    errorMessage.classList.remove('hidden');  // Show the error message
+                    fileInput.value = '';  // Clear the file input
+                 return false;
+                } else {
+                    errorMessage.classList.add('hidden');  // Hide the error message if the file is valid
+                }
             }
     </script>
 </head>
@@ -605,14 +789,18 @@
                         <label class="form-label block">Event Guests</label>
                         <div class="flex">
                             <label class="radio-label">
-                                <input type="radio" name="event_guests" value="single" checked>
+                                <input type="radio" name="event_guests" value="none" checked>
+                                None
+                            </label>
+                            <label class="radio-label">
+                                <input type="radio" name="event_guests" value="single">
                                 Single
                             </label>
                             <label class="radio-label">
                                 <input type="radio" name="event_guests" value="multiple">
                                 Multiple
                             </label>
-                            <input type="number" id="guest-counter" name="guest_counter" placeholder="Number of Guests" min="1" value="1" class="w-full p-2 border border-gray-300 rounded">
+                            <input type="number" id="guest-counter" name="guest_counter" placeholder="Number of Guests" min="2" value="2" class="w-full p-2 border border-gray-300 rounded">
                         </div>
                     </div>
 
@@ -633,7 +821,8 @@
                     <!-- File upload for event poster -->
                     <div class="form-section">
                         <label for="event_poster" class="form-label block">Event Poster</label>
-                        <input type="file" name="event_poster" id="event_poster" class="w-full p-2 border border-gray-300 rounded mt-1">
+                        <input type="file" name="event_poster" id="event_poster" class="w-full p-2 border border-gray-300 rounded mt-1" accept=".jpg, .jpeg, .png" onchange="validateFile()">
+                        <span id="file-error" class="text-red-500 text-sm mt-1 hidden">Please upload a file with .jpg, .jpeg, or .png extension.</span>
                     </div>
                 </div>
             </div>
@@ -646,7 +835,7 @@
                     </svg>
                     Back
                 </button>
-                <button type="submit" class="next-btn flex">
+                <button type="submit" class="next-btn flex disabled" disabled>
                     Next
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-2" viewBox="0 0 20 20" fill="currentColor">
                         <path fill-rule="evenodd" d="M12.293 10.707l-5.146 5.146a.5.5 0 01-.708-.708L11.293 10 6.44 5.146a.5.5 0 01.708-.708l5.146 5.146a.5.5 0 010 .708z" clip-rule="evenodd" />

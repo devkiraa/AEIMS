@@ -6,34 +6,93 @@
     <title>Add Resources</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-    <script src="https://cdn.tailwindcss.com"></script>
     <style>
         body {
             font-family: 'Poppins', sans-serif;
         }
+
+        .btn-primary {
+            background-color: #2563EB; /* Tailwind blue-600 */
+            color: white;
+            padding: 0.75rem 2rem;
+            border-radius: 0.375rem;
+            font-weight: 600;
+        }
+
+        .btn-primary:hover {
+            background-color: #1D4ED8; /* Tailwind blue-700 */
+        }
+
+        .btn-secondary {
+            background-color: #E5E7EB; /* Tailwind gray-300 */
+            color: #374151; /* Tailwind gray-700 */
+            padding: 0.75rem 2rem;
+            border-radius: 0.375rem;
+            font-weight: 600;
+        }
+
+        .btn-secondary:hover {
+            background-color: #D1D5DB; /* Tailwind gray-400 */
+        }
     </style>
+    <!-- JavaScript for Filtering and Adding Resources -->
+    <script>
+        // Example for filtering inventory
+        document.getElementById('searchInventory').addEventListener('input', function() {
+            const searchTerm = this.value.toLowerCase();
+            const rows = document.querySelectorAll('#inventoryTable tr');
+            rows.forEach(row => {
+                const itemName = row.cells[0].innerText.toLowerCase();
+                if (itemName.includes(searchTerm)) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        });
+
+        // Functionality to add resources to event
+        document.querySelectorAll('#inventoryTable button').forEach(button => {
+            button.addEventListener('click', function() {
+                const row = this.closest('tr');
+                const name = row.cells[0].innerText;
+                const count = row.cells[3].innerText;
+                const today = new Date().toLocaleDateString();
+
+                const newRow = `
+                    <tr>
+                        <td class="p-4">${name}</td>
+                        <td class="p-4">${count}</td>
+                        <td class="p-4">${today}</td>
+                        <td class="p-4">${today}</td>
+                        <td class="p-4"><button class="bg-red-500 text -white px-3 py-1 rounded-lg">x</button></td>
+                    </tr>
+                `;
+
+                document.getElementById('eventResourcesTable').innerHTML += newRow;
+            });
+        });
+    </script>
 </head>
 <body class="bg-gray-50">
     <div class="min-h-screen flex flex-col">
         <!-- Navbar -->
-    <nav class="bg-blue-600 p-4">
-        <div class="container mx-auto flex justify-between items-center">
-            <!-- Move header elements to the left -->
-            <div class="flex items-center space-x-6">
-                <ul class="flex space-x-6 text-white">
-                    <li><a href="#" class="hover:text-gray-300">Home</a></li>
-                    <li><a href="#" class="hover:text-gray-300">Create</a></li>
-                    <li><a href="#" class="hover:text-gray-300">Users</a></li>
-                    <li><a href="#" class="hover:text-gray-300">My Events</a></li>
-                    <li><a href="#" class="hover:text-gray-300">About Us</a></li>
-                </ul>
+        <nav class="bg-blue-600 p-4">
+            <div class="container mx-auto flex justify-between items-center">
+                <div class="flex items-center space-x-6">
+                    <ul class="flex space-x-6 text-white">
+                        <li><a href="#" class="hover:text-gray-300">Home</a></li>
+                        <li><a href="#" class="hover:text-gray-300">Create</a></li>
+                        <li><a href="#" class="hover:text-gray-300">Users</a></li>
+                        <li><a href="#" class="hover:text-gray-300">My Events</a></li>
+                        <li><a href="#" class="hover:text-gray-300">About Us</a></li>
+                    </ul>
+                </div>
+                <div class="bg-white rounded-full p-2">
+                    <a href="#"><img src="/assets/icons/avatar.svg" alt="User  Icon" class="w-6 h-6"></a>
+                </div>
             </div>
-            <!-- User icon in rounded background -->
-            <div class="bg-white rounded-full p-2">
-                <a href="#"><img src="/assets/icons/avatar.svg" alt="User Icon" class="w-6 h-6"></a>
-            </div>
-        </div>
-    </nav>
+        </nav>
 
         <!-- Main Content -->
         <main class="flex-grow container mx-auto p-6 max-w-5xl">
@@ -65,7 +124,7 @@
                             <tr>
                                 <td class="p-4">Chair</td>
                                 <td class="p-4">850</td>
-                                <td class="p-4">450</td>
+                                <td class="p-4"> 450</td>
                                 <td class="p-4">550</td>
                                 <td class="p-4"><button class="bg-blue-500 text-white px-3 py-1 rounded-lg">+</button></td>
                             </tr>
@@ -125,11 +184,17 @@
 
             <!-- Action Buttons -->
             <div class="flex justify-between">
-                <button class="bg-gray-300 text-gray-700 px-6 py-2 rounded-lg">
-                    ← Back
+                <button class="btn-secondary items-center flex" onclick="window.history.back()">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M7.707 9l4.646-4.646a.5.5 0 00-.708-.708L6.5 9l5.146 5.146a.5.5 0 00.708-.708L7.707 9z" clip-rule="evenodd" />
+                    </svg>
+                    Back
                 </button>
-                <button class="bg-blue-600 text-white px-6 py-2 rounded-lg">
-                    Preview →
+                <button class="btn-primary flex items-center">
+                    Submit
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-2" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M12.293 10.707l-5.146 5.146a.5.5 0 01-.708-.708L11.293 10 6.44 5.146a.5.5 0 01.708-.708l5.146 5.146a.5.5 0 010 .708z" clip-rule="evenodd" />
+                    </svg>
                 </button>
             </div>
         </main>
@@ -141,44 +206,5 @@
             </div>
         </footer>
     </div>
-
-    <!-- JavaScript for Filtering and Adding Resources -->
-    <script>
-        // Example for filtering inventory
-        document.getElementById('searchInventory').addEventListener('input', function() {
-            const searchTerm = this.value.toLowerCase();
-            const rows = document.querySelectorAll('#inventoryTable tr');
-            rows.forEach(row => {
-                const itemName = row.cells[0].innerText.toLowerCase();
-                if (itemName.includes(searchTerm)) {
-                    row.style.display = '';
-                } else {
-                    row.style.display = 'none';
-                }
-            });
-        });
-
-        // Functionality to add resources to event
-        document.querySelectorAll('#inventoryTable button').forEach(button => {
-            button.addEventListener('click', function() {
-                const row = this.closest('tr');
-                const name = row.cells[0].innerText;
-                const count = row.cells[3].innerText;
-                const today = new Date().toLocaleDateString();
-
-                const newRow = `
-                    <tr>
-                        <td class="p-4">${name}</td>
-                        <td class="p-4">${count}</td>
-                        <td class="p-4">${today}</td>
-                        <td class="p-4">${today}</td>
-                        <td class="p-4"><button class="bg-red-500 text-white px-3 py-1 rounded-lg">x</button></td>
-                    </tr>
-                `;
-
-                document.getElementById('eventResourcesTable').innerHTML += newRow;
-            });
-        });
-    </script>
 </body>
 </html>

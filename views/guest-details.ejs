@@ -52,6 +52,19 @@
             padding-bottom: 6rem; /* Ensure there's space for the fixed buttons */
         }
     </style>
+    <script>
+        // Function to show/hide external guest options
+        function toggleGuestOptions() {
+            const externalOptions = document.getElementById('externalOptions');
+            const guestType = document.querySelector('input[name="guestType"]:checked').value;
+
+            if (guestType === 'external') {
+                externalOptions.style.display = 'block';
+            } else {
+                externalOptions.style.display = 'none';
+            }
+        }
+    </script>
 </head>
 <body class="bg-gray-100 min-h-screen">
 
@@ -76,10 +89,10 @@
     </nav>
 
     <!-- Main Content Wrapper to handle scrolling -->
-    <div class="content-wrapper">
+    <div class="content-wrapper bg-white">
         <div class="container mx-auto px-4 py-8 page-container">
             <!-- Form Heading -->
-            <h1 class="text-2xl font-semibold mb-6">Add Guest Details!</h1>
+            <h2 class="text-2xl font-semibold mb-6">Add Guest Details!</h2>
 
             <!-- Form Section -->
             <form>
@@ -176,7 +189,7 @@
                 <!-- Action Buttons (Always at Bottom Right) -->
                 <div class="form-buttons flex flex-col space-y-4 md:flex-row md:space-x-4 md:space-y-0">
                     <!-- Back Button with Left Arrow -->
-                    <button type="button" class="bg-gray-200 text-gray-700 py-2 px-4 rounded-lg font-medium hover:bg-gray-300 flex items-center justify-center">
+                    <button type="button" class="bg-gray-200 text-gray-700 py-2 px-4 rounded-lg font-medium hover:bg-gray-300 flex items-center justify-center" onclick="window.history.back()">
                         <!-- Left Arrow SVG -->
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
                             <path fill-rule="evenodd" d="M7.707 9l4.646-4.646a.5.5 0 00-.708-.708L6.5 9l5.146 5.146a.5.5 0 00.708-.708L7.707 9z" clip-rule="evenodd" />
@@ -196,19 +209,5 @@
             </form>
         </div>
     </div>
-
-    <script>
-        // Function to show/hide external guest options
-        function toggleGuestOptions() {
-            const externalOptions = document.getElementById('externalOptions');
-            const guestType = document.querySelector('input[name="guestType"]:checked').value;
-
-            if (guestType === 'external') {
-                externalOptions.style.display = 'block';
-            } else {
-                externalOptions.style.display = 'none';
-            }
-        }
-    </script>
 </body>
 </html>
