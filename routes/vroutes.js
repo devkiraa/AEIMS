@@ -32,7 +32,7 @@ router.get('/signup-waiting', (req, res) => {
 });
 
 // Dashboard page
-router.get('/dashboard', (req, res) => {
+router.get('/', (req, res) => {
     res.render('dashboard');
 });
 
