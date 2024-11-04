@@ -489,6 +489,23 @@
                 }
             }
         }
+        
+        // Function to validate and enforce 12-hour format (hh:mm AM/PM)
+        function validateTimeFormat(input) {
+            const timePattern = /^(0[1-9]|1[0-2]):([0-5][0-9])\s?(AM|PM)$/i;
+            return timePattern.test(input);
+        }
+
+        // Event listener to check time format on input
+        document.querySelectorAll('.input-field').forEach(inputField => {
+            inputField.addEventListener('blur', (event) => {
+                const input = event.target;
+                if (!validateTimeFormat(input.value)) {
+                    alert('Please enter the time in the format hh:mm AM/PM');
+                    input.value = '';  // Clear incorrect input
+                }
+            });
+        });
 
         window.onload = setMinDate;
     </script>
