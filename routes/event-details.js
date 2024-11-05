@@ -1,76 +1,72 @@
 const express = require('express');
-const mysql = require('mysql');
+const router = express.Router();
 const multer = require('multer'); // For handling file uploads
 const path = require('path');
-const app = express();
-
-// Middleware to parse form data
-app.use(express.urlencoded({ extended: true }));
-app.use(express.json());
-
-// Set up the MySQL connection
-const db = mysql.createConnection({
-    host: 'localhost',  // Change according to your database configuration
-    user: 'root',
-    password: 'password',
-    database: 'aeims'
-});
-
-db.connect((err) => {
-    if (err) throw err;
-    console.log('Connected to MySQL Database');
-});
+const db = require('../models/db'); // Ensure correct import of your database connection
 
 // Configure Multer for file upload (Event Poster)
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
-        cb(null, 'uploads/');  // Store files in the 'uploads' folder
+        cb(null, 'uploads/'); // Store files in the 'uploads' folder
     },
     filename: function (req, file, cb) {
-        cb(null, Date.now() + path.extname(file.originalname));  // Rename file with timestamp to avoid duplicates
+        cb(null, Date.now() + path.extname(file.originalname)); // Rename file with timestamp to avoid duplicates
     }
 });
 
 const upload = multer({ storage: storage });
 
-// POST route to handle event creation form
-app.post('/events/create', upload.single('event_poster'), (req, res) => {
+// Route to create an event
+router.post('/create', upload.single('event_poster'), (req, res) => {
     const {
-        event_title,
-        start_date,
-        start_time,
-        end_date,
-        end_time,
-        venue,
-        event_description,
-        event_volunteers,
-        event_coordinators,
-        guest_counter,
-        volunteer_counter,
-        event_food,
+        evn_name,
+        event_sd,
+        evn_st,
+        evn_ed,
+        event_et,
+        ven_id,
+        evn_desc,
+        evn_vol_cnt,
+        evn_snk,
+        evn_food,
+        evn_stat
     } = req.body;
 
-    // Handle boolean fields for volunteers and food
-    const volunteerRequired = event_volunteers === 'yes' ? 1 : 0;
-    const foodRequired = event_food === 'yes' ? 1 : 0;
+    // If an event poster was uploaded, use its path
+    const event_poster = req.file ? req.file.filename : null;
 
-    // Prepare the SQL query for inserting event data
-    const sql = `INSERT INTO events_tb (event_name, event_start_date, event_start_time, event_end_date, event_end_time, event_description, volunteer_required, guest_count, food_provided, venue_id) 
-                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+    // SQL query to insert the event into the database
+    const sql = `
+        INSERT INTO event_tb 
+        (evn_name, event_sd, evn_st, evn_ed, event_et, ven_id, evn_desc, event_poster, evn_vol_cnt, evn_snk, evn_food, evn_stat) 
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `;
 
-    // Execute the SQL query
-    db.query(sql, [event_title, start_date, start_time, end_date, end_time, event_description, volunteerRequired, guest_counter, foodRequired, venue], (err, result) => {
+    const values = [
+        evn_name,
+        event_sd,
+        evn_st,
+        evn_ed,
+        event_et,
+        ven_id,
+        evn_desc,
+        event_poster,
+        evn_vol_cnt || null, // Optional field
+        evn_snk,
+        evn_food,
+        evn_stat
+    ];
+
+    db.query(sql, values, (err, result) => {
         if (err) {
-            console.error('Error inserting event into the database:', err);
-            return res.status(500).send('Database error');
+            console.error(err);
+            return res.status(500).send('An error occurred while creating the event');
         }
-
-        console.log('Event inserted into the database:', result);
-        res.status(200).send('Event details saved successfully');
+        console.log('Event successfully created with ID:', result.insertId);
+        res.json({ message: 'Event created successfully!' });
     });
 });
 
-// Start the server
-app.listen(3000, () => {
-    console.log('Server running on port 3000');
-});
+// Export the router
+module.exports = router;
+ 

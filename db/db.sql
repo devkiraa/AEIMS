@@ -314,3 +314,12 @@ ADD COLUMN `gst_fee` TINYINT NULL AFTER `gst_acc`;
 
 ALTER TABLE `aeims`.`event_guest_details` 
 CHANGE COLUMN `gst_type` `gst_type` TINYINT NOT NULL ;
+
+-- Change as on 04/11/2024
+
+ALTER TABLE `aeims`.`inventory` 
+CHANGE COLUMN `inv_id` `inv_id` INT NOT NULL AUTO_INCREMENT ;
+
+ALTER TABLE `aeims`.`inventory` 
+CHANGE COLUMN `inv_service_count` `inv_service_count` VARCHAR(5) NULL ,
+CHANGE COLUMN `inv_remove_count` `inv_remove_count` VARCHAR(5) NULL ;
