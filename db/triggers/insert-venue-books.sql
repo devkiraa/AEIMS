@@ -1,6 +1,6 @@
 DELIMITER //
 
-CREATE TRIGGER update_venue_books
+CREATE TRIGGER insert_venue_books
 AFTER INSERT ON event_tb
 FOR EACH ROW
 BEGIN

@@ -18,15 +18,33 @@
         <!-- Navbar -->
         <nav class="bg-blue-600 p-4">
             <div class="container mx-auto flex justify-between items-center">
-                <ul class="flex space-x-6 text-white">
-                    <li><a href="#" class="hover:text-gray-300">Home</a></li>
-                    <li><a href="#" class="hover:text-gray-300">Events</a></li>
-                    <li><a href="#" class="hover:text-gray-300">Users</a></li>
-                    <li><a href="#" class="hover:text-gray-300">Inventory</a></li>
-                    <li><a href="#" class="hover:text-gray-300">About Us</a></li>
-                </ul>
-                <div class="bg-white rounded-full p-2">
-                    <a href="#"><img src="/assets/icons/avatar.svg" alt="User Icon" class="w-6 h-6"></a>
+                <!-- Navbar Links -->
+                <div class="flex items-center space-x-6">
+                    <ul class="flex space-x-6 text-white">
+                        <li><a href="/" class="hover:text-gray-300">Home</a></li>
+                        <% if (userRole !== 'ev') { %>
+                            <li><a href="/create-event" class="hover:text-gray-300">Create</a></li>
+                            <% if (userRole === 'admin' || userRole === 'hod') { %>
+                                <li><a href="/user-management" class="hover:text-gray-300">Users</a></li>
+                            <% } %>
+                            <% if (userRole === 'admin') { %>
+                                <li><a href="/inventory" class="hover:text-gray-300">Inventory</a></li>
+                            <% } %>
+                            <li><a href="/my-events" class="hover:text-gray-300">My Events</a></li>
+                        <% } %>
+                    </ul>                    
+                </div>
+    
+                <!-- Profile Dropdown (Visible on Click) -->
+                <div class="relative dropdown">
+                    <button class="bg-white rounded-full p-2" id="profileButton">
+                        <img src="/assets/icons/avatar.svg" alt="User Icon" class="w-6 h-6">
+                    </button>
+                    <div class="dropdown-menu absolute hidden right-0 mt-2 w-48 bg-white rounded-lg shadow-lg" id="profileDropdown">
+                        <a href="/profile" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">Profile</a>
+                        <a href="/change-password" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">Change Password</a>
+                        <a href="/logout" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">Logout</a>
+                    </div>
                 </div>
             </div>
         </nav>
