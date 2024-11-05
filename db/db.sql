@@ -314,3 +314,11 @@ ADD COLUMN `gst_fee` TINYINT NULL AFTER `gst_acc`;
 
 ALTER TABLE `aeims`.`event_guest_details` 
 CHANGE COLUMN `gst_type` `gst_type` TINYINT NOT NULL ;
+
+-- Change as on 5/11/2024
+
+ALTER TABLE aeims.event_tb
+ADD COLUMN evn_approval INTEGER(1);
+
+ALTER TABLE aeims.user_password_memory
+MODIFY COLUMN usr_pwd_mem_id INT AUTO_INCREMENT;
