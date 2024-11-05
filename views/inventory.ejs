@@ -6,27 +6,24 @@
     <title>Inventory and In Service</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-    <script src="https://cdn.tailwindcss.com"></script>
     <style>
         body {
             font-family: 'Poppins', sans-serif;
         }
+        .hidden { display: none; }
     </style>
 </head>
 <body class="bg-gray-50">
     <!-- Navbar -->
     <nav class="bg-blue-600 p-4">
         <div class="container mx-auto flex justify-between items-center">
-            <div class="flex items-center space-x-6">
-                <ul class="flex space-x-6 text-white">
-                    <li><a href="#" class="hover:text-gray-300">Home</a></li>
-                    <li><a href="#" class="hover:text-gray-300">Events</a></li>
-                    <li><a href="#" class="hover:text-gray-300">Users</a></li>
-                    <li><a href="#" class="hover:text-gray-300">Inventory</a></li>
-                    <li><a href="#" class="hover:text-gray-300">About Us</a></li>
-                </ul>
-            </div>
-            <!-- User icon -->
+            <ul class="flex space-x-6 text-white">
+                <li><a href="#" class="hover:text-gray-300">Home</a></li>
+                <li><a href="#" class="hover:text-gray-300">Events</a></li>
+                <li><a href="#" class="hover:text-gray-300">Users</a></li>
+                <li><a href="#" class="hover:text-gray-300">Inventory</a></li>
+                <li><a href="#" class="hover:text-gray-300">About Us</a></li>
+            </ul>
             <div class="bg-white rounded-full p-2">
                 <a href="#"><img src="/assets/icons/avatar.svg" alt="User Icon" class="w-6 h-6"></a>
             </div>
@@ -39,7 +36,6 @@
         <section>
             <div class="flex justify-between items-center mb-4">
                 <h2 class="text-2xl font-semibold">Inventory</h2>
-                <!-- Add Button -->
                 <button id="addInventoryBtn" class="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded flex items-center">
                     Add
                     <svg xmlns="http://www.w3.org/2000/svg" class="ml-2 h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -72,7 +68,7 @@
                 <table class="min-w-full bg-white">
                     <thead>
                         <tr class="bg-blue-50 text-gray-600">
-                            <th class="p-4">Event Title</th>
+                            <th class="p-4">Item Name</th>
                             <th class="p-4">Service Date</th>
                             <th class="p-4">Action</th>
                         </tr>
@@ -98,11 +94,6 @@
                     <label for="inv_item_count" class="block text-gray-700">Item Count:</label>
                     <input type="number" id="inv_item_count" class="w-full px-3 py-2 border border-gray-300 rounded" required>
                 </div>
-                <div class="mb-4">
-                    <label for="inv_service_count" class="block text-gray-700">Service Count:</label>
-                    <input type="number" id="inv_service_count" class="w-full px-3 py-2 border border-gray-300 rounded" required>
-                </div>
-                <!-- Hidden fields for auto-generated values -->
                 <input type="hidden" id="inv_id">
                 <input type="hidden" id="inv_first_added">
                 <div class="flex justify-end space-x-4">
@@ -113,54 +104,98 @@
         </div>
     </div>
 
+    <!-- Modal for adding to service -->
+    <div id="addToServiceModal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 hidden">
+        <div class="bg-white p-6 rounded-lg shadow-lg w-96">
+            <h2 class="text-2xl font-semibold mb-4">Add to Service</h2>
+            <p id="inventoryDetails" class="mb-4"></p>
+            <form id="addToServiceForm">
+                <div class="mb-4">
+                    <label for="service_item_count" class="block text-gray-700">Number of items to service:</label>
+                    <input type="number" id="service_item_count" class="w-full px-3 py-2 border border-gray-300 rounded" required>
+                </div>
+                <div class="flex justify-end space-x-4">
+                    <button type="button" class="bg-gray-500 text-white py-2 px-4 rounded" onclick="closeServiceModal()">Cancel</button>
+                    <button type="submit" class="bg-blue-500 text-white py-2 px-4 rounded">OK</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <script>
-        // Open the modal when the "Add" button is clicked
+        // Load inventory data on page load
+        async function loadInventory() {
+            try {
+                const response = await fetch('/api/inventory');
+                if (!response.ok) {
+                    throw new Error('Network response was not ok ' + response.statusText);
+                }
+                const inventoryItems = await response.json();
+    
+                // Clear the table before adding new items
+                document.getElementById('inventoryBody').innerHTML = '';
+    
+                inventoryItems.forEach(item => {
+                    const newRow = `
+                        <tr>
+                            <td class="p-4">${item.inv_prd_name}</td>
+                            <td class="p-4">${new Date(item.inv_first_added).toLocaleDateString()}</td>
+                            <td class="p-4">${item.inv_item_count}</td>
+                            <td class="p-4 text-center">
+                                <button class="text-blue-500 hover:text-blue-700" onclick="showAddToServiceModal(this)">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 inline-block" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                                    </svg>
+                                </button>
+                            </td>
+                            <td class="p-4 text-center">
+                                <button class="text-gray-500 hover:text-red-600" onclick="deleteRow(this)">
+                                    <img src="/assets/icons/delete_24dp_6B7280_FILL0_wght500_GRAD0_opsz24.svg" alt="Delete Icon" class="w-6 h-6">
+                                </button>
+                                <button class="text-gray-500 hover:text-green-600" onclick="editRow(this)">
+                                    <img src="/assets/icons/edit_24dp_6B7280_FILL0_wght500_GRAD0_opsz24.svg" alt="Edit Icon" class="w-6 h-6">
+                                </button>
+                            </td>
+                        </tr>
+                    `;
+                    document.getElementById('inventoryBody').insertAdjacentHTML('beforeend', newRow);
+                });
+            } catch (error) {
+                console.error('Error loading inventory:', error);
+            }
+        }
+    
+        // Modal handling functions
         document.getElementById('addInventoryBtn').addEventListener('click', function () {
             openModal();
         });
-
+    
         function openModal() {
-            // Auto-generate inv_id (e.g., using a timestamp or a random number)
-            const inv_id = 'INV' + Date.now(); // This will generate a unique ID based on timestamp
+            const inv_id = 'INV' + Date.now();
             document.getElementById('inv_id').value = inv_id;
-
-            // Auto-generate inv_first_added with the current date
             const currentDate = new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
             document.getElementById('inv_first_added').value = currentDate;
-
-            // Show the modal
             document.getElementById('addInventoryModal').classList.remove('hidden');
         }
-
-        // Close the modal
+    
         function closeModal() {
             document.getElementById('addInventoryModal').classList.add('hidden');
         }
-
-        // Handle the form submission
-        document.getElementById('addInventoryForm').addEventListener('submit', function (e) {
+    
+        document.getElementById('addInventoryForm').addEventListener('submit', async function (e) {
             e.preventDefault();
-
-            // Get the values from the form
             const inv_prd_name = document.getElementById('inv_prd_name').value;
             const inv_item_count = document.getElementById('inv_item_count').value;
-            const inv_service_count = document.getElementById('inv_service_count').value;
-            const inv_id = document.getElementById('inv_id').value;
             const inv_first_added = document.getElementById('inv_first_added').value;
-
-            // You can also generate inv_remove_count and inv_stat based on your needs
-            const inv_remove_count = 0; // Assuming it's initially 0
-            const inv_stat = "Available"; // Assuming status is 'Available' by default
-
-            // Now add the new inventory item to the table
+    
             const newRow = `
                 <tr>
                     <td class="p-4">${inv_prd_name}</td>
                     <td class="p-4">${inv_first_added}</td>
                     <td class="p-4">${inv_item_count}</td>
                     <td class="p-4 text-center">
-                        <button class="text-blue-500 hover:text-blue-700" onclick="addToService(this)">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <button class="text-blue-500 hover:text-blue-700" onclick="showAddToServiceModal(this)">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 inline-block" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
                             </svg>
                         </button>
@@ -169,21 +204,76 @@
                         <button class="text-gray-500 hover:text-red-600" onclick="deleteRow(this)">
                             <img src="/assets/icons/delete_24dp_6B7280_FILL0_wght500_GRAD0_opsz24.svg" alt="Delete Icon" class="w-6 h-6">
                         </button>
-                        <button class="text-gray-500 hover:text-red-600">
+                        <button class="text-gray-500 hover:text-green-600" onclick="editRow(this)">
                             <img src="/assets/icons/edit_24dp_6B7280_FILL0_wght500_GRAD0_opsz24.svg" alt="Edit Icon" class="w-6 h-6">
                         </button>
                     </td>
                 </tr>
             `;
-
-            document.getElementById('inventoryBody').innerHTML += newRow;
-
-            // Close the modal
+            document.getElementById('inventoryBody').insertAdjacentHTML('beforeend', newRow);
             closeModal();
-
-            // Reset the form
-            document.getElementById('addInventoryForm').reset();
+        });
+    
+        function deleteRow(button) {
+            button.closest('tr').remove();
+        }
+    
+        // Add to service modal handling
+        function showAddToServiceModal(button) {
+            const row = button.closest('tr');
+            const itemName = row.cells[0].innerText;
+            const itemCount = row.cells[2].innerText;
+    
+            document.getElementById('inventoryDetails').innerText = `Item: ${itemName}, Available Quantity: ${itemCount}`;
+            document.getElementById('addToServiceModal').classList.remove('hidden');
+        }
+    
+        function closeServiceModal() {
+            document.getElementById('addToServiceModal').classList.add('hidden');
+        }
+    
+        document.getElementById('addToServiceForm').addEventListener('submit', async function (e) {
+            e.preventDefault();
+            const serviceCount = document.getElementById('service_item_count').value;
+            const inventoryDetails = document.getElementById('inventoryDetails').innerText;
+    
+            const itemName = inventoryDetails.split(',')[0].replace('Item: ', '').trim();
+    
+            const newRow = `
+                <tr>
+                    <td class="p-4">${itemName}</td>
+                    <td class="p-4">${new Date().toLocaleDateString()}</td>
+                    <td class="p-4 text-center">
+                        <button class="text-gray-500 hover:text-red-600" onclick="deleteRow(this)">
+                            <img src="/assets/icons/delete_24dp_6B7280_FILL0_wght500_GRAD0_opsz24.svg" alt="Delete Icon" class="w-6 h-6">
+                        </button>
+                    </td>
+                </tr>
+            `;
+            document.getElementById('serviceBody').insertAdjacentHTML('beforeend', newRow);
+            closeServiceModal();
+        });
+    
+        // Edit functionality
+        function editRow(button) {
+            const row = button.closest('tr');
+            const itemName = row.cells[0].innerText;
+            const itemCount = row.cells[2].innerText;
+    
+            // Open modal with pre-filled data
+            openModal();
+            document.getElementById('inv_prd_name').value = itemName;
+            document.getElementById('inv_item_count').value = itemCount;
+    
+            // Remove the current row to replace it with the edited version
+            row.remove();
+        }
+    
+        // Load inventory when the DOM is fully loaded
+        document.addEventListener('DOMContentLoaded', () => {
+            loadInventory(); // Call the loadInventory function when the DOM is fully loaded
         });
     </script>
+    
 </body>
 </html>

@@ -128,4 +128,13 @@ router.get('/', async (req, res) => {
     });
 });
 
+router.get('/user-management', (req, res) => {
+    if (!req.session.user_id) {
+        return res.redirect('/login');
+    }
+    const userRole = req.session.user_role;
+    console.log(req.session.user_role);
+    res.render('user-management', { userRole });
+});
+
 module.exports = router;

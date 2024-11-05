@@ -41,6 +41,7 @@ const bookingRoutes = require('./routes/venue-availability');
 const quickEventRoutes = require('./routes/quick-event');
 const resetPasswordRoutes = require('./routes/resetpassword');
 const fileHandlerRoutes = require('./routes/fileHandler');
+const inventoryRoutes = require('./routes/inventory');
 // const resetPasswordRouter = require('./routes/resetpassword');
 
 // Use the user routes with '/api' as prefix to avoid conflicts
@@ -53,6 +54,7 @@ app.use('/api', quickEventRoutes);
 app.use('/', resetPasswordRoutes);
 app.use('/api', fileHandlerRoutes);
 app.use('/uploads', express.static('uploads'));
+app.use('/api', inventoryRoutes);
 // app.use('/', resetPasswordRouter);
 
 // Start server

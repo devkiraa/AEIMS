@@ -3,32 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>User Management</title>
+    <title>Inventory Management</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <style>
         body {
             font-family: 'Poppins', sans-serif;
         }
-        /* Popup Styles */
-        .popup-overlay {
-            background-color: rgba(0, 0, 0, 0.5);
-        }
-        .popup-content {
-            position: relative;
-        }
-        .popup-close {
-            position: absolute;
-            top: 0.5rem;
-            right: 0.5rem;
-            cursor: pointer;
-            font-size: 1.5rem;
-            color: #4B5563;
-            transition: color 0.3s;
-        }
-        .popup-close:hover {
-            color: #EF4444;
-        }
+        .hidden { display: none; }
     </style>
 </head>
 <body class="bg-gray-50">
@@ -36,89 +18,58 @@
         <!-- Navbar -->
         <nav class="bg-blue-600 p-4">
             <div class="container mx-auto flex justify-between items-center">
-                <ul class="flex space-x-6 text-white">
-                    <li><a href="#" class="hover:text-gray-300">Home</a></li>
-                    <li><a href="#" class="hover:text-gray-300">Events</a></li>
-                    <li><a href="#" class="hover:text-gray-300">Users</a></li>
-                    <li><a href="#" class="hover:text-gray-300">Inventory</a></li>
-                    <li><a href="#" class="hover:text-gray-300">About Us</a></li>
-                </ul>
-                <div class="bg-white rounded-full p-2">
-                    <a href="#"><img src="/assets/icons/avatar.svg" alt="User Icon" class="w-6 h-6"></a>
+                <!-- Navbar Links -->
+                <div class="flex items-center space-x-6">
+                    <ul class="flex space-x-6 text-white">
+                        <li><a href="/" class="hover:text-gray-300">Home</a></li>
+                        <% if (userRole !== 'ev') { %>
+                            <li><a href="/create-event" class="hover:text-gray-300">Create</a></li>
+                            <% if (userRole === 'admin' || userRole === 'hod') { %>
+                                <li><a href="/user-management" class="hover:text-gray-300">Users</a></li>
+                            <% } %>
+                            <% if (userRole === 'admin') { %>
+                                <li><a href="/inventory" class="hover:text-gray-300">Inventory</a></li>
+                            <% } %>
+                            <li><a href="/my-events" class="hover:text-gray-300">My Events</a></li>
+                        <% } %>
+                    </ul>                    
+                </div>
+    
+                <!-- Profile Dropdown (Visible on Click) -->
+                <div class="relative dropdown">
+                    <button class="bg-white rounded-full p-2" id="profileButton">
+                        <img src="/assets/icons/avatar.svg" alt="User Icon" class="w-6 h-6">
+                    </button>
+                    <div class="dropdown-menu absolute hidden right-0 mt-2 w-48 bg-white rounded-lg shadow-lg" id="profileDropdown">
+                        <a href="/profile" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">Profile</a>
+                        <a href="/change-password" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">Change Password</a>
+                        <a href="/logout" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">Logout</a>
+                    </div>
                 </div>
             </div>
         </nav>
 
         <!-- Main Content -->
         <main class="flex-grow container mx-auto p-6 max-w-5xl">
-            <h1 class="text-3xl font-bold mb-8">User Management</h1>
+            <h1 class="text-3xl font-bold mb-8">Inventory Management</h1>
         
-            <!-- Flex container to align tabs and search bar -->
-            <div class="mb-6 flex justify-between items-center">
-                <!-- Tab navigation -->
-                <ul class="flex divide-x divide-gray-300">
-                    <li id="all-tab" class="px-4 text-blue-600 hover:text-gray-700 cursor-pointer" onclick="switchTab('all')">
-                        All Users
-                    </li>
-                    <li id="deleted-tab" class="px-4 text-gray-500 hover:text-gray-700 cursor-pointer" onclick="switchTab('deleted')">
-                        Deleted Users
-                    </li>
-                </ul>
-        
-                <!-- Search bar -->
-                <div class="w-full md:w-1/2">
-                    <input 
-                        type="text" 
-                        placeholder="Search User..." 
-                        class="w-full p-2 border rounded-lg" 
-                        id="searchUser">
-                </div>
-            </div>
-        
-            <!-- User Tables for Tabs -->
-            <div id="all" class="tab-content">
-                <h2 class="text-xl font-semibold mb-4">All Users</h2>
-                <div class="overflow-x-auto">
-                    <table class="min-w-full bg-white border border-gray-300 rounded-lg">
-                        <thead>
-                            <tr class="bg-gray-100 text-gray-600 text-left">
-                                <th class="p-4">Name</th>
-                                <th class="p-4">Role</th>
-                                <th class="p-4">Create Date</th>
-                                <th class="p-4">Department</th>
-                                <th class="p-4">Action</th>
-                            </tr>
-                        </thead>
-                        <tbody id="userTable">
-                            <!-- User rows will be populated dynamically -->
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        
-            <div id="deleted" class="tab-content hidden">
-                <h2 class="text-xl font-semibold mb-4">Deleted Users</h2>
-                <div class="overflow-x-auto">
-                    <table class="min-w-full bg-white border border-gray-300 rounded-lg">
-                        <thead>
-                            <tr class="bg-gray-100 text-gray-600 text-left">
-                                <th class="p-4">Name</th>
-                                <th class="p-4">Role</th>
-                                <th class="p-4">Created Date</th>
-                                <th class="p-4">Delete Date</th>
-                                <th class="p-4">Department</th>
-                                <th class="p-4">Action</th>
-                            </tr>
-                        </thead>
-                        <tbody id="deletedUserTable">
-                            <!-- Deleted user rows will be populated dynamically -->
-                        </tbody>
-                    </table>
-                </div>
+            <div class="overflow-x-auto">
+                <table class="min-w-full bg-white border border-gray-300 rounded-lg">
+                    <thead>
+                        <tr class="bg-gray-100 text-gray-600 text-left">
+                            <th class="p-4">Item Name</th>
+                            <th class="p-4">Category</th>
+                            <th class="p-4">Quantity</th>
+                            <th class="p-4">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="inventoryTable">
+                        <!-- Inventory rows will be populated dynamically -->
+                    </tbody>
+                </table>
             </div>
         </main>
         
-
         <!-- Footer -->
         <footer class="bg-blue-600 p-4 mt-8">
             <div class="text-center text-white">
@@ -127,302 +78,93 @@
         </footer>
     </div>
 
-    <!-- Popup Modal Edit -->
-    <div id="userPopup" class="fixed inset-0 hidden flex items-center justify-center popup-overlay">
-        <div class="bg-white p-6 rounded-lg shadow-lg max-w-lg w-full popup-content">
+    <!-- Popup Modal -->
+    <div id="inventoryPopup" class="fixed inset-0 flex items-center justify-center hidden">
+        <div class="bg-white p-6 rounded-lg shadow-lg max-w-lg w-full">
             <!-- Close Icon -->
-            <span class="popup-close" onclick="closePopup(0)">&times;</span>
+            <span class="absolute top-4 right-4 text-gray-500 hover:text-gray-700 cursor-pointer" onclick="closePopup()">&times;</span>
 
-            <h2 class="text-xl font-semibold mb-4">User Details</h2>
+            <h2 class="text-xl font-semibold mb-4">Inventory Details</h2>
             <div id="popupContent">
-                <!-- User details will be populated dynamically -->
+                <!-- Inventory details will be populated dynamically -->
             </div>
             <div class="mt-4 text-right">
-                <button onclick="saveUser()" class="bg-blue-600 text-white px-4 py-2 rounded-lg">
+                <button onclick="saveInventory()" class="bg-blue-600 text-white px-4 py-2 rounded-lg">
                     Save
                 </button>
-                <button onclick="closePopup(0)" class="bg-gray-200 text-gray-700 px-4 py-2 rounded-lg mr-2">
+                <button onclick="closePopup()" class="bg-gray-200 text-gray-700 px-4 py-2 rounded-lg mr-2">
                     Cancel
                 </button>
             </div>
         </div>
     </div>
 
-    <!-- Popup Model for Delete -->
-    <div id="deleteUserPopup" class="fixed inset-0 hidden flex items-center justify-center popup-overlay">
-        <div class="bg-white p-6 rounded-lg shadow-lg max-w-lg w-full popup-content">
-            <!-- Close Icon -->
-            <span class="popup-close" onclick="closePopup(1)">&times;</span>
-
-            <h2 class="text-xl font-semibold mb-4">Delete User</h2>
-            <!-- Dynamic Content -->
-            <div id="deletePopupContent">
-                <!-- User details or delete confirmation will be populated here -->
-            </div>
-
-            <div class="mt-4 text-right">
-                <button onclick="deleteUser()" class="bg-blue-600 text-white px-4 py-2 rounded-lg ">
-                    Yes
-                </button>
-                <button onclick="closePopup(1)" class="bg-gray-200 text-gray-700 px-4 py-2 rounded-lg mr-2">
-                    No
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Popup Model for Restore -->
-    <div id="restoreUserPopup" class="fixed inset-0 hidden flex items-center justify-center popup-overlay">
-        <div class="bg-white p-6 rounded-lg shadow-lg max-w-lg w-full popup-content">
-            <!-- Close Icon -->
-            <span class="popup-close" onclick="closePopup(2)">&times;</span>
-
-            <h2 class="text-xl font-semibold mb-4">Restore User</h2>
-            <!-- Dynamic Content -->
-            <div id="restorePopupContent">
-                <!-- User details or delete confirmation will be populated here -->
-            </div>
-
-            <div class="mt-4 text-right">
-                <button onclick="restoreUser()" class="bg-blue-600 text-white px-4 py-2 rounded-lg ">
-                    Yes
-                </button>
-                <button onclick="closePopup(2)" class="bg-gray-200 text-gray-700 px-4 py-2 rounded-lg mr-2">
-                    No
-                </button>
-            </div>
-        </div>
-    </div>
-
     <script>
-        function switchTab(tabId) {
-            const tabs = ['all', 'deleted'];
+        const inventoryData = [
+            { itemName: 'Projector', category: 'Electronics', quantity: 5 },
+            { itemName: 'Microphone', category: 'Audio', quantity: 20 },
+            { itemName: 'Chairs', category: 'Furniture', quantity: 100 }
+        ];
 
-            // Hide all tab content and reset tab styles
-            tabs.forEach(tab => {
-                document.getElementById(tab).classList.add('hidden');
-                document.getElementById(`${tab}-tab`).classList.remove('text-blue-600');
-                document.getElementById(`${tab}-tab`).classList.add('text-gray-500');
-            });
+        // Populate inventory table
+        function loadInventory() {
+            const inventoryTable = document.getElementById('inventoryTable');
+            inventoryTable.innerHTML = ''; // Clear existing rows
 
-            // Show the selected tab's content and update tab style
-            document.getElementById(tabId).classList.remove('hidden');
-            document.getElementById(`${tabId}-tab`).classList.add('text-blue-600');
-            document.getElementById(`${tabId}-tab`).classList.remove('text-gray-500');
-        }
-
-        // Fetch users on page load
-        fetchUsers();
-
-        // Fetch and display users from the backend
-        async function fetchUsers() {
-            try {
-                const response = await fetch('/api/users');
-                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-
-                const users = await response.json();
-
-                // Separate active and deleted users
-                const activeUsers = users.filter(user => user.usr_stat === 'Active' || user.usr_stat === 'Disabled');
-                const deletedUsers = users.filter(user => user.usr_stat === 'Deleted');
-
-                populateTable('userTable', activeUsers);
-                populateTable('deletedUserTable', deletedUsers);
-            } catch (error) {
-                console.error('Failed to fetch users:', error);
-            }
-        }
-
-        // Populate a table with user data
-        function populateTable(tableId, users) {
-            const tableBody = document.getElementById(tableId);
-            tableBody.innerHTML = ''; // Clear existing rows
-
-            users.forEach(user => {
+            inventoryData.forEach((item, index) => {
                 const row = `
                     <tr>
+                        <td class="p-4">${item.itemName}</td>
+                        <td class="p-4">${item.category}</td>
+                        <td class="p-4">${item.quantity}</td>
                         <td class="p-4">
-                            <div class="text-base font-semibold">${user.usr_aname}</div>
-                            <div class="text-sm text-gray-500">${user.usr_name}</div>
+                            <button class="text-gray-500 hover:text-blue-600 mr-4" onclick='editItem(${index})'>
+                                <img src="/assets/icons/edit_24dp_6B7280_FILL0_wght500_GRAD0_opsz24.svg" alt="edit" class="w-6 h-6">
+                            </button>
+                            <button class="text-gray-500 hover:text-red-600" onclick='deleteItem(${index})'>
+                                <img src="/assets/icons/delete_24dp_6B7280_FILL0_wght500_GRAD0_opsz24.svg" alt="delete" class="w-6 h-6">
+                            </button>
                         </td>
-                        <td class="p-4 ${user.usr_role === 'Pending' ? 'text-yellow-500' : ''}">${user.usr_role}</td>
-                        <td class="p-4">${new Date(user.usr_cre_date).toLocaleDateString()}</td>
-                        ${tableId === 'deletedUserTable' ? `<td class="p-4">${new Date(user.usr_del_date).toLocaleDateString()}</td>` : ''}
-                        <td class="p-4">${user.usr_dept}</td>
-                        ${tableId === 'userTable' ? `
-                            <td class="p-4 text-left">
-                                <button class="text-gray-500 hover:text-blue-600 mr-4" onclick='openPopup(${JSON.stringify(user)})'>
-                                    <img src="/assets/icons/edit_24dp_6B7280_FILL0_wght500_GRAD0_opsz24.svg" alt="edit" class="w-6 h-6">
-                                </button>
-                                <button class="text-gray-500 hover:text-red-600" onclick='openDeletePopup(${JSON.stringify(user)})'>
-                                    <img src="/assets/icons/delete_24dp_6B7280_FILL0_wght500_GRAD0_opsz24.svg" alt="delete" class="w-6 h-6">
-                                </button>
-                            </td>
-                        ` : `
-                            <td class="p-4 text-left">
-                                <button class="text-gray-500 hover:text-blue-600 mr-4" onclick='openRestorePopup(${JSON.stringify(user)})'>
-                                    <img src="/assets/icons/restore_from_trash_24dp_6B7280_FILL0_wght500_GRAD0_opsz24.svg" alt="restore" class="w-6 h-6">
-                                </button>
-                            </td>
-                        `}
                     </tr>
                 `;
-                tableBody.insertAdjacentHTML('beforeend', row);
+                inventoryTable.insertAdjacentHTML('beforeend', row);
             });
         }
 
-
-        // Open Popup and populate user details
-        function openPopup(user) {
-            currentUserId = user.usr_id; // Store the current user ID
+        // Open the edit popup and populate it with item details
+        function editItem(index) {
+            const item = inventoryData[index];
             const popupContent = document.getElementById('popupContent');
             popupContent.innerHTML = `
-                <p class=" mb-1"><strong>Name:</strong> ${user.usr_aname}</p>
-                <p class=" mb-1"><strong>Email:</strong> ${user.usr_name}</p>
-                <p class=" mb-1"><strong>Mobile:</strong> +91${user.usr_mob}</p>
-                <p class=" mb-1"><strong>Joined On:</strong> ${new Date(user.usr_cre_date).toLocaleDateString()}</p>
-                <p class=" mb-2"><strong>Club Association:</strong> 
-                    ${
-                        user.usr_club === 'sic' ? 'SIC' : 
-                        user.usr_club === 'iedc' ? 'IEDC' : 
-                        user.usr_club === 'iic' ? 'IIC' : 
-                        user.usr_club === 'csi' ? 'CSI' : 'N/A' 
-                    }
-                </p>
-                <label><strong>Role:</strong></label>
-                <select id="userRole" class="w-full p-2 border rounded-lg mb-2">
-                    ${user.usr_role === 'Pending' ? '<option value="regw" selected>Pending</option>' : ''}
-                    <option value="admin" ${user.usr_role === 'Admin' ? 'selected' : ''}>Admin</option>
-                    <option value="hod" ${user.usr_role === 'HOD' ? 'selected' : ''}>HOD</option>
-                    <option value="em" ${user.usr_role === 'Manager' ? 'selected' : ''}>Manager</option>
-                    <option value="ev" ${user.usr_role === 'Viewer' ? 'selected' : ''}>Viewer</option>
-                </select>
-                <label><strong>Department:</strong></label>
-                <select id="userDept" class="w-full p-2 border rounded-lg mb-2">
-                    <option value="cs" ${user.usr_dept === 'CS & IT' ? 'selected' : ''}>Computer Science & IT</option>
-                    <option value="math" ${user.usr_dept === 'Mathematics' ? 'selected' : ''}>Mathematics</option>
-                    <option value="com" ${user.usr_dept === 'Commerce' ? 'selected' : ''}>Commerce</option>
-                    <option value="vm" ${user.usr_dept === 'VM' ? 'selected' : ''}>VIsual Media</option>
-                    <option value="phs" ${user.usr_dept === 'PS' ? 'selected' : ''}>Physical Science</option>
-                    <option value="eng" ${user.usr_dept === 'English' ? 'selected' : ''}>English</option>
-                </select>
-                <label><strong>Status:</strong></label>
-                <select id="userStatus" class="w-full p-2 border rounded-lg">
-                    <option value="1" ${user.usr_stat === 'Active' ? 'selected' : ''}>Active</option>
-                    <option value="0" ${user.usr_stat === 'Disabled' ? 'selected' : ''}>Disabled</option>
-                </select>
+                <p><strong>Item Name:</strong> ${item.itemName}</p>
+                <p><strong>Category:</strong> ${item.category}</p>
+                <label for="quantity">Quantity:</label>
+                <input type="number" id="itemQuantity" value="${item.quantity}" class="w-full p-2 border rounded-lg">
             `;
-            document.getElementById('userPopup').classList.remove('hidden');
+            document.getElementById('inventoryPopup').classList.remove('hidden');
         }
 
-        // Save user details
-        async function saveUser() {
-            const updatedUser = {
-                usr_id: currentUserId,
-                usr_role: document.getElementById('userRole').value,
-                usr_dept: document.getElementById('userDept').value,
-                usr_stat: document.getElementById('userStatus').value,
-            };
-
-            try {
-                const response = await fetch(`/api/users/${currentUserId}`, {
-                    method: 'PUT',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(updatedUser),
-                });
-
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`); 
-                }
-                
-                fetchUsers(); // Refresh the user list
-                closePopup(0);
-            } catch (error) {
-                console.error('Failed to update user:', error);
-            }
+        // Delete the item from the inventory
+        function deleteItem(index) {
+            inventoryData.splice(index, 1); // Remove the item from the array
+            loadInventory(); // Reload the table
         }
 
-        // Open Delete Confirmation Popup
-        function openDeletePopup(user) {
-            currentUserId = user.usr_id; // Store the current user ID
-            const popupContent = document.getElementById('deletePopupContent');
-            popupContent.innerHTML = `
-                <p>Are you sure you want to delete <strong>${user.usr_aname}</strong>?</p>
-            `;
-            document.getElementById('deleteUserPopup').classList.remove('hidden');
+        // Save the edited item details
+        function saveInventory() {
+            const quantity = document.getElementById('itemQuantity').value;
+            // Assuming saving logic
+            console.log('Saved quantity:', quantity);
+            closePopup(); // Close the popup after saving
         }
 
-        // Delete User
-        async function deleteUser() {
-            try {
-                const response = await fetch(`/api/users/${currentUserId}`, { method: 'DELETE' });
-                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-
-                fetchUsers(); // Refresh the user list
-                closePopup(1);
-            } catch (error) {
-                console.error('Failed to delete user:', error);
-            }
+        // Close the popup
+        function closePopup() {
+            document.getElementById('inventoryPopup').classList.add('hidden');
         }
 
-        // Open Restore Confirmation Popup
-        function openRestorePopup(user) {
-            currentUserId = user.usr_id; // Store the current user ID
-            const popupContent = document.getElementById('restorePopupContent');
-            popupContent.innerHTML = `
-                <p>Restore user <strong>${user.usr_aname}</strong>?</p>
-            `;
-            document.getElementById('restoreUserPopup').classList.remove('hidden');
-        }
-
-        // Restore User
-        async function restoreUser() {
-            try {
-                const response = await fetch(`/api/users/${currentUserId}`, {
-                    method: 'PUT',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ restore: true }), // Send restore flag
-                });
-
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-
-                fetchUsers(); // Refresh the user list
-                closePopup(2); // Close the restore popup
-            } catch (error) {
-                console.error('Failed to restore user:', error);
-            }
-        }
-
-
-        // Close Popup
-        function closePopup(popup) {
-            if (popup === 0) {
-                document.getElementById('userPopup').classList.add('hidden');
-            }else if (popup === 1){
-                document.getElementById('deleteUserPopup').classList.add('hidden');
-            }else{
-                document.getElementById('restoreUserPopup').classList.add('hidden');
-            }
-        }
-
-        // Search functionality
-        document.getElementById('searchUser').addEventListener('input', function () {
-            const searchTerm = this.value.toLowerCase();
-            const rows = document.querySelectorAll('#userTable tr');
-            rows.forEach(row => {
-                const userName = row.cells[0].innerText.toLowerCase();
-                row.style.display = userName.includes(searchTerm) ? '' : 'none';
-            });
-        });
-
-        // Fetch users on page load
-        fetchUsers();
+        // Load inventory on page load
+        loadInventory();
     </script>
 </body>
 </html>
