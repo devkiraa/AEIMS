@@ -315,7 +315,6 @@ ADD COLUMN `gst_fee` TINYINT NULL AFTER `gst_acc`;
 ALTER TABLE `aeims`.`event_guest_details` 
 CHANGE COLUMN `gst_type` `gst_type` TINYINT NOT NULL ;
 
-<<<<<<< HEAD
 -- Change as on 04/11/2024
 
 ALTER TABLE `aeims`.`inventory` 
@@ -324,7 +323,7 @@ CHANGE COLUMN `inv_id` `inv_id` INT NOT NULL AUTO_INCREMENT ;
 ALTER TABLE `aeims`.`inventory` 
 CHANGE COLUMN `inv_service_count` `inv_service_count` VARCHAR(5) NULL ,
 CHANGE COLUMN `inv_remove_count` `inv_remove_count` VARCHAR(5) NULL ;
-=======
+
 -- Change as on 5/11/2024
 
 ALTER TABLE aeims.event_tb
@@ -332,4 +331,8 @@ ADD COLUMN evn_approval INTEGER(1);
 
 ALTER TABLE aeims.user_password_memory
 MODIFY COLUMN usr_pwd_mem_id INT AUTO_INCREMENT;
->>>>>>> de0d108d6a8d91c9e723203b399830e22820f778
+
+ALTER TABLE `aeims`.`venues_bookings` 
+ADD COLUMN `evn_id` INT NULL DEFAULT NULL AFTER `ven_stat`,
+ADD COLUMN `quick_evn` INT NULL AFTER `evn_id`;
+
