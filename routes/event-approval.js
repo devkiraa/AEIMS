@@ -13,7 +13,7 @@ router.get('/events', async (req, res) => {
           FROM event_tb e
           JOIN event_coordinator ec ON e.evn_id = ec.evn_id
           JOIN user_details u ON ec.usr_id = u.usr_id`;
-      
+       
       const [allEvents] = await db.query(allEventsQuery);
   
       res.json(allEvents);
