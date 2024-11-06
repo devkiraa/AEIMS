@@ -137,4 +137,42 @@ router.get('/user-management', (req, res) => {
     res.render('user-management', { userRole });
 });
 
+// Approve event
+router.post('/events/approve/:id', async (req, res) => {
+    try {
+        const eventId = req.params.id;
+        await Event.updateOne({ _id: eventId }, { approval_status: 'Approved' });
+        res.json({ success: true });
+    } catch (error) {
+        console.error(error);
+        res.json({ success: false, message: 'Could not approve event.' });
+    }
+});
+
+// Reject event
+router.post('/events/reject/:id', async (req, res) => {
+    try {
+        const eventId = req.params.id;
+        await Event.updateOne({ _id: eventId }, { approval_status: 'Rejected' });
+        res.json({ success: true });
+    } catch (error) {
+        console.error(error);
+        res.json({ success: false, message: 'Could not reject event.' });
+    }
+});
+
+
+// Approve and reject events route
+router.get('/event-approval', async (req, res) => {
+    try {
+        const userRole = req.session.user_role;
+        // Pass the events data to the template
+        res.render('event-approval-page', {userRole});
+    } catch (error) {
+        console.error('Error fetching events:', error);
+        res.status(500).send('Internal Server Error');
+    }
+});
+
+
 module.exports = router;

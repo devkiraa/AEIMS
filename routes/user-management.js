@@ -1,7 +1,6 @@
 const express = require('express');
 const router = express.Router();
 const db = require('../models/db'); // Database connection using promise-based mysql2
-const { exec } = require('child_process');
 
 // Route to fetch all users with role and department transformation
 router.get('/users', async (req, res) => {
