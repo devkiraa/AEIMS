@@ -31,6 +31,7 @@
         }
     </style>
     <script>
+        const userDept = "<%= userDept %>"; // Embed the userDept variable
         function switchTab(tabId) {
             const tabs = ['pending', 'approved', 'rejected'];
         
@@ -75,9 +76,9 @@
               const events = await response.json();
 
               // Separate events by approval status
-              const pendingEvents = events.filter(event => event.evn_approval === 0);
-              const approvedEvents = events.filter(event => event.evn_approval === 1);
-              const rejectedEvents = events.filter(event => event.evn_approval === 2);
+              const pendingEvents = events.filter(event => (event.evn_approval === 0 && event.evn_dept === userDept));
+              const approvedEvents = events.filter(event => (event.evn_approval === 1 && event.evn_dept === userDept));
+              const rejectedEvents = events.filter(event => (event.evn_approval === 2 && event.evn_dept === userDept));
           
               // Populate pending events table
               const pendingTable = document.getElementById('pendingEventTable');
@@ -89,10 +90,7 @@
                   <td class="p-4">${event.organizer}</td>
                   <td class="p-4 text-yellow-500">Pending</td>
                   <td class="p-4">
-                    <button onclick="openPopup('${event.evn_id}', '${event.evn_name}', '${event.evn_desc}', '${event.evn_dept}', '${event.event_sd}', '${event.evn_ed}', '${event.evn_st}', '${event.event_et}', '${event.organizer}')" class="text-blue-600 hover:text-blue-800">
-  View Details
-</button>
-
+                    <button onclick="openPopup('${event.evn_id}', '${event.evn_name}', '${event.evn_desc}', '${event.evn_dept}', '${event.event_sd}', '${event.evn_ed}', '${event.evn_st}', '${event.event_et}', '${event.organizer}')" class="text-blue-600 hover:text-blue-800">View Details</button>
                   </td>
                 `;
                 pendingTable.appendChild(row);

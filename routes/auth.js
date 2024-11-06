@@ -167,8 +167,9 @@ router.post('/events/reject/:id', async (req, res) => {
 router.get('/event-approval', async (req, res) => {
     try {
         const userRole = req.session.user_role;
+        const userDept = req.session.user_dept;
         // Pass the events data to the template
-        res.render('event-approval-page', {userRole});
+        res.render('event-approval-page', {userRole, userDept});
     } catch (error) {
         console.error('Error fetching events:', error);
         res.status(500).send('Internal Server Error');
