@@ -313,7 +313,6 @@
 
             // Fetch users initially and store them in a variable
             let users = await fetchUsers(); // Fetch users initially and store them
-            console.log(users);
 
             // Show the user list when the search bar is visible
             searchBar.addEventListener('focus', () => {
@@ -484,8 +483,6 @@
                         guestCount,
                         eventFood
                     };
-
-                    console.log(updatedData);
 
                     const formData = new FormData();
                     formData.append('eventPoster', eventPoster);
