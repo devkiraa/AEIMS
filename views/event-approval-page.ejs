@@ -89,9 +89,10 @@
                   <td class="p-4">${event.organizer}</td>
                   <td class="p-4 text-yellow-500">Pending</td>
                   <td class="p-4">
-                    <button onclick="openPopup('${event.evn_name}', '${event.evn_desc}', '${event.evn_dept}', '${event.event_sd}', '${event.evn_ed}', '${event.evn_st}', '${event.event_et}', '${event.organizer}')" class="text-blue-600 hover:text-blue-800">
-                      View Details
-                    </button>
+                    <button onclick="openPopup('${event.evn_id}', '${event.evn_name}', '${event.evn_desc}', '${event.evn_dept}', '${event.event_sd}', '${event.evn_ed}', '${event.evn_st}', '${event.event_et}', '${event.organizer}')" class="text-blue-600 hover:text-blue-800">
+  View Details
+</button>
+
                   </td>
                 `;
                 pendingTable.appendChild(row);
@@ -130,8 +131,7 @@
           }
 
 // Function to open popup and show event details
-function openPopup(evn_name, evn_desc, evn_dept, event_sd, evn_ed, evn_st, event_et, organizer) {
-    // Format start and end dates to show only the date part
+function openPopup(evn_id, evn_name, evn_desc, evn_dept, event_sd, evn_ed, evn_st, event_et, organizer) {
     const formattedStartDate = new Date(event_sd).toISOString().split('T')[0];
     const formattedEndDate = new Date(evn_ed).toISOString().split('T')[0];
 
@@ -147,6 +147,10 @@ function openPopup(evn_name, evn_desc, evn_dept, event_sd, evn_ed, evn_st, event
         <p><strong>Organizer:</strong> ${organizer}</p>
     `;
     document.getElementById('eventPopup').classList.remove('hidden');
+
+    // Set the approve/reject buttons with event ID
+    document.getElementById('approveButton').onclick = () => approveEvent(evn_id);
+    document.getElementById('rejectButton').onclick = () => rejectEvent(evn_id);
 }
 
 // Function to close the popup
@@ -155,16 +159,49 @@ function closePopup() {
 }
 
 // Function to approve the event
-function approveEvent() {
-    alert("Event Approved!");
-    closePopup();
+async function approveEvent(eventId) {
+    try {
+        const response = await fetch(`/api/events/${eventId}/approve`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+
+        if (response.ok) {
+            closePopup();
+            fetchEvents(); // Refresh the events list to show updated status
+        } else {
+            alert("Failed to approve event.");
+        }
+    } catch (error) {
+        console.error("Error approving event:", error);
+        alert("An error occurred while approving the event.");
+    }
 }
 
 // Function to reject the event
-function rejectEvent() {
-    alert("Event Rejected!");
-    closePopup();
+async function rejectEvent(eventId) {
+    try {
+        const response = await fetch(`/api/events/${eventId}/reject`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+
+        if (response.ok) {
+            closePopup();
+            fetchEvents(); // Refresh the events list to show updated status
+        } else {
+            alert("Failed to reject event.");
+        }
+    } catch (error) {
+        console.error("Error rejecting event:", error);
+        alert("An error occurred while rejecting the event.");
+    }
 }
+
     </script>
 </head>
 <body class="bg-gray-50">
@@ -294,12 +331,6 @@ function rejectEvent() {
 
         </main>
 
-        <!-- Footer -->
-        <footer class="bg-blue-600 p-4 mt-8">
-            <div class="text-center text-white">
-                &copy; 2024 Event Management System. All rights reserved.
-            </div>
-        </footer>
     </div>
 
     <!-- Popup Modal for Approving or Rejecting Event -->
@@ -313,16 +344,17 @@ function rejectEvent() {
                 <!-- Event details will be populated dynamically -->
             </div>
             <div class="mt-4 text-right">
-                <button onclick="approveEvent()" class="bg-blue-600 text-white px-4 py-2 rounded-lg">
+                <button id="approveButton" class="bg-blue-600 text-white px-4 py-2 rounded-lg">
                     Approve
                 </button>
-                <button onclick="rejectEvent()" class="bg-red-600 text-white px-4 py-2 rounded-lg mr-2">
+                <button id="rejectButton" class="bg-red-600 text-white px-4 py-2 rounded-lg mr-2">
                     Reject
                 </button>
-                <button onclick="closePopup(0)" class="bg-gray-200 text-gray-700 px-4 py-2 rounded-lg">
+                <button onclick="closePopup()" class="bg-gray-200 text-gray-700 px-4 py-2 rounded-lg">
                     Cancel
                 </button>
             </div>
+            
         </div>
     </div>
 </body>

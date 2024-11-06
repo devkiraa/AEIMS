@@ -23,4 +23,30 @@ router.get('/events', async (req, res) => {
     }
   });
 
+// Endpoint to approve an event
+router.post('/events/:id/approve', async (req, res) => {
+    try {
+        const { id } = req.params;
+        const approveQuery = 'UPDATE event_tb SET evn_approval = 1 WHERE evn_id = ?';
+        await db.query(approveQuery, [id]);
+        res.status(200).json({ message: 'Event approved successfully' });
+    } catch (error) {
+        console.error("Error approving event: ", error);
+        res.status(500).json({ error: 'Failed to approve event' });
+    }
+});
+
+// Endpoint to reject an event
+router.post('/events/:id/reject', async (req, res) => {
+    try {
+        const { id } = req.params;
+        const rejectQuery = 'UPDATE event_tb SET evn_approval = 2 WHERE evn_id = ?';
+        await db.query(rejectQuery, [id]);
+        res.status(200).json({ message: 'Event rejected successfully' });
+    } catch (error) {
+        console.error("Error rejecting event: ", error);
+        res.status(500).json({ error: 'Failed to reject event' });
+    }
+});
+
 module.exports = router;
