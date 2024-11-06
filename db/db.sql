@@ -336,3 +336,23 @@ ALTER TABLE `aeims`.`venues_bookings`
 ADD COLUMN `evn_id` INT NULL DEFAULT NULL AFTER `ven_stat`,
 ADD COLUMN `quick_evn` INT NULL AFTER `evn_id`;
 
+-- Change as on 6/11/2024
+
+CREATE TABLE `event_approvals` (
+    `approval_id` INT NOT NULL AUTO_INCREMENT,
+    `evn_id` INT NOT NULL,
+    `usr_id` INT NOT NULL,
+    `approval_status` TINYINT NOT NULL COMMENT '0 = Pending, 1 = Approved, 2 = Rejected',
+    `approval_date` DATE NOT NULL,
+    `approval_time` TIME NOT NULL,
+    `approval_comment` VARCHAR(255),
+    PRIMARY KEY (`approval_id`),
+    INDEX `approval_evn_idx` (`evn_id`),
+    INDEX `approval_usr_idx` (`usr_id`),
+    CONSTRAINT `approval_evn_ref` FOREIGN KEY (`evn_id`) REFERENCES `event_tb` (`evn_id`),
+    CONSTRAINT `approval_usr_ref` FOREIGN KEY (`usr_id`) REFERENCES `users` (`usr_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+ALTER TABLE `event_tb`
+MODIFY COLUMN `evn_approval` TINYINT DEFAULT 0 COMMENT '0 = Pending, 1 = Approved, 2 = Rejected';
+
