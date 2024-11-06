@@ -12,47 +12,29 @@
             margin: 0;
         }
 
-        /* Make the navbar fixed at the top */
-        nav {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            z-index: 1000;
-        }
-
-        /* Add padding to the top to avoid content being hidden under the fixed nav */
         .page-container {
             padding-left: 4rem;
-            padding-top: 6rem; /* Add padding to push the content below the navbar */
+            padding-top: 2rem;
         }
 
-        /* Ensure buttons are fixed at the bottom-right */
-        .form-buttons {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-        }
-
-        /* Customize radio button checked state */
         input[type="radio"]:checked {
-            background-color: #2563EB; /* Tailwind color for blue-600 */
-            border-color: #2563EB; /* Change border color to match */
+            background-color: #2563EB;
+            border-color: #2563EB;
         }
 
-        /* Initially hide the external options */
         .external-options {
             display: none;
         }
 
-        /* Handle scroll only for content */
         .content-wrapper {
-            overflow-y: auto;
-            height: 100vh;
-            padding-bottom: 6rem; /* Ensure there's space for the fixed buttons */
+            background-color: white;
+            padding-bottom: 6rem;
         }
     </style>
     <script>
+        let currentGuestIndex = 0; // Track the current guest index
+        let totalGuests = 0; // Total number of guests
+
         // Function to show/hide external guest options
         function toggleGuestOptions() {
             const externalOptions = document.getElementById('externalOptions');
@@ -63,6 +45,151 @@
             } else {
                 externalOptions.style.display = 'none';
             }
+            checkFormValidity(); // Check form validity when guest type changes
+        }
+
+        window.onload = function() {
+
+            // Retrieve event data from sessionStorage
+            const eventDetails = JSON.parse(sessionStorage.getItem('eventDetails'));
+            if (!eventDetails) {
+                // Redirect to the previous page if eventData is not found
+                window.location.href = '/book-event/event-details';
+                return;
+            }
+
+            totalGuests = parseInt(eventDetails.guestCount);
+            console.log(eventDetails.guestCount);
+
+            // Retrieve the current guest index from session storage
+            currentGuestIndex = parseInt(sessionStorage.getItem('currentGuestIndex')) || 0;
+
+            toggleGuestOptions();
+
+            // Check if we have guest details in session storage
+            loadGuestDetails();
+
+            // Add event listeners to input fields to check validity
+            document.getElementById('guestName').addEventListener('input', checkFormValidity);
+            document.getElementById('aboutGuest').addEventListener('input', checkFormValidity);
+            document.querySelectorAll('input[name="guestType"]').forEach(input => {
+                input.addEventListener('change', checkFormValidity);
+            });
+            document.querySelectorAll('input[name="guestFood"]').forEach(input => {
+                input.addEventListener('change', checkFormValidity);
+            });
+            document.querySelectorAll('input[name="guestAccommodation"]').forEach(input => {
+                input.addEventListener('change', checkFormValidity);
+            });
+            document.querySelectorAll('input[name="guestConveyance"]').forEach(input => {
+                input.addEventListener('change', checkFormValidity);
+            });
+            document.querySelectorAll('input[name="guestFees"]').forEach(input => {
+                input.addEventListener('change', checkFormValidity);
+            });
+            checkFormValidity(); // Initial check on page load
+        };
+
+        function loadGuestDetails() {
+            const guestDetails = JSON.parse(sessionStorage.getItem('guestDetails')) || [];
+            if (guestDetails[currentGuestIndex]) {
+                const guest = guestDetails[currentGuestIndex];
+                document.getElementById('guestName').value = guest.guestName || '';
+                document.getElementById('aboutGuest').value = guest.aboutGuest || '';
+                document.querySelector(`input[name="guestType"][value="${guest.guestType}"]`).checked = true;
+                document.querySelector(`input[name="guestFood"][value="${guest.guestFood}"]`).checked = true;
+                document.querySelector(`input[name="guestAccommodation"][value="${guest.guestAccommodation}"]`).checked = true;
+                document.querySelector(`input[name="guestConveyance"][value="${guest.guestConveyance}"]`).checked = true;
+                document.querySelector(`input[name="guestFees"][value="${guest.guestFees}"]`).checked = true;
+
+                // Call toggleGuestOptions to show/hide external options based on the selected guest type
+                toggleGuestOptions();
+            } else {
+                // Clear fields if no guest details are found
+                clearFields();
+            }
+        }
+
+        function clearFields() {
+            document.getElementById('guestName').value = '';
+            document.getElementById('aboutGuest').value = '';
+            document.querySelector('input[name="guestType"][value="internal"]').checked = true;
+            document.querySelector('input[name="guestFood"][value="no"]').checked = true;
+            document.querySelector('input[name="guestAccommodation"][value="no"]').checked = true;
+            document.querySelector('input[name="guestConveyance"][value="no"]').checked = true;
+            document.querySelector('input[name="guestFees"][value="no"]').checked = true;
+            toggleGuestOptions();
+        }
+
+        function saveToSessionStorage() {
+            const guestDetails = JSON.parse(sessionStorage.getItem('guestDetails')) || [];
+            const guestName = document.getElementById('guestName').value;
+            const aboutGuest = document.getElementById('aboutGuest').value;
+            const guestType = document.querySelector('input[name="guestType"]:checked').value;
+            const guestFood = document.querySelector('input[name="guestFood"]:checked').value;
+            const guestAccommodation = document.querySelector('input[name="guestAccommodation"]:checked').value;
+            const guestConveyance = document.querySelector('input[name="guestConveyance"]:checked').value;
+            const guestFees = document.querySelector('input[name="guestFees"]:checked').value;
+
+            const updatedData = {
+                guestName,
+                aboutGuest,
+                guestType,
+                guestFood,
+                guestAccommodation,
+                guestConveyance,
+                guestFees
+            };
+
+            // Save the current guest details
+            guestDetails[currentGuestIndex] = updatedData;
+            sessionStorage.setItem('guestDetails', JSON.stringify(guestDetails));
+
+            // Store the current guest index
+            sessionStorage.setItem('currentGuestIndex', currentGuestIndex);
+
+            currentGuestIndex++;
+
+            // Check if we have more guests to add
+            if (currentGuestIndex < totalGuests) {
+                clearFields(); // Clear fields for the next guest
+                loadGuestDetails();
+                toggleGuestOptions();
+            } else {
+                // Redirect to the next page if all guests are added
+                window.location.href = '/book-event/resource';
+            }
+        }
+
+        function checkFormValidity() {
+            const guestName = document.getElementById('guestName').value;
+            const aboutGuest = document.getElementById('aboutGuest').value;
+            const guestType = document.querySelector('input[name="guestType"]:checked');
+            const guestFood = document.querySelector('input[name="guestFood"]:checked');
+            const guestAccommodation = document.querySelector('input[name="guestAccommodation"]:checked');
+            const guestConveyance = document.querySelector('input[name="guestConveyance"]:checked');
+            const guestFees = document.querySelector('input[name="guestFees"]:checked');
+
+            const nextButton = document.getElementById('nextButton');
+
+            // Enable the button only if all required fields are filled
+            if (guestName && aboutGuest && guestType && guestFood && guestAccommodation && guestConveyance && guestFees) {
+                nextButton.disabled = false;
+            } else {
+                nextButton.disabled = true;
+            }
+        }
+
+        function goBack() {
+            if (currentGuestIndex > 0) {
+                currentGuestIndex--;
+                // Store the current guest index
+                sessionStorage.setItem('currentGuestIndex', currentGuestIndex);
+                loadGuestDetails();
+                toggleGuestOptions();
+            } else {
+                window.history.back(); // Go back to the previous page if no previous guest
+            }
         }
     </script>
 </head>
@@ -71,7 +198,6 @@
     <!-- Navbar -->
     <nav class="bg-blue-600 p-4">
         <div class="container mx-auto flex justify-between items-center">
-            <!-- Move header elements to the left -->
             <div class="flex items-center space-x-6">
                 <ul class="flex space-x-6 text-white">
                     <li><a href="#" class="hover:text-gray-300">Home</a></li>
@@ -81,34 +207,28 @@
                     <li><a href="#" class="hover:text-gray-300">About Us</a></li>
                 </ul>
             </div>
-            <!-- User icon in rounded background -->
             <div class="bg-white rounded-full p-2">
-                <a href="#"><img src="/assets/icons/avatar.svg" alt="User Icon" class="w-6 h-6"></a>
+                <a href="#"><img src="/assets/icons/avatar.svg" alt="User  Icon" class="w-6 h-6"></a>
             </div>
         </div>
     </nav>
 
-    <!-- Main Content Wrapper to handle scrolling -->
-    <div class="content-wrapper bg-white">
+    <!-- Main Content Wrapper -->
+    <div class="content-wrapper">
         <div class="container mx-auto px-4 py-8 page-container">
-            <!-- Form Heading -->
             <h2 class="text-2xl font-semibold mb-6">Add Guest Details!</h2>
 
-            <!-- Form Section -->
-            <form>
-                <!-- Guest Name -->
+            <form onsubmit="event.preventDefault(); saveToSessionStorage();">
                 <div class="mb-6">
-                    <label for="guestName" class="block text-gray-700 text-lg font-medium">Guest Name</label>
-                    <input type="text" id="guestName" placeholder="Guest Name...?" class="w-full max-w-full md:w-64 mt-2 p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <label for="guestName" class="block text-gray-700 text-lg fontmedium">Guest Name</label>
+                    <input type="text" id="guestName" placeholder="Name" class="w-full max-w-full md:w-64 mt-2 p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
                 </div>
 
-                <!-- About Guest -->
                 <div class="mb-6">
                     <label for="aboutGuest" class="block text-gray-700 text-lg font-medium">About Guest</label>
-                    <input type="text" id="aboutGuest" placeholder="About the guest...?" class="w-full max-w-full md:w-64 mt-2 p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <input type="text" id="aboutGuest" placeholder="Guest Description" class="w-full max-w-full md:w-64 mt-2 p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
                 </div>
 
-                <!-- Guest Type -->
                 <div class="mb-6">
                     <p class="text-lg font-medium text-gray-700 mb-2">Guest Type</p>
                     <div class="flex items-center space-x-6">
@@ -123,91 +243,81 @@
                     </div>
                 </div>
 
-                <!-- External Guest Options (Initially hidden) -->
                 <div id="externalOptions" class="external-options">
-                    <!-- Guest Food (Yes/No) -->
                     <div class="mb-6">
                         <p class="text-lg font-medium text-gray-700 mb-2">Guest Food</p>
                         <div class="flex items-center space-x-6">
                             <label class="inline-flex items-center">
-                                <input type="radio" name="guestFood" value="yes" class="form-radio h-5 w-5 text-blue-600" checked>
+                                <input type="radio" name="guestFood" value="yes" class="form-radio h-5 w-5 text-blue-600">
                                 <span class="ml-2 text-gray-700">Yes</span>
                             </label>
                             <label class="inline-flex items-center">
-                                <input type="radio" name="guestFood" value="no" class="form-radio h-5 w-5 text-gray-400">
+                                <input type="radio" name="guestFood" value="no" class="form-radio h-5 w-5 text-gray-400" checked>
                                 <span class="ml-2 text-gray-700">No</span>
                             </label>
                         </div>
                     </div>
 
-                    <!-- Guest Accommodation -->
                     <div class="mb-6">
                         <p class="text-lg font-medium text-gray-700 mb-2">Guest Accommodation</p>
                         <div class="flex items-center space-x-6">
                             <label class="inline-flex items-center">
-                                <input type="radio" name="guestAccommodation" value="yes" class="form-radio h-5 w-5 text-blue-600" checked>
+                                <input type="radio" name="guestAccommodation" value="yes" class="form-radio h-5 w-5 text-blue-600">
                                 <span class="ml-2 text-gray-700">Yes</span>
                             </label>
                             <label class="inline-flex items-center">
-                                <input type="radio" name="guestAccommodation" value="no" class="form-radio h-5 w-5 text-gray-400">
+                                <input type="radio" name="guestAccommodation" value="no" class="form-radio h-5 w-5 text-gray-400" checked>
                                 <span class="ml-2 text-gray-700">No</span>
                             </label>
                         </div>
                     </div>
 
-                    <!-- Guest Conveyance -->
                     <div class="mb-8">
                         <p class="text-lg font-medium text-gray-700 mb-2">Guest Conveyance</p>
                         <div class="flex items-center space-x-6">
                             <label class="inline-flex items-center">
-                                <input type="radio" name="guestConveyance" value="yes" class="form-radio h-5 w-5 text-blue-600" checked>
+                                <input type="radio" name="guestConveyance" value="yes" class="form-radio h-5 w-5 text-blue-600">
                                 <span class="ml-2 text-gray-700">Yes</span>
                             </label>
                             <label class="inline-flex items-center">
-                                <input type="radio" name="guestConveyance" value="no" class="form-radio h-5 w-5 text-gray-400">
+                                <input type="radio" name="guestConveyance" value="no" class="form-radio h-5 w-5 text-gray-400" checked>
                                 <span class="ml-2 text-gray-700">No</span>
                             </label>
                         </div>
                     </div>
 
-                    <!-- Guest Fees -->
                     <div class="mb-8">
                         <p class="text-lg font-medium text-gray-700 mb-2">Guest Fees</p>
                         <div class="flex items-center space-x-6">
                             <label class="inline-flex items-center">
-                                <input type="radio" name="guestFees" value="yes" class="form-radio h-5 w-5 text-blue-600" checked>
-                                <span class="ml-2 text-gray-700">Yes</span>
-                            </label>
+                                <input type="radio" name="guestFees" value="yes" class="form-radio h-5 w-5 text-blue-600">
+                                <span class="ml-2 text-gray-700">Yes</span> </label>
                             <label class="inline-flex items-center">
-                                <input type="radio" name="guestFees" value="no" class="form-radio h-5 w-5 text-gray-400">
+                                <input type="radio" name="guestFees" value="no" class="form-radio h-5 w-5 text-gray-400" checked>
                                 <span class="ml-2 text-gray-700">No</span>
                             </label>
                         </div>
                     </div>
                 </div>
+            </div>
 
-                <!-- Action Buttons (Always at Bottom Right) -->
-                <div class="form-buttons flex flex-col space-y-4 md:flex-row md:space-x-4 md:space-y-0">
-                    <!-- Back Button with Left Arrow -->
-                    <button type="button" class="bg-gray-200 text-gray-700 py-2 px-4 rounded-lg font-medium hover:bg-gray-300 flex items-center justify-center" onclick="window.history.back()">
-                        <!-- Left Arrow SVG -->
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
-                            <path fill-rule="evenodd" d="M7.707 9l4.646-4.646a.5.5 0 00-.708-.708L6.5 9l5.146 5.146a.5.5 0 00.708-.708L7.707 9z" clip-rule="evenodd" />
-                        </svg>
-                        Back
-                    </button>
+            <div class="flex justify-end mt-6">
+                <button type="button" class="bg-gray-200 text-gray-700 py-2 px-4 rounded-lg font-medium hover:bg-gray-300 flex items-center justify-center mr-2" onclick="goBack()">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M7.707 9l4.646-4.646a.5.5 0 00-.708-.708L6.5 9l5.146 5.146a.5.5 0 00.708-.708L7.707 9z" clip-rule="evenodd" />
+                    </svg>
+                    Back
+                </button>
 
-                    <!-- Next Button with Right Arrow -->
-                    <button type="submit" class="bg-blue-600 text-white py-2 px-4 rounded-lg font-medium hover:bg-blue-700 flex items-center justify-center">
-                        Next
-                        <!-- Right Arrow SVG -->
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-2" viewBox="0 0 20 20" fill="currentColor">
-                            <path fill-rule="evenodd" d="M12.293 10.707l-5.146 5.146a.5.5 0 01-.708-.708L11.293 10 6.44 5.146a.5.5 0 01.708-.708l5.146 5.146a.5.5 0 010 .708z" clip-rule="evenodd" />
-                        </svg>
-                    </button>
-                </div>
-            </form>
-        </div>
+                <button type="submit" id="nextButton" class="bg-blue-600 text-white py-2 px-4 rounded-lg font-medium hover:bg-blue-700 flex items-center justify-center" disabled>
+                    Next
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-2" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M12.293 10.707l-5.146 5.146a.5.5 0 01-.708-.708L11.293 10 6.44 5.146a.5.5 0 01.708-.708l5.146 5.146a.5.5 0 010 .708z" clip-rule="evenodd" />
+                    </svg>
+                </button>
+            </div>
+        </form>
     </div>
+</div>
 </body>
 </html>
