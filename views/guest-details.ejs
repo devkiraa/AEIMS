@@ -49,8 +49,15 @@
         }
 
         window.onload = function() {
-            // Retrieve the total guest count from session storage
+
+            // Retrieve event data from sessionStorage
             const eventDetails = JSON.parse(sessionStorage.getItem('eventDetails'));
+            if (!eventDetails) {
+                // Redirect to the previous page if eventData is not found
+                window.location.href = '/book-event/event-details';
+                return;
+            }
+
             totalGuests = parseInt(eventDetails.guestCount);
             console.log(eventDetails.guestCount);
 
