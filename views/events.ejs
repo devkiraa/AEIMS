@@ -87,15 +87,16 @@
                 row.innerHTML = `
                   <td class="p-4">${event.evn_name}</td>
                   <td class="p-4">${event.organizer}</td>
+                  <td class="p-4">${event.event_sd}</td>
                   <td class="p-4 text-yellow-500">Pending</td>
                   <td class="p-4">
-                    <button onclick="openPopup('${event.evn_name}', '${event.evn_desc}', '${event.evn_dept}', '${event.event_sd}', '${event.evn_ed}', '${event.evn_st}', '${event.event_et}', '${event.organizer}')" class="text-blue-600 hover:text-blue-800">
+                    <button onclick="openPopup('${event.evn_id}', '${event.evn_name}', '${event.organizer}', '${event.event_sd}')" class="text-blue-600 hover:text-blue-800">
                       View Details
                     </button>
                   </td>
                 `;
                 pendingTable.appendChild(row);
-            });            
+              });
           
               // Populate approved events table
               const approvedTable = document.getElementById('approvedEventTable');
@@ -105,6 +106,7 @@
                 row.innerHTML = `
                   <td class="p-4">${event.evn_name}</td>
                   <td class="p-4">${event.organizer}</td>
+                  <td class="p-4">${event.event_sd}</td>
                   <td class="p-4 text-green-500">Approved</td>
                   <td class="p-4">-</td>
                 `;
@@ -119,6 +121,7 @@
                 row.innerHTML = `
                   <td class="p-4">${event.evn_name}</td>
                   <td class="p-4">${event.organizer}</td>
+                  <td class="p-4">${event.event_sd}</td>
                   <td class="p-4 text-red-500">Rejected</td>
                   <td class="p-4">-</td>
                 `;
@@ -130,21 +133,12 @@
           }
 
 // Function to open popup and show event details
-function openPopup(evn_name, evn_desc, evn_dept, event_sd, evn_ed, evn_st, event_et, organizer) {
-    // Format start and end dates to show only the date part
-    const formattedStartDate = new Date(event_sd).toISOString().split('T')[0];
-    const formattedEndDate = new Date(evn_ed).toISOString().split('T')[0];
-
+function openPopup(evn_id, evn_name, organizer, event_sd) {
     const popupContent = document.getElementById('popupEventContent');
     popupContent.innerHTML = `
         <p><strong>Event Name:</strong> ${evn_name}</p>
-        <p><strong>Description:</strong> ${evn_desc}</p>
-        <p><strong>Department:</strong> ${evn_dept}</p>
-        <p><strong>Start Date:</strong> ${formattedStartDate}</p>
-        <p><strong>End Date:</strong> ${formattedEndDate}</p>
-        <p><strong>Start Time:</strong> ${evn_st}</p>
-        <p><strong>End Time:</strong> ${event_et}</p>
         <p><strong>Organizer:</strong> ${organizer}</p>
+        <p><strong>Event Date:</strong> ${event_sd}</p>
     `;
     document.getElementById('eventPopup').classList.remove('hidden');
 }
@@ -242,6 +236,7 @@ function rejectEvent() {
                             <tr class="bg-gray-100 text-gray-600 text-left">
                                 <th class="p-4">Event Name</th>
                                 <th class="p-4">Organizer</th>
+                                <th class="p-4">Event Date</th>
                                 <th class="p-4">Status</th>
                                 <th class="p-4">Action</th>
                             </tr>
@@ -261,6 +256,7 @@ function rejectEvent() {
                             <tr class="bg-gray-100 text-gray-600 text-left">
                                 <th class="p-4">Event Name</th>
                                 <th class="p-4">Organizer</th>
+                                <th class="p-4">Event Date</th>
                                 <th class="p-4">Status</th>
                                 <th class="p-4">Action</th>
                             </tr>
@@ -281,6 +277,7 @@ function rejectEvent() {
                 <tr class="bg-gray-100 text-gray-600 text-left">
                     <th class="p-4">Event Name</th>
                     <th class="p-4">Organizer</th>
+                    <th class="p-4">Event Date</th>
                     <th class="p-4">Status</th>
                     <th class="p-4">Action</th>
                 </tr>
