@@ -34,6 +34,7 @@ router.post('/login', async (req, res) => {
 
         // Set session variables
         req.session.user_id = user.usr_id;
+        console.log('User ID set in session:', req.session.user_id); // Log session data here=
         req.session.user_role = user.usr_role;
         req.session.user_name = userDetails[0].usr_aname;
         req.session.user_dept = user.usr_dept;

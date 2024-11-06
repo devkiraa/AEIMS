@@ -60,6 +60,25 @@ app.use('/api', inventoryRoutes);
 app.use('/api',eventRoutes);
 // app.use('/', resetPasswordRouter);
 
+app.use(session({
+    secret: sessionSecret, // Secure session secret
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+        maxAge: 1000 * 60 * 60, // 1 hour expiration
+        secure: process.env.NODE_ENV === 'production', // Secure in production
+        httpOnly: true // Prevent client-side JS access
+    }
+}));
+
+
+app.use((req, res, next) => {
+    res.locals.user_id = req.session.user_id || null; // Set `user_id` in `res.locals`
+    res.locals.user_role = req.session.user_role || null;
+    res.locals.user_name = req.session.user_name || null;
+    next();
+});
+
 // Start server
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
