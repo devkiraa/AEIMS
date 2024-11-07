@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Add Guest Details</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <script>
+    function toggleExternalFields() {
+      const externalFields = document.getElementById('external-fields');
+      const guestTypeExternal = document.getElementById('guest-type-external');
+      externalFields.style.display = guestTypeExternal.checked ? 'block' : 'none';
+    }
+  </script>
+</head>
+<body class="bg-gray-100 font-sans" onload="toggleExternalFields()">
+
+  <!-- Navbar -->
+  <nav class="bg-blue-600 text-white p-4 flex justify-between items-center">
+    <div class="flex space-x-8 ml-10">
+      <a href="#" class="text-lg font-medium hover:text-gray-200">Home</a>
+      <a href="#" class="text-lg font-medium hover:text-gray-200">Create</a>
+      <a href="#" class="text-lg font-medium hover:text-gray-200">Users</a>
+      <a href="#" class="text-lg font-medium hover:text-gray-200">My Events</a>
+      <a href="#" class="text-lg font-medium hover:text-gray-200">About Us</a>
+    </div>
+    <div class="mr-10">
+      <img src="/assets/icons/avatar.svg" alt="User Icon" class="w-10 h-10 rounded-full border-2 border-white">
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <div class="p-8 mt-8 ml-10 mb-20">
+    <h1 class="text-3xl font-bold mb-8 text-gray-800">Add Guest Details!</h1>
+
+    <form>
+      <!-- Guest Name -->
+      <div class="mb-6">
+        <label for="guest-name" class="block text-lg font-medium text-gray-700">Guest Name</label>
+        <input type="text" id="guest-name" placeholder="Guest Name...?" class="mt-2 w-1/4 p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500">
+      </div>
+
+      <!-- About Guest -->
+      <div class="mb-6">
+        <label for="about-guest" class="block text-lg font-medium text-gray-700">About Guest</label>
+        <textarea id="about-guest" placeholder="About the guest...?" class="mt-2 w-1/4 p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
+      </div>
+
+      <!-- Guest Type -->
+      <div class="mb-6">
+        <label class="block text-lg font-medium text-gray-700 mb-2">Guest Type</label>
+        <div class="flex space-x-10">
+          <label class="inline-flex items-center">
+            <input type="radio" name="guest-type" class="form-radio text-blue-600 transform scale-150" value="internal" onclick="toggleExternalFields()">
+            <span class="ml-2">Internal</span>
+          </label>
+          <label class="inline-flex items-center">
+            <input type="radio" name="guest-type" id="guest-type-external" class="form-radio text-blue-600 transform scale-150" value="external" onclick="toggleExternalFields()">
+            <span class="ml-2">External</span>
+          </label>
+        </div>
+      </div>
+
+      <!-- External Fields Section -->
+      <div id="external-fields" style="display: none;">
+        <!-- Guest Food -->
+        <div class="mb-6">
+          <label class="block text-lg font-medium text-gray-700 mb-2">Guest Food</label>
+          <div class="flex space-x-10">
+            <label class="inline-flex items-center">
+              <input type="radio" name="guest-food" class="form-radio text-blue-600 transform scale-150" value="yes">
+              <span class="ml-2">Yes</span>
+            </label>
+            <label class="inline-flex items-center">
+              <input type="radio" name="guest-food" class="form-radio text-blue-600 transform scale-150" value="no">
+              <span class="ml-2">No</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Guest Accommodation -->
+        <div class="mb-6">
+          <label class="block text-lg font-medium text-gray-700 mb-2">Guest Accommodation</label>
+          <div class="flex space-x-10">
+            <label class="inline-flex items-center">
+              <input type="radio" name="guest-accommodation" class="form-radio text-blue-600 transform scale-150" value="yes">
+              <span class="ml-2">Yes</span>
+            </label>
+            <label class="inline-flex items-center">
+              <input type="radio" name="guest-accommodation" class="form-radio text-blue-600 transform scale-150" value="no">
+              <span class="ml-2">No</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Guest Conveyance -->
+        <div class="mb-6">
+          <label class="block text-lg font-medium text-gray-700 mb-2">Guest Conveyance</label>
+          <div class="flex space-x-10">
+            <label class="inline-flex items-center">
+              <input type="radio" name="guest-conveyance" class="form-radio text-blue-600 transform scale-150" value="yes">
+              <span class="ml-2">Yes</span>
+            </label>
+            <label class="inline-flex items-center">
+              <input type="radio" name="guest-conveyance" class="form-radio text-blue-600 transform scale-150" value="no">
+              <span class="ml-2">No</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Additional Requirements -->
+        <div class="mb-6">
+          <label for="additional-requirements" class="block text-lg font-medium text-gray-700">Additional Requirements</label>
+          <textarea id="additional-requirements" placeholder="Any additional requirements..." class="mt-2 w-1/4 p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <!-- Fixed Bottom Navigation Buttons -->
+  <div class="p-4 flex justify-end space-x-4">
+    <button type="button" class="bg-gray-300 text-gray-700 px-6 py-2 rounded flex items-center space-x-2">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
+        <path d="M19 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H19z"/>
+      </svg>
+      <span>Back</span>
+    </button>
+    <button type="submit" class="bg-blue-600 text-white px-6 py-2 rounded flex items-center space-x-2">
+      <span>Next</span>
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
+        <path d="M5 11h11.17l-5.59-5.59L13 4l8 8-8 8-1.41-1.41L16.17 13H5z"/>
+      </svg>
+    </button>
+  </div>
+
+</body>
+</html>

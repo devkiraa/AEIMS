@@ -1,13 +1,16 @@
-usr_id,usr_aname,usr_mob,usr_cre_date,usr_club
-1,"Erick Xavier",6238314481,2024-10-16,iedc
-2,"Narayanan G",8848228367,2024-10-16,sic
-3,"Anandhu Krishna T B",8156912378,2024-10-16,none
-4,"Gopikrishnan M",9188493587,2024-10-24,iic
-5,Chokli,9188732355,2024-10-24,sic
-6,Kathrii,6282675026,2024-10-25,sic
-7,"Meenakshi B",8301032641,2024-10-25,none
-8,"Gowri Parvathy Sailesh",9207335220,2024-10-25,iic
-9,"Niranjana A S",9074510770,2024-10-25,sic
-10,Jesine,9188533700,2024-10-26,csi
-11,"Kiran S ",9446565036,2024-10-26,sic
-12,Sabhyam,9633149771,2024-10-26,iedc
+usr_id,usr_aname,usr_mob,usr_cre_date,usr_del_date,usr_club
+1,"Erick Xavier",6238314481,2024-10-16,NULL,iedc
+2,"Narayanan G",8848228367,2024-10-16,NULL,sic
+3,"Anandhu Krishna T B",8156912378,2024-10-16,NULL,none
+4,"Gopikrishnan M",9188493587,2024-10-24,NULL,iic
+5,Chokli,9188732355,2024-10-24,NULL,sic
+6,Kathrii,6282675026,2024-10-25,NULL,sic
+7,"Meenakshi B",8301032641,2024-10-25,NULL,none
+8,"Gowri Parvathy Sailesh",9207335220,2024-10-25,NULL,iic
+9,"Niranjana A S",9074510770,2024-10-25,NULL,sic
+10,Jesine,9188533700,2024-10-26,NULL,csi
+11,"Kiran S ",9446565036,2024-10-26,NULL,sic
+12,Sabhyam,9633149771,2024-10-26,NULL,iedc
+13,"Nithya Maria Joy",9605183480,2024-10-26,NULL,none
+14,"John Doe",8590493280,2024-10-27,NULL,none
+15,"Ajin T V",1243567890,2024-10-31,2024-11-07,iic
