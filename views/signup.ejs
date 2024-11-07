@@ -9,6 +9,11 @@
     <style>
         body {
             font-family: 'Poppins', sans-serif;
+            background-image: url('/assets/Background-images/welcome3.jpg'); /* Replace with your image path */
+            background-size:cover;  /* Ensures the image covers the entire page */
+            background-position:left; /* Centers the image */
+            background-repeat:repeat; /* Prevents the image from repeating */
+            min-height: 100vh; /* Ensures the image covers the full height of the viewport */
         }
         #password-criteria {
             display: none;
@@ -274,6 +279,18 @@
             // Submit the form (you can also use fetch here if needed)
             this.submit(); // This will submit the form normally
         });
+
+        window.addEventListener('scroll', function() {
+        const scrollY = window.scrollY; // Get the scroll position
+        const body = document.body;
+        const image = '/assets/Background-images/welcome3.jpg'; // Image path
+        
+        // Set background size based on scroll position
+        body.style.backgroundImage = '/assets/Background-images/welcome3.jpg';
+        body.style.backgroundSize = `${100 + scrollY / 5}%`; // Resize based on scroll position
+    });
+
+
     </script>
 </body>
 </html>
