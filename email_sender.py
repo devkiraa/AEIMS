@@ -65,7 +65,7 @@ def send_email(subject, recipient, body, is_html):
             server.login(EMAIL_ADDRESS, EMAIL_PASSWORD)  # Login
             server.send_message(message)  # Send the email
 
-        print(f"Email sent to {recipient}")
+        print(f"{subject} Email has sent to {recipient}")
 
         # Get user ID from email
         usr_id = get_user_id(recipient)
@@ -106,7 +106,6 @@ def log_email(subject, recipient, status, usr_id):
         values = ("email", mail_date, mail_time, status, usr_id, recipient)  # Include receiver email
         cursor.execute(insert_query, values)
         connection.commit()
-        print("Email log recorded.")
 
     except mysql.connector.Error as err:
         print(f"Database error: {err}")
