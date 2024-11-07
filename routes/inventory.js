@@ -47,7 +47,8 @@ router.post('/service/add', async (req, res) => {
         res.status(500).json({ message: 'Failed to add item to service.' });
     }
 });
-router.get('/api/inventory', async (req, res) => {
+
+router.get('/inventory', async (req, res) => {
     try {
         const inventoryItems = await db.query('SELECT * FROM inventory'); 
         console.log(inventoryItems.rows); // Log the rows for debugging
@@ -57,9 +58,5 @@ router.get('/api/inventory', async (req, res) => {
         res.status(500).json({ message: 'Internal server error' });
     }
 });
-
-
-    
-
 
 module.exports = router;
