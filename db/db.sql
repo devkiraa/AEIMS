@@ -1,5 +1,7 @@
 CREATE SCHEMA `aeims` ;
 
+USE aeims;
+
 CREATE TABLE `users` (
   `usr_id` int NOT NULL,
   `usr_name` varchar(100) NOT NULL,
@@ -28,6 +30,9 @@ CREATE TABLE `venues_bookings` (
   `end_date` date NOT NULL,
   `start_time` time NOT NULL,
   `end_time` time NOT NULL,
+  `ven_stat` int NOT NULL,
+  `evn_id` int DEFAULT NULL,
+  `qck_evn_id` int DEFAULT NULL,
   PRIMARY KEY (`ven_book_id`),
   KEY `ven_id_ref_idx` (`ven_id`),
   CONSTRAINT `ven_id_ref` FOREIGN KEY (`ven_id`) REFERENCES `venues` (`ven_id`)
@@ -41,7 +46,7 @@ CREATE TABLE `inventory` (
   `inv_service_count` varchar(5) NOT NULL,
   `inv_remove_count` varchar(5) NOT NULL,
   `inv_first_added` date NOT NULL,
-  `inv_stat` varchar(10) DEFAULT NULL,
+  `inv_stat` varchar(20) DEFAULT NULL,
   PRIMARY KEY (`inv_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
@@ -49,7 +54,9 @@ CREATE TABLE `inventory` (
 CREATE TABLE `user_details` (
   `usr_id` int NOT NULL,
   `usr_aname` varchar(100) NOT NULL,
-  `usr_mob` varchar(15) NOT NULL,
+  `usr_mob` varchar(12) NOT NULL,
+  `usr_cre_date` date NOT NULL,
+  `usr_del_date` date DEFAULT NULL,
   `usr_club` varchar(50) DEFAULT NULL,
   PRIMARY KEY (`usr_id`),
   UNIQUE KEY `usr_mob_UNIQUE` (`usr_mob`),
@@ -60,7 +67,7 @@ CREATE TABLE `user_details` (
 CREATE TABLE `event_tb` (
   `evn_id` int NOT NULL,
   `evn_name` varchar(100) NOT NULL,
-  `evn_desc` varchar(50) NOT NULL,
+  `evn_desc` varchar(260) NOT NULL,
   `evn_dept` varchar(100) NOT NULL,
   `event_poster` varchar(100) NOT NULL,
   `ven_id` int NOT NULL,
@@ -68,9 +75,11 @@ CREATE TABLE `event_tb` (
   `evn_ed` date NOT NULL,
   `evn_st` time NOT NULL,
   `event_et` time NOT NULL,
+  `evn_vol_cnt` int NOT NULL,
   `evn_snk` tinyint NOT NULL,
   `evn_food` tinyint NOT NULL,
-  `evn_stat` varchar(10) NOT NULL,
+  `evn_stat` int NOT NULL,
+  `evn_approval` tinyint NOT NULL,
   PRIMARY KEY (`evn_id`),
   KEY `evn_ven_ref_idx` (`ven_id`),
   CONSTRAINT `evn_ven_ref` FOREIGN KEY (`ven_id`) REFERENCES `venues` (`ven_id`)
@@ -78,16 +87,15 @@ CREATE TABLE `event_tb` (
 
 
 CREATE TABLE `event_coordinator` (
-  `eco_id` int NOT NULL,
+  `eco_id` int NOT NULL AUTO_INCREMENT,
   `usr_id` int NOT NULL,
   `evn_id` int NOT NULL,
-  `usr_aname` varchar(100) NOT NULL,
   PRIMARY KEY (`eco_id`),
   KEY `evn_coor_idx` (`evn_id`),
-  KEY `evn_coor_usr_idx` (`usr_id`,`usr_aname`),
+  KEY `evn_coor_usr_idx` (`usr_id`),
   CONSTRAINT `evn_coor` FOREIGN KEY (`evn_id`) REFERENCES `event_tb` (`evn_id`),
   CONSTRAINT `evn_coor_usr` FOREIGN KEY (`usr_id`) REFERENCES `users` (`usr_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 
 CREATE TABLE `event_guest_details` (
@@ -95,17 +103,18 @@ CREATE TABLE `event_guest_details` (
   `evn_id` int NOT NULL,
   `gst_name` varchar(30) NOT NULL,
   `gst_details` varchar(200) NOT NULL,
-  `gst_type` varchar(15) NOT NULL,
+  `gst_type` tinyint NOT NULL,
   `gst_food` tinyint DEFAULT NULL,
   `gst_cnv` tinyint DEFAULT NULL,
   `gst_acc` tinyint DEFAULT NULL,
+  `gst_fee` tinyint DEFAULT NULL,
   PRIMARY KEY (`gst_id`),
   KEY `gst_evn_ref_idx` (`evn_id`),
   CONSTRAINT `gst_evn_ref` FOREIGN KEY (`evn_id`) REFERENCES `event_tb` (`evn_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 
-CREATE TABLE `event_modification_histroy` (
+CREATE TABLE `event_modification_log` (
   `evn_mod_id` int NOT NULL,
   `evn_id` int NOT NULL,
   `evn_lst_mod_date` date NOT NULL,
@@ -137,61 +146,21 @@ CREATE TABLE `event_resources` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 
-CREATE TABLE `event_volunteers` (
-  `vol_id` int NOT NULL,
-  `evn_id` int NOT NULL,
-  `vol_name` varchar(100) NOT NULL,
-  `vol_batch` varchar(50) NOT NULL,
-  `vol_year` varchar(10) NOT NULL,
-  PRIMARY KEY (`vol_id`),
-  KEY `evn_id_vol_ref_idx` (`evn_id`),
-  CONSTRAINT `evn_id_vol_ref` FOREIGN KEY (`evn_id`) REFERENCES `event_tb` (`evn_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-
-
 CREATE TABLE `notification_tb` (
   `noti_id` int NOT NULL,
-  `evn_id` int NOT NULL,
-  `evn_date` date NOT NULL,
-  `evn_time` time NOT NULL,
-  `noti_stat` varchar(10) NOT NULL,
+  `noti_message` varchar(150) NOT NULL,
+  `evn_id` int DEFAULT NULL,
+  `noti_date` date NOT NULL,
+  `noti_time` time NOT NULL,
+  `noti_stat` int NOT NULL,
+  `usr_id` int NOT NULL,
   PRIMARY KEY (`noti_id`),
   KEY `noti_evn_ref_idx` (`evn_id`),
-  CONSTRAINT `noti_evn_ref` FOREIGN KEY (`evn_id`) REFERENCES `event_tb` (`evn_id`)
+  KEY `noti_usr_ref_idx` (`usr_id`),
+  CONSTRAINT `noti_evn_ref` FOREIGN KEY (`evn_id`) REFERENCES `event_tb` (`evn_id`),
+  CONSTRAINT `noti_usr_ref` FOREIGN KEY (`usr_id`) REFERENCES `users` (`usr_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
-DROP TABLE `aeims`.`event_volunteers`;
-
-ALTER TABLE `aeims`.`event_tb` 
-ADD COLUMN `evn_vol_cnt` INT NOT NULL AFTER `event_et`;
-
-ALTER TABLE `aeims`.`event_modification_histroy` 
-RENAME TO  `aeims`.`event_modification_log` ;
-
-ALTER TABLE `aeims`.`notification_tb` 
-DROP FOREIGN KEY `noti_evn_ref`;
-ALTER TABLE `aeims`.`notification_tb` 
-ADD COLUMN `noti_message` VARCHAR(150) NOT NULL AFTER `noti_id`,
-CHANGE COLUMN `evn_id` `evn_id` INT NULL ,
-CHANGE COLUMN `evn_date` `noti_date` DATE NOT NULL ,
-CHANGE COLUMN `evn_time` `noti_time` TIME NOT NULL ;
-ALTER TABLE `aeims`.`notification_tb` 
-ADD CONSTRAINT `noti_evn_ref`
-  FOREIGN KEY (`evn_id`)
-  REFERENCES `aeims`.`event_tb` (`evn_id`);
-
-
-CREATE TABLE `mail_log` (
-  `log_id` int NOT NULL,
-  `mail_kind` varchar(100) DEFAULT NULL,
-  `mail_date` date DEFAULT NULL,
-  `mail_time` time DEFAULT NULL,
-  `mail_stat` varchar(15) DEFAULT NULL,
-  `usr_id` int DEFAULT NULL,
-  PRIMARY KEY (`log_id`),
-  KEY `mail_recipient_idx` (`usr_id`),
-  CONSTRAINT `mail_recipient` FOREIGN KEY (`usr_id`) REFERENCES `users` (`usr_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 CREATE TABLE `event_quick` (
   `evn_qk_id` int NOT NULL,
@@ -202,6 +171,7 @@ CREATE TABLE `event_quick` (
   `evn_qk_st` time NOT NULL,
   `evn_qk_et` time NOT NULL,
   `usr_id` int NOT NULL,
+  `qck_stat` int NOT NULL,
   PRIMARY KEY (`evn_qk_id`),
   KEY `quick_event_usr_idx` (`usr_id`),
   KEY `quick_event_ven_idx` (`ven_id`),
@@ -209,150 +179,50 @@ CREATE TABLE `event_quick` (
   CONSTRAINT `quick_event_ven` FOREIGN KEY (`ven_id`) REFERENCES `venues` (`ven_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
-CREATE TABLE `aeims`.`user_login_log` (
-  `login_id` INT NOT NULL,
-  `usr_id` INT NOT NULL,
-  `usr_log_dt` DATE NOT NULL,
-  `usr_log_time` TIME NOT NULL,
+
+CREATE TABLE `mail_log` (
+  `log_id` int NOT NULL AUTO_INCREMENT,
+  `mail_kind` varchar(100) DEFAULT NULL,
+  `mail_date` date DEFAULT NULL,
+  `mail_time` time DEFAULT NULL,
+  `mail_stat` varchar(15) DEFAULT NULL,
+  `usr_id` int DEFAULT NULL,
+  `receiver_email` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`log_id`),
+  KEY `mail_recipient_idx` (`usr_id`),
+  CONSTRAINT `mail_recipient` FOREIGN KEY (`usr_id`) REFERENCES `users` (`usr_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=21 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+
+CREATE TABLE `password_resets` (
+  `reset_id` int NOT NULL AUTO_INCREMENT,
+  `usr_id` int NOT NULL,
+  `reset_token` varchar(255) NOT NULL,
+  `reset_token_expiry` datetime NOT NULL,
+  `reset_link_stat` int DEFAULT '0',
+  PRIMARY KEY (`reset_id`),
+  KEY `usr_id` (`usr_id`),
+  CONSTRAINT `password_resets_ibfk_1` FOREIGN KEY (`usr_id`) REFERENCES `users` (`usr_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+
+CREATE TABLE `user_login_log` (
+  `login_id` int NOT NULL AUTO_INCREMENT,
+  `usr_id` int NOT NULL,
+  `usr_log_dt` date NOT NULL,
+  `usr_log_time` time NOT NULL,
   PRIMARY KEY (`login_id`),
-  INDEX `usr_login_log_idx` (`usr_id` ASC) VISIBLE,
-  CONSTRAINT `usr_login_log`
-    FOREIGN KEY (`usr_id`)
-    REFERENCES `aeims`.`users` (`usr_id`)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION);
+  KEY `usr_login_log_idx` (`usr_id`),
+  CONSTRAINT `usr_login_log` FOREIGN KEY (`usr_id`) REFERENCES `users` (`usr_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=17 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
-CREATE TABLE `aeims`.`user_password_memory` (
-  `usr_pwd_mem_id` INT NOT NULL,
-  `usr_id` INT NOT NULL,
-  `usr_pwd` VARCHAR(100) NOT NULL,
-  `usr_pwd_creation_dt` DATE NOT NULL,
+
+CREATE TABLE `user_password_memory` (
+  `usr_pwd_mem_id` int NOT NULL,
+  `usr_id` int NOT NULL,
+  `usr_pwd` varchar(100) NOT NULL,
+  `usr_pwd_creation_dt` date NOT NULL,
   PRIMARY KEY (`usr_pwd_mem_id`),
-  INDEX `usr_pwd_mem_idx` (`usr_id` ASC) VISIBLE,
-  CONSTRAINT `usr_pwd_mem`
-    FOREIGN KEY (`usr_id`)
-    REFERENCES `aeims`.`users` (`usr_id`)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION);
-
--- Change as on 15/10/2024
-
-ALTER TABLE `aeims`.`user_details` 
-CHANGE COLUMN `usr_mob` `usr_mob` VARCHAR(12) NOT NULL ;
-
--- Change as on 16/10/2024
-
-ALTER TABLE `aeims`.`user_details` 
-ADD COLUMN `usr_cre_date` DATE NOT NULL AFTER `usr_mob`;
-
--- Change as on 27/10/2024
-
-ALTER TABLE `aeims`.`notification_tb` 
-ADD COLUMN `usr_id` INT NOT NULL AFTER `noti_stat`,
-ADD INDEX `noti_usr_ref_idx` (`usr_id` ASC) VISIBLE;
-
-ALTER TABLE `aeims`.`notification_tb` 
-ADD CONSTRAINT `noti_usr_ref`
-  FOREIGN KEY (`usr_id`)
-  REFERENCES `aeims`.`users` (`usr_id`)
-  ON DELETE NO ACTION
-  ON UPDATE NO ACTION;
-
-ALTER TABLE `aeims`.`user_details` 
-ADD COLUMN `usr_del_date` DATE NULL AFTER `usr_cre_date`;
-
--- Change as on 28/10/2024
-
-ALTER TABLE `aeims`.`event_tb`
-ADD UNIQUE INDEX `idx_evn_name` (`evn_name`);
-
-ALTER TABLE `aeims`.`venues_bookings` 
-ADD COLUMN `ven_stat` VARCHAR(10) NOT NULL AFTER `end_time`;
-
--- Change as on 31/10/2024
-
-CREATE TABLE password_resets (
-    reset_id INT AUTO_INCREMENT PRIMARY KEY,
-    usr_id INT NOT NULL,
-    reset_token VARCHAR(255) NOT NULL,
-    reset_token_expiry DATETIME NOT NULL,
-    reset_count INT DEFAULT 0,
-    FOREIGN KEY (usr_id) REFERENCES users(usr_id)
-);
-
--- Change as on 1/11/2024
-
-ALTER TABLE `aeims`.`password_resets` 
-CHANGE COLUMN `reset_count` `reset_link_stat` INT NULL DEFAULT '0' ;
-
-ALTER TABLE `aeims`.`user_login_log` 
-CHANGE COLUMN `login_id` `login_id` INT NOT NULL AUTO_INCREMENT ;
-
--- Change as on 2/11/2024
-
-ALTER TABLE mail_log
-MODIFY log_id INT NOT NULL AUTO_INCREMENT;
-
-ALTER TABLE mail_log
-ADD COLUMN receiver_email VARCHAR(255) NULL;
-
-ALTER TABLE `aeims`.`event_tb` 
-DROP INDEX `idx_evn_name` ;
-;
-
-ALTER TABLE `aeims`.`event_tb` 
-CHANGE COLUMN `evn_stat` `evn_stat` INT NOT NULL ;
-
-ALTER TABLE `aeims`.`venues_bookings` 
-CHANGE COLUMN `ven_stat` `ven_stat` INT NOT NULL ;
-
-ALTER TABLE `aeims`.`event_coordinator` 
-CHANGE COLUMN `eco_id` `eco_id` INT NOT NULL AUTO_INCREMENT ;
-
-ALTER TABLE `aeims`.`event_guest_details` 
-ADD COLUMN `gst_fee` TINYINT NULL AFTER `gst_acc`;
-
-ALTER TABLE `aeims`.`event_guest_details` 
-CHANGE COLUMN `gst_type` `gst_type` TINYINT NOT NULL ;
-
--- Change as on 04/11/2024
-
-ALTER TABLE `aeims`.`inventory` 
-CHANGE COLUMN `inv_id` `inv_id` INT NOT NULL AUTO_INCREMENT ;
-
-ALTER TABLE `aeims`.`inventory` 
-CHANGE COLUMN `inv_service_count` `inv_service_count` VARCHAR(5) NULL ,
-CHANGE COLUMN `inv_remove_count` `inv_remove_count` VARCHAR(5) NULL ;
-
--- Change as on 5/11/2024
-
-ALTER TABLE aeims.event_tb
-ADD COLUMN evn_approval INTEGER(1);
-
-ALTER TABLE aeims.user_password_memory
-MODIFY COLUMN usr_pwd_mem_id INT AUTO_INCREMENT;
-
-ALTER TABLE `aeims`.`venues_bookings` 
-ADD COLUMN `evn_id` INT NULL DEFAULT NULL AFTER `ven_stat`,
-ADD COLUMN `quick_evn` INT NULL AFTER `evn_id`;
-
--- Change as on 6/11/2024
-
-CREATE TABLE `event_approvals` (
-    `approval_id` INT NOT NULL AUTO_INCREMENT,
-    `evn_id` INT NOT NULL,
-    `usr_id` INT NOT NULL,
-    `approval_status` TINYINT NOT NULL COMMENT '0 = Pending, 1 = Approved, 2 = Rejected',
-    `approval_date` DATE NOT NULL,
-    `approval_time` TIME NOT NULL,
-    `approval_comment` VARCHAR(255),
-    PRIMARY KEY (`approval_id`),
-    INDEX `approval_evn_idx` (`evn_id`),
-    INDEX `approval_usr_idx` (`usr_id`),
-    CONSTRAINT `approval_evn_ref` FOREIGN KEY (`evn_id`) REFERENCES `event_tb` (`evn_id`),
-    CONSTRAINT `approval_usr_ref` FOREIGN KEY (`usr_id`) REFERENCES `users` (`usr_id`)
+  KEY `usr_pwd_mem_idx` (`usr_id`),
+  CONSTRAINT `usr_pwd_mem` FOREIGN KEY (`usr_id`) REFERENCES `users` (`usr_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-
-ALTER TABLE `event_tb`
-MODIFY COLUMN `evn_approval` TINYINT DEFAULT 0 COMMENT '0 = Pending, 1 = Approved, 2 = Rejected';
-
