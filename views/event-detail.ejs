@@ -683,22 +683,72 @@
                     errorMessage.classList.add('hidden');  // Hide the error message if the file is valid
                 }
             }
+            document.addEventListener('DOMContentLoaded', function () {
+                const profileButton = document.getElementById('profileButton');
+                const profileDropdown = document.getElementById('profileDropdown');
+            
+                // Toggle dropdown on button click
+                profileButton.addEventListener('click', (event) => {
+                    event.stopPropagation();
+                    profileDropdown.classList.toggle('hidden');
+                });
+            
+                // Close dropdown if clicked outside
+                document.addEventListener('click', (event) => {
+                    if (!profileDropdown.classList.contains('hidden') && !profileDropdown.contains(event.target) && event.target !== profileButton) {
+                        profileDropdown.classList.add('hidden');
+                    }
+                });
+            });        
     </script>
 </head>
 <body class="min-h-screen bg-gray-100">
+    <!-- Navbar -->
     <nav class="bg-blue-600 p-4">
         <div class="container mx-auto flex justify-between items-center">
+            <!-- Navbar Links -->
             <div class="flex items-center space-x-6">
                 <ul class="flex space-x-6 text-white">
-                    <li><a href="#" class="hover:text-gray-300">Home</a></li>
-                    <li><a href="#" class="hover:text-gray-300">Create</a></li>
-                    <li><a href="#" class="hover:text-gray-300">Users</a></li>
-                    <li><a href="#" class="hover:text-gray-300">My Events</a></li>
-                    <li><a href="#" class="hover:text-gray-300">About Us</a></li>
+                    <!-- Home Link - Always First -->
+                    <li><a href="/" class="hover:text-gray-300">Home</a></li>
+            
+                    <!-- Conditional Links for 'admin' or 'icts' -->
+                    <% if (userRole === 'admin' || userRole === 'icts') { %>
+                        <li><a href="/book-event" class="hover:text-gray-300">Book</a></li>
+                        <li><a href="/user-management" class="hover:text-gray-300">Users</a></li>
+                        <li><a href="/inventory" class="hover:text-gray-300">Inventory</a></li>
+                        <li><a href="/my-events" class="hover:text-gray-300">My Events</a></li>
+                    <% } %>
+            
+                    <!-- Conditional Links for 'hod' -->
+                    <% if (userRole === 'hod') { %>
+                        <li><a href="/book-event" class="hover:text-gray-300">Book</a></li>
+                        <li><a href="/user-management" class="hover:text-gray-300">Users</a></li>
+                        <li><a href="/dept-events" class="hover:text-gray-300">Dept Events</a></li>
+                        <li><a href="/event-approval" class="hover:text-gray-300">Approval</a></li>
+                    <% } %>
+            
+                    <!-- Conditional Links for 'em' -->
+                    <% if (userRole === 'em') { %>
+                        <li><a href="/book-event" class="hover:text-gray-300">Book</a></li>
+                        <li><a href="/my-events" class="hover:text-gray-300">My Events</a></li>
+                    <% } %>
+            
+                    <!-- About Us Link - Always Last -->
+                    <li><a href="/about-us" class="hover:text-gray-300">About Us</a></li>
                 </ul>
-            </div>
-            <div class="bg-white rounded-full p-2">
-                <a href="#"><img src="/assets/icons/avatar.svg" alt="User Icon" class="w-6 h-6"></a>
+            </div>         
+
+            <!-- Profile Dropdown (Visible on Click) -->
+            <div class="relative dropdown">
+                <button class="bg-white rounded-full p-2" id="profileButton">
+                    <img src="/assets/icons/avatar.svg" alt="User Icon" class="w-6 h-6">
+                </button>
+                <div class="dropdown-menu absolute hidden right-0 mt-2 w-48 bg-white rounded-lg shadow-lg" id="profileDropdown">
+                    <a href="/profile" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">Profile</a>
+                    <a href="/change-password" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">Change Password</a>
+                    <a href="/logout" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">Logout</a>
+                </div>
             </div>
         </div>
     </nav>

@@ -14,19 +14,35 @@
             <!-- Navbar Links -->
             <div class="flex items-center space-x-6">
                 <ul class="flex space-x-6 text-white">
+                    <!-- Home Link - Always First -->
                     <li><a href="/" class="hover:text-gray-300">Home</a></li>
-                    <% if (userRole !== 'ev') { %>
-                        <li><a href="/create-event" class="hover:text-gray-300">Create</a></li>
-                        <% if (userRole === 'admin' || userRole === 'hod') { %>
-                            <li><a href="/user-management" class="hover:text-gray-300">Users</a></li>
-                        <% } %>
-                        <% if (userRole === 'admin') { %>
-                            <li><a href="/inventory" class="hover:text-gray-300">Inventory</a></li>
-                        <% } %>
-                        <li><a href="/event-approval" class="hover:text-gray-300">Approvals</a></li>
+            
+                    <!-- Conditional Links for 'admin' or 'icts' -->
+                    <% if (userRole === 'admin' || userRole === 'icts') { %>
+                        <li><a href="/book-event" class="hover:text-gray-300">Book</a></li>
+                        <li><a href="/user-management" class="hover:text-gray-300">Users</a></li>
+                        <li><a href="/inventory" class="hover:text-gray-300">Inventory</a></li>
+                        <li><a href="/my-events" class="hover:text-gray-300">My Events</a></li>
                     <% } %>
+            
+                    <!-- Conditional Links for 'hod' -->
+                    <% if (userRole === 'hod') { %>
+                        <li><a href="/book-event" class="hover:text-gray-300">Book</a></li>
+                        <li><a href="/user-management" class="hover:text-gray-300">Users</a></li>
+                        <li><a href="/dept-events" class="hover:text-gray-300">Dept Events</a></li>
+                        <li><a href="/event-approval" class="hover:text-gray-300">Approval</a></li>
+                    <% } %>
+            
+                    <!-- Conditional Links for 'em' -->
+                    <% if (userRole === 'em') { %>
+                        <li><a href="/book-event" class="hover:text-gray-300">Book</a></li>
+                        <li><a href="/my-events" class="hover:text-gray-300">My Events</a></li>
+                    <% } %>
+            
+                    <!-- About Us Link - Always Last -->
+                    <li><a href="/about-us" class="hover:text-gray-300">About Us</a></li>
                 </ul>
-            </div>
+            </div>         
 
             <!-- Profile Dropdown (Visible on Click) -->
             <div class="relative dropdown">
