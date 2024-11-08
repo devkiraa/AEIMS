@@ -9,11 +9,11 @@
     <style>
         body {
             font-family: 'Poppins', sans-serif;
-            background-image: url('/assets/Background-images/welcome3.jpg'); /* Replace with your image path */
-            background-size:cover;  /* Ensures the image covers the entire page */
-            background-position:left; /* Centers the image */
-            background-repeat:repeat; /* Prevents the image from repeating */
-            min-height: 100vh; /* Ensures the image covers the full height of the viewport */
+            background-image: url('/assets/Background-images/welcome3.jpg');
+            background-size: cover;
+            background-position: left;
+            background-repeat: repeat;
+            min-height: 100vh;
         }
         #password-criteria {
             display: none;
@@ -21,56 +21,40 @@
         .valid {
             color: rgb(83, 179, 83);
         }
-        .invalid {
+        .invalid, .error {
             color: rgb(238, 66, 66);
         }
-        .error {
-            color: rgb(238, 66, 66);
-        }
-        /* Initially hide the toggle button */
         #toggleConfirmPassword {
             display: none;
         }
-        /* Show toggle button when the confirm password field is focused */
         .peer:focus ~ #toggleConfirmPassword {
             display: flex;
         }
     </style>
 </head>
 <body class="min-h-screen bg-gray-100 flex items-center justify-end">
-    <!-- Stretched vertically downwards -->
     <div class="bg-white min-h-screen w-full max-w-lg lg:max-w-md absolute right-0 top-0 flex flex-col justify-start p-6 lg:p-12 shadow-lg">
-        
-        <!-- Header Text (properly spaced) -->
         <div class="text-center mb-10">
             <h2 class="text-2xl lg:text-3xl font-semibold">Welcome to <span class="text-blue-600">AEIMS</span></h2>
         </div>
-        
         <form id="signup-form" action="/signup" method="POST">
-            <!-- Full Name Field -->
             <div class="mb-3">
                 <label for="full_name" class="block text-gray-700">Name</label>
                 <input type="text" name="full_name" id="full_name" placeholder="Full Name" class="w-full p-2 border border-gray-300 rounded mt-1" required>
             </div>
-
-            <!-- Mobile Field -->
             <div class="mb-3">
                 <label for="mobile" class="block text-gray-700">Mobile</label>
                 <input type="text" name="mobile" id="mobile" placeholder="+91" class="w-full p-2 border border-gray-300 rounded mt-1" required>
                 <p id="mobile-error" class="error text-xs mt-1"></p>
             </div>
-
-            <!-- Email Field -->
             <div class="mb-3">
                 <label for="email" class="block text-gray-700">Official Mail ID</label>
                 <input type="email" name="email" id="email" placeholder="Email" class="w-full p-2 border border-gray-300 rounded mt-1" required>
                 <p id="email-error" class="error text-xs mt-1"></p>
             </div>
-
-            <!-- Department Dropdown -->
             <div class="mb-3">
                 <label for="dept" class="block text-gray-700">Department</label>
-                <select name="dept" id="dept" class="w-full p-2 border border-gray-300 rounded mt-1">
+                <select name="dept" id="dept" class="w-full p-2 border border-gray-300 rounded mt-1" required>
                     <option value="null">-Select-</option>
                     <option value="cs">Computer Science and IT</option>
                     <option value="math">Mathematics</option>
@@ -79,161 +63,57 @@
                     <option value="phs">Physical Sciences</option>
                     <option value="eng">English</option>
                 </select>
+                <p id="dept-error" class="error text-xs mt-1"></p>
             </div>
-
-            <!-- Club Association Dropdown -->
             <div class="mb-3">
                 <label for="club" class="block text-gray-700">Is associated with any club?</label>
                 <select name="club" id="club" class="w-full p-2 border border-gray-300 rounded mt-1">
                     <option value="none">None</option>
                     <option value="iedc">IEDC</option>
-                    <option value="sic">Software Innovater's Club</option>
-                    <option value="iic">Instituions Innovation Council</option>
+                    <option value="sic">Software Innovator's Club</option>
+                    <option value="iic">Institutions Innovation Council</option>
                     <option value="csi">Computer Society of India</option>
                 </select>
             </div>
-
-            <!-- Password Field -->
             <div class="mb-3">
                 <label for="password" class="block text-gray-700">Password</label>
                 <input type="password" name="password" id="password" placeholder="Password" class="w-full p-2 border border-gray-300 rounded mt-1" required>
             </div>
-
-            <!-- Confirm Password Field -->
             <div class="mb-3 relative">
                 <label for="confirm_password" class="block text-gray-700">Confirm Password</label>
                 <div class="relative">
                     <input type="password" name="confirm_password" id="confirm_password" placeholder="Confirm password" class="w-full p-2 border border-gray-300 rounded mt-1 peer pr-10" required>
-                    <!-- Eye icon for toggling password visibility -->
                     <button type="button" id="toggleConfirmPassword" class="absolute inset-y-0 right-3 flex items-center text-gray-600 p-1">
                         <img src="/assets/icons/visibility_20dp_4B5563_FILL0_wght500_GRAD0_opsz20.svg" alt="Show Password" id="confirmEyeIcon" class="w-5 h-5">
                     </button>
                 </div>
                 <p id="password-match-error" class="error text-xs mt-1"></p>
             </div>
-
-            <!-- Password Criteria (Initially Hidden) -->
-            <div id="password-criteria" class="text-xs text-gray-500 mb-3">
+             <!-- Password Criteria (Initially Hidden) -->
+             <div id="password-criteria" class="text-xs text-gray-500 mb-3">
                 <p>Password must contain:</p>
                 <ul class="list-disc pl-4">
-                    <li id="min-characters" class="invalid">Minimum 6 characters</li>
+                    <li id="min-characters" class="invalid">Minimum 8 characters</li>
                     <li id="uppercase" class="invalid">Uppercase letters (A-Z)</li>
+                    <li id="lowercase" class="invalid">Lowercase letters (a-z)</li>
                     <li id="numbers" class="invalid">Numbers (0-9)</li>
                     <li id="special-characters" class="invalid">Special characters</li>
                 </ul>
             </div>
-
-            <!-- Submit Button -->
-            <button id="submit-button" type="submit" class="bg-blue-500 text-white py-2 px-4 rounded w-full flex justify-center items-center">
+            <button id="submit-button" type="submit" class="submit-btn bg-blue-500 text-white py-2 px-4 rounded w-full flex justify-center items-center">
                 <svg id="loader" class="hidden animate-spin h-5 w-5 text-white mr-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                 </svg>
                 <span id="button-text">Sign Up</span>
-            </button>          
+            </button>
         </form>
-
-        <!-- Sign-in Text -->
         <p class="text-gray-500 text-center mt-6">
             Have an account? <a href="/login" class="text-blue-500">Sign in now</a>
         </p>
     </div>
 
-    <!-- JavaScript to Validate Password and Show Criteria -->
     <script>
-
-        document.getElementById('signup-form').addEventListener('submit', function(event) {
-        const mobileInput = document.getElementById('mobile');
-        const mobileError = document.getElementById('mobile-error');
-        const mobileValue = mobileInput.value;
-
-        // Check if the mobile number is exactly 10 digits
-        if (!/^\d{10}$/.test(mobileValue)) {
-            mobileError.textContent = 'Mobile number must be exactly 10 digits';
-            event.preventDefault(); // Prevent form submission
-        } else {
-            mobileError.textContent = ''; // Clear the error message
-        }
-        });
-
-        document.getElementById('password').addEventListener('input', function() {
-            var password = this.value;
-            var passwordCriteria = document.getElementById('password-criteria');
-
-            // Show the password criteria section if password is being typed
-            if (password.length > 0) {
-                passwordCriteria.style.display = 'block';
-            } else {
-                passwordCriteria.style.display = 'none';
-            }
-
-            // Validate password length
-            var minCharacters = document.getElementById('min-characters');
-            if (password.length >= 6) {
-                minCharacters.classList.remove('invalid');
-                minCharacters.classList.add('valid');
-            } else {
-                minCharacters.classList.remove('valid');
-                minCharacters.classList.add('invalid');
-            }
-
-            // Validate if there is an uppercase letter
-            var uppercase = document.getElementById('uppercase');
-            if (/[A-Z]/.test(password)) {
-                uppercase.classList.remove('invalid');
-                uppercase.classList.add('valid');
-            } else {
-                uppercase.classList.remove('valid');
-                uppercase.classList.add('invalid');
-            }
-
-            // Validate if there is a number
-            var numbers = document.getElementById('numbers');
-            if (/\d/.test(password)) {
-                numbers.classList.remove('invalid');
-                numbers.classList.add('valid');
-            } else {
-                numbers.classList.remove('valid');
-                numbers.classList.add('invalid');
-            }
-
-            // Validate if there is a special character
-            var specialCharacters = document.getElementById('special-characters');
-            if (/[!@#$%^&*(),.?":{}|<>]/.test(password)) {
-                specialCharacters.classList.remove('invalid');
-                specialCharacters.classList.add('valid');
-            } else {
-                specialCharacters.classList.remove('valid');
-                specialCharacters.classList.add('invalid');
-            }
-        });
-
-        // Validate all the inputs when submit is clicked
-        document.getElementById('signup-form').addEventListener('submit', function(event) {
-            var email = document.getElementById('email').value;
-            var password = document.getElementById('password').value;
-            var confirmPassword = document.getElementById('confirm_password').value;
-            var emailError = document.getElementById('email-error');
-            var passwordMatchError = document.getElementById('password-match-error');
-
-            var emailValid = /^(.+@kh\.students\.amrita\.edu|.+@kh\.amrita\.edu)$/.test(email);
-            var passwordsMatch = password === confirmPassword;
-
-            if (!emailValid) {
-                emailError.textContent = 'Email must be @kh.students.amrita.edu or @kh.amrita.edu';
-                event.preventDefault();
-            } else {
-                emailError.textContent = '';
-            }
-
-            if (!passwordsMatch) {
-                passwordMatchError.textContent = 'Passwords do not match';
-                event.preventDefault();
-            } else {
-                passwordMatchError.textContent = '';
-            }
-        });
-
         const toggleConfirmPassword = document.querySelector('#toggleConfirmPassword');
         const confirmPassword = document.querySelector('#confirm_password');
         const confirmEyeIcon = document.querySelector('#confirmEyeIcon');
@@ -261,35 +141,117 @@
                 toggleConfirmPassword.style.display = 'none'; // Hide the eye icon when there's no text
             }
         });
+
         document.getElementById('signup-form').addEventListener('submit', function(event) {
-            const button = document.getElementById('submit-button');
+    event.preventDefault();
+
+    const mobileInput = document.getElementById('mobile');
+    const emailInput = document.getElementById('email');
+    const passwordInput = document.getElementById('password');
+    const confirmPasswordInput = document.getElementById('confirm_password');
+    const deptSelect = document.getElementById('dept');
+
+    const mobileError = document.getElementById('mobile-error');
+    const emailError = document.getElementById('email-error');
+    const passwordMatchError = document.getElementById('password-match-error');
+    const deptError = document.getElementById('dept-error');
+
+    const button = document.getElementById('submit-button');
             const loader = document.getElementById('loader');
             const buttonText = document.getElementById('button-text');
-    
-            // Prevent default form submission
-            event.preventDefault();
-    
-            // Disable the button
-            button.disabled = true;
-    
+            const submitButton = document.querySelector('.submit-btn');    
+
+    let isValid = true;
+
+    // Mobile number validation
+    if (!/^[4-9]\d{9}$/.test(mobileInput.value)) {
+        mobileError.textContent = 'Mobile number must be 10 digits and start with 4, 5, 6, 7, 8, or 9.';
+        isValid = false;
+    } else {
+        mobileError.textContent = '';
+    }
+
+    // Email validation
+    const emailRegex = /^(.+@kh\.students\.amrita\.edu|.+@kh\.amrita\.edu)$/;
+    if (!emailRegex.test(emailInput.value)) {
+        emailError.textContent = 'Email must be @kh.students.amrita.edu or @kh.amrita.edu';
+        isValid = false;
+    } else {
+        emailError.textContent = '';
+    }
+
+    // Department selection validation
+    if (deptSelect.value === "null") {
+        deptError.textContent = 'Please select a department.';
+        isValid = false;
+    } else {
+        deptError.textContent = '';
+    }
+
+    // Password matching validation
+    if (passwordInput.value !== confirmPasswordInput.value) {
+        passwordMatchError.textContent = 'Passwords do not match';
+        isValid = false;
+    } else {
+        passwordMatchError.textContent = '';
+    }
+
+    // Password criteria validation
+    if (!allPasswordCriteriaValid()) {
+        isValid = false;
+    }
+
+    // Submit form if all validations pass
+    if (isValid) {
             // Show the loader and hide the button text
             loader.classList.remove('hidden');
             buttonText.classList.add('hidden');
-    
-            // Submit the form (you can also use fetch here if needed)
-            this.submit(); // This will submit the form normally
-        });
+            submitButton.classList.add('disabled');
+            submitButton.disabled = true;
+            this.submit();
+            console.log("submitted");
+    }
+});
 
-        window.addEventListener('scroll', function() {
-        const scrollY = window.scrollY; // Get the scroll position
-        const body = document.body;
-        const image = '/assets/Background-images/welcome3.jpg'; // Image path
-        
-        // Set background size based on scroll position
-        body.style.backgroundImage = '/assets/Background-images/welcome3.jpg';
-        body.style.backgroundSize = `${100 + scrollY / 5}%`; // Resize based on scroll position
-    });
+// Function to check if all password criteria are valid
+function allPasswordCriteriaValid() {
+    return (
+        document.getElementById('min-characters').classList.contains('valid') &&
+        document.getElementById('uppercase').classList.contains('valid') &&
+        document.getElementById('lowercase').classList.contains('valid') &&
+        document.getElementById('numbers').classList.contains('valid') &&
+        document.getElementById('special-characters').classList.contains('valid')
+    );
+}
 
+// Password strength validation and criteria display
+document.getElementById('password').addEventListener('input', function() {
+    var password = this.value;
+    var passwordCriteria = document.getElementById('password-criteria');
+
+    // Show password criteria if password field is not empty
+    passwordCriteria.style.display = password.length > 0 ? 'block' : 'none';
+
+    // Validate password length (minimum 8 characters)
+    document.getElementById('min-characters').classList.toggle('valid', password.length >= 8);
+    document.getElementById('min-characters').classList.toggle('invalid', password.length < 8);
+
+    // Validate uppercase letters
+    document.getElementById('uppercase').classList.toggle('valid', /[A-Z]/.test(password));
+    document.getElementById('uppercase').classList.toggle('invalid', !/[A-Z]/.test(password));
+
+    // Validate lowercase letters
+    document.getElementById('lowercase').classList.toggle('valid', /[a-z]/.test(password));
+    document.getElementById('lowercase').classList.toggle('invalid', !/[a-z]/.test(password));
+
+    // Validate numbers
+    document.getElementById('numbers').classList.toggle('valid', /\d/.test(password));
+    document.getElementById('numbers').classList.toggle('invalid', !/\d/.test(password));
+
+    // Validate special characters
+    document.getElementById('special-characters').classList.toggle('valid', /[!@#$%^&*(),.?":{}|<>]/.test(password));
+    document.getElementById('special-characters').classList.toggle('invalid', !/[!@#$%^&*(),.?":{}|<>]/.test(password));
+});
 
     </script>
 </body>
