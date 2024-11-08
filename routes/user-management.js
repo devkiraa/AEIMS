@@ -81,9 +81,20 @@ router.put('/users/:id', async (req, res) => {
             }
 
             const email = user[0]?.usr_name;  // Access usr_name as the email
-            const dept = user[0]?.usr_role;
+            const role = user[0]?.usr_role;
 
-            if (usr_stat === '1' && email && dept === 'regw' && !(usr_role === 'regw')) {
+            if ((usr_stat === '1' || usr_stat === '0') && email && role === 'regw' && !(usr_role === 'regw')) {
+
+                // Update user details logic
+                const [sresult] = await db.query(
+                    `UPDATE users SET usr_stat = ? WHERE usr_id = ?`,
+                    [1, userId]
+                );
+
+                if (sresult.affectedRows === 0) {
+                    return res.status(404).json({ error: 'User not found' });
+                }
+
                 const emailResponse = await fetch(`${req.protocol}://${req.get('host')}/api/send-email`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },

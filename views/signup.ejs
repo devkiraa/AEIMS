@@ -143,115 +143,115 @@
         });
 
         document.getElementById('signup-form').addEventListener('submit', function(event) {
-    event.preventDefault();
+            event.preventDefault();
 
-    const mobileInput = document.getElementById('mobile');
-    const emailInput = document.getElementById('email');
-    const passwordInput = document.getElementById('password');
-    const confirmPasswordInput = document.getElementById('confirm_password');
-    const deptSelect = document.getElementById('dept');
+            const mobileInput = document.getElementById('mobile');
+            const emailInput = document.getElementById('email');
+            const passwordInput = document.getElementById('password');
+            const confirmPasswordInput = document.getElementById('confirm_password');
+            const deptSelect = document.getElementById('dept');
 
-    const mobileError = document.getElementById('mobile-error');
-    const emailError = document.getElementById('email-error');
-    const passwordMatchError = document.getElementById('password-match-error');
-    const deptError = document.getElementById('dept-error');
+            const mobileError = document.getElementById('mobile-error');
+            const emailError = document.getElementById('email-error');
+            const passwordMatchError = document.getElementById('password-match-error');
+            const deptError = document.getElementById('dept-error');
 
-    const button = document.getElementById('submit-button');
+            const button = document.getElementById('submit-button');
             const loader = document.getElementById('loader');
             const buttonText = document.getElementById('button-text');
             const submitButton = document.querySelector('.submit-btn');    
 
-    let isValid = true;
+            let isValid = true;
 
-    // Mobile number validation
-    if (!/^[4-9]\d{9}$/.test(mobileInput.value)) {
-        mobileError.textContent = 'Mobile number must be 10 digits and start with 4, 5, 6, 7, 8, or 9.';
-        isValid = false;
-    } else {
-        mobileError.textContent = '';
-    }
+            // Mobile number validation
+            if (!/^[4-9]\d{9}$/.test(mobileInput.value)) {
+                mobileError.textContent = 'Mobile number must be 10 digits and start with 4, 5, 6, 7, 8, or 9.';
+                isValid = false;
+            } else {
+                mobileError.textContent = '';
+            }
 
-    // Email validation
-    const emailRegex = /^(.+@kh\.students\.amrita\.edu|.+@kh\.amrita\.edu)$/;
-    if (!emailRegex.test(emailInput.value)) {
-        emailError.textContent = 'Email must be @kh.students.amrita.edu or @kh.amrita.edu';
-        isValid = false;
-    } else {
-        emailError.textContent = '';
-    }
+            // Email validation
+            const emailRegex = /^(.+@kh\.students\.amrita\.edu|.+@kh\.amrita\.edu)$/;
+            if (!emailRegex.test(emailInput.value)) {
+                emailError.textContent = 'Email must be @kh.students.amrita.edu or @kh.amrita.edu';
+                isValid = false;
+            } else {
+                emailError.textContent = '';
+            }
 
-    // Department selection validation
-    if (deptSelect.value === "null") {
-        deptError.textContent = 'Please select a department.';
-        isValid = false;
-    } else {
-        deptError.textContent = '';
-    }
+            // Department selection validation
+            if (deptSelect.value === "null") {
+                deptError.textContent = 'Please select a department.';
+                isValid = false;
+            } else {
+                deptError.textContent = '';
+            }
 
-    // Password matching validation
-    if (passwordInput.value !== confirmPasswordInput.value) {
-        passwordMatchError.textContent = 'Passwords do not match';
-        isValid = false;
-    } else {
-        passwordMatchError.textContent = '';
-    }
+            // Password matching validation
+            if (passwordInput.value !== confirmPasswordInput.value) {
+                passwordMatchError.textContent = 'Passwords do not match';
+                isValid = false;
+            } else {
+                passwordMatchError.textContent = '';
+            }
 
-    // Password criteria validation
-    if (!allPasswordCriteriaValid()) {
-        isValid = false;
-    }
+            // Password criteria validation
+            if (!allPasswordCriteriaValid()) {
+                isValid = false;
+            }
 
-    // Submit form if all validations pass
-    if (isValid) {
-            // Show the loader and hide the button text
-            loader.classList.remove('hidden');
-            buttonText.classList.add('hidden');
-            submitButton.classList.add('disabled');
-            submitButton.disabled = true;
-            this.submit();
-            console.log("submitted");
-    }
-});
+            // Submit form if all validations pass
+            if (isValid) {
+                // Show the loader and hide the button text
+                loader.classList.remove('hidden');
+                buttonText.classList.add('hidden');
+                submitButton.classList.add('disabled');
+                submitButton.disabled = true;
+                this.submit();
+                console.log("submitted");
+            }
+        });
 
-// Function to check if all password criteria are valid
-function allPasswordCriteriaValid() {
-    return (
-        document.getElementById('min-characters').classList.contains('valid') &&
-        document.getElementById('uppercase').classList.contains('valid') &&
-        document.getElementById('lowercase').classList.contains('valid') &&
-        document.getElementById('numbers').classList.contains('valid') &&
-        document.getElementById('special-characters').classList.contains('valid')
-    );
-}
+        // Function to check if all password criteria are valid
+        function allPasswordCriteriaValid() {
+            return (
+                document.getElementById('min-characters').classList.contains('valid') &&
+                document.getElementById('uppercase').classList.contains('valid') &&
+                document.getElementById('lowercase').classList.contains('valid') &&
+                document.getElementById('numbers').classList.contains('valid') &&
+                document.getElementById('special-characters').classList.contains('valid')
+            );
+        }
 
-// Password strength validation and criteria display
-document.getElementById('password').addEventListener('input', function() {
-    var password = this.value;
-    var passwordCriteria = document.getElementById('password-criteria');
+        // Password strength validation and criteria display
+        document.getElementById('password').addEventListener('input', function() {
+            var password = this.value;
+            var passwordCriteria = document.getElementById('password-criteria');
 
-    // Show password criteria if password field is not empty
-    passwordCriteria.style.display = password.length > 0 ? 'block' : 'none';
+            // Show password criteria if password field is not empty
+            passwordCriteria.style.display = password.length > 0 ? 'block' : 'none';
 
-    // Validate password length (minimum 8 characters)
-    document.getElementById('min-characters').classList.toggle('valid', password.length >= 8);
-    document.getElementById('min-characters').classList.toggle('invalid', password.length < 8);
+            // Validate password length (minimum 8 characters)
+            document.getElementById('min-characters').classList.toggle('valid', password.length >= 8);
+            document.getElementById('min-characters').classList.toggle('invalid', password.length < 8);
 
-    // Validate uppercase letters
-    document.getElementById('uppercase').classList.toggle('valid', /[A-Z]/.test(password));
-    document.getElementById('uppercase').classList.toggle('invalid', !/[A-Z]/.test(password));
+            // Validate uppercase letters
+            document.getElementById('uppercase').classList.toggle('valid', /[A-Z]/.test(password));
+            document.getElementById('uppercase').classList.toggle('invalid', !/[A-Z]/.test(password));
 
-    // Validate lowercase letters
-    document.getElementById('lowercase').classList.toggle('valid', /[a-z]/.test(password));
-    document.getElementById('lowercase').classList.toggle('invalid', !/[a-z]/.test(password));
+            // Validate lowercase letters
+            document.getElementById('lowercase').classList.toggle('valid', /[a-z]/.test(password));
+            document.getElementById('lowercase').classList.toggle('invalid', !/[a-z]/.test(password));
 
-    // Validate numbers
-    document.getElementById('numbers').classList.toggle('valid', /\d/.test(password));
-    document.getElementById('numbers').classList.toggle('invalid', !/\d/.test(password));
+            // Validate numbers
+            document.getElementById('numbers').classList.toggle('valid', /\d/.test(password));
+            document.getElementById('numbers').classList.toggle('invalid', !/\d/.test(password));
 
-    // Validate special characters
-    document.getElementById('special-characters').classList.toggle('valid', /[!@#$%^&*(),.?":{}|<>]/.test(password));
-    document.getElementById('special-characters').classList.toggle('invalid', !/[!@#$%^&*(),.?":{}|<>]/.test(password));
-});
+            // Validate special characters
+            document.getElementById('special-characters').classList.toggle('valid', /[!@#$%^&*(),.?":{}|<>]/.test(password));
+            document.getElementById('special-characters').classList.toggle('invalid', !/[!@#$%^&*(),.?":{}|<>]/.test(password));
+        });
 
     </script>
 </body>
