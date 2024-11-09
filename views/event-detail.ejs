@@ -39,6 +39,10 @@
             margin-bottom: 1.5rem;
         }
 
+        .form-section2 {
+            margin-bottom: 1rem;
+        }
+
         .btn-primary {
             background-color: #3B82F6;
             color: white;
@@ -149,6 +153,10 @@
         .remove-user {
             cursor: pointer;
             color: #2563eb;
+        }
+
+        #event_description {
+            height: 129px;
         }
     </style>
     <script>
@@ -369,11 +377,13 @@
             function checkRequiredFields() {
                 const eventTitle = document.getElementById('event_title');
                 const eventDescription = document.getElementById('event_description');
-                const fileInput = document.getElementById('event_poster');
+                const eventLink = document.getElementById('event_link');
+                const pfileInput = document.getElementById('event_poster');
+                const bfileInput = document.getElementById('event_banner');
                 const nextButton = document.querySelector('.next-btn');
 
                 // Check if all fields are filled
-                if (eventTitle.value && eventDescription.value && (fileInput.files.length > 0)) {
+                if (eventTitle.value && eventDescription.value && eventLink.value && (eventLink.value.length < 250) && (pfileInput.files.length > 0) && (bfileInput.files.length > 0)) {
                     nextButton.classList.add('enabled');
                     nextButton.disabled = false;
                 } else {
@@ -391,7 +401,9 @@
                 'end_time',
                 'venue',
                 'event_description',
-                'event_poster'
+                'event_poster',
+                'event_banner',
+                'event_link'
             ];
 
             inputFields.forEach(id => {
@@ -415,20 +427,22 @@
                 const endTime = document.getElementById('end_time').value;
                 const venue = document.getElementById('venue').value;
                 const eventDescription = document.getElementById('event_description').value;
+                const eventLink = document.getElementById('event_link').value;
                 const volunteerCounter = parseInt(document.getElementById('volunteer-counter').value);
                 const guestCounter = parseInt(document.getElementById('guest-counter').value);
+                const eventBanner = document.getElementById('event_banner').files[0];
                 const eventPoster = document.getElementById('event_poster').files[0];
-                const eventFood = 0;
 
                 const vselectedOption = document.querySelector('input[name="event_volunteers"]:checked');
                 const cselectedOption = document.querySelector('input[name="event_coordinators"]:checked');
                 const gselectedOption = document.querySelector('input[name="event_guests"]:checked');
                 const fselectedOption = document.querySelector('input[name="event_food"]:checked');
+                const tselectedOption = document.querySelector('input[name="event_type"]:checked');
 
                 // Define a lookup table for event configurations
                 const eventConfigurations = {
                    'no_no': {
-                        'none_single': { volunteerCount: 0, eventFood: 0, guestCount: 0 },
+                        'none_single': { volunteerCount: 0, eventFood: 0, guestCount: 0,  },
                         'none_multiple': { volunteerCount: 0, eventFood: 0, guestCount: 0 },
                         'single_single': { volunteerCount: 0, eventFood: 0, guestCount: 1 },
                         'single_multiple': { volunteerCount: 0, eventFood: 0, guestCount: 1 },
@@ -466,6 +480,7 @@
                 const fselected = fselectedOption.value;
                 const gselected = gselectedOption.value;
                 const cselected = cselectedOption.value;
+                const eventType = tselectedOption.value;
 
                 // Construct the keys for the lookup
                 const key = `${vselected}_${fselected}`;
@@ -479,13 +494,17 @@
                     updatedData = {
                         eventTitle,
                         eventDescription,
+                        eventLink,
                         volunteerCount,
                         guestCount,
-                        eventFood
+                        eventFood,
+                        eventLink,
+                        eventType
                     };
 
                     const formData = new FormData();
                     formData.append('eventPoster', eventPoster);
+                    formData.append('eventBanner', eventBanner);
 
                     // Save the updated data to sessionStorage
                     sessionStorage.setItem('eventDetails', JSON.stringify(updatedData));
@@ -495,14 +514,16 @@
                         const response = await fetch('/api/upload-file', { // Endpoint to handle file upload
                             method: 'POST',
                             body: formData
-                        });
+                            });
 
                         if (response.ok) {
                             const result = await response.json(); // Get the response from the server
-                            const imageUrl = result.url; // Assuming the server returns the URL of the uploaded file
+                            const posterUrl = result.eventPosterUrl; // Server returns eventPoster URL
+                            const bannerUrl = result.eventBannerUrl; // Server returns eventBanner URL
 
-                            // Store the URL in sessionStorage
-                            sessionStorage.setItem('eventPosterUrl', imageUrl);
+                            // Store the URLs in sessionStorage
+                            sessionStorage.setItem('eventPosterUrl', posterUrl);
+                            sessionStorage.setItem('eventBannerUrl', bannerUrl);
 
                             // Redirect to the next page
                             if (eventConfigurations[key][guestKey].guestCount === 0) {
@@ -513,10 +534,9 @@
                         } else {
                             console.error("Upload failed.");
                         }
-                    } catch (error) {
-                        console.error("Error uploading:", error);
-                    }
-
+                } catch (error) {
+                    console.error("Error uploading:", error);
+                }
                     // // Redirect to the next page
                     // if (eventConfigurations[key][guestKey].guestCount === 0) {
                     //     window.location.href = '/book-event/resource';
@@ -669,18 +689,59 @@
                 };
             }
 
-            function validateFile() {
-                const fileInput = document.getElementById('event_poster');
-                const errorMessage = document.getElementById('file-error');
-                const filePath = fileInput.value;
+            function validateFile(chk) {
                 const allowedExtensions = /(\.jpg|\.jpeg|\.png)$/i;
+
+                if (chk === 0) {
+                    const fileInput = document.getElementById('event_banner');
+                    const errorMessage = document.getElementById('banner-error');
+                    const filePath = fileInput.value;
         
-                if (!allowedExtensions.exec(filePath)) {
-                    errorMessage.classList.remove('hidden');  // Show the error message
-                    fileInput.value = '';  // Clear the file input
-                 return false;
-                } else {
-                    errorMessage.classList.add('hidden');  // Hide the error message if the file is valid
+                    if (!allowedExtensions.exec(filePath)) {
+                        errorMessage.textContent = 'Please upload a file with .jpg, .jpeg, or .png extension.';
+                        errorMessage.classList.remove('hidden');  // Show the error message
+                        fileInput.value = '';  // Clear the file input
+                        return false;
+                    } else {
+                        errorMessage.classList.add('hidden'); // Hide the error message if the file is valid
+                    }
+
+                    // Log and validate file details
+                    const file = fileInput.files[0];
+                    if (file) {        
+                        // Use FileReader to get image dimensions
+                        const reader = new FileReader();
+                        reader.onload = function(e) {
+                            const img = new Image();
+                            img.src = e.target.result;
+
+                            img.onload = function() {
+                                // Additional check for specific dimensions
+                                if (img.width !== 720 || img.height !== 300) {
+                                    errorMessage.textContent = 'Image must be 720x300 pixels.';
+                                    errorMessage.classList.remove('hidden');
+                                    fileInput.value = '';  // Clear the file input if dimensions are incorrect
+                                } else {
+                                    errorMessage.classList.add('hidden');  // Hide error if file is valid
+                                }
+                            };
+                        };
+                        reader.readAsDataURL(file); // Read the file as Data URL for image preview
+                    } else {
+                        console.log("No file selected");
+                    }
+                } else if (chk === 1) {
+                    const fileInput = document.getElementById('event_poster');
+                    const errorMessage = document.getElementById('poster-error');
+                    const filePath = fileInput.value;
+        
+                    if (!allowedExtensions.exec(filePath)) {
+                        errorMessage.classList.remove('hidden');  // Show the error message
+                        fileInput.value = '';  // Clear the file input
+                        return false;
+                    } else {
+                        errorMessage.classList.add('hidden');  // Hide the error message if the file is valid
+                    }
                 }
             }
             document.addEventListener('DOMContentLoaded', function () {
@@ -768,6 +829,13 @@
                     </div>
 
                     <div class="form-section">
+                        <label for="venue" class="form-label block">Venue</label>
+                        <select name="venue" id="venue" class="w-full p-2 border border-gray-300 rounded mt-1">
+                            <!-- Venue Inserted Dynamically -->
+                        </select>
+                    </div>
+
+                    <div class="form-section">
                         <label for="start_date" class="form-label block">Event Start Date</label>
                         <input type="date" name="start_date" id="start_date" class="w-full p-2 border border-gray-300 rounded mt-1" required>
                     </div>
@@ -778,15 +846,22 @@
                     </div>
 
                     <div class="form-section">
-                        <label for="venue" class="form-label block">Venue</label>
-                        <select name="venue" id="venue" class="w-full p-2 border border-gray-300 rounded mt-1">
-                            <!-- Venue Inserted Dynamically -->
-                        </select>
+                        <label class="form-label block">Event Food</label>
+                        <div class="flex h-10">
+                            <label class="radio-label">
+                                <input type="radio" name="event_food" value="yes">
+                                Yes
+                            </label>
+                            <label class="radio-label">
+                                <input type="radio" name="event_food" value="no" checked>
+                                No
+                            </label>
+                        </div>
                     </div>
 
                     <div class="form-section">
                         <label class="form-label block">Event Volunteers</label>
-                        <div class="flex">
+                        <div class="flex h-11">
                             <label class="radio-label">
                                 <input type="radio" name="event_volunteers" value="yes">
                                 Yes
@@ -800,41 +875,8 @@
                     </div>
 
                     <div class="form-section">
-                        <label class="form-label block">Event Coordinators</label>
-                        <div class="flex items-center">
-                            <label class="radio-label">
-                                <input type="radio" name="event_coordinators" value="single" checked>
-                                Single
-                            </label>
-                            <label class="radio-label">
-                                <input type="radio" name="event_coordinators" value="multiple">
-                                Multiple
-                            </label>
-                            <input type="text" id="coordinator-search" name="coordinator_search" placeholder="Search for Coordinators..." class="w-full p-2 border border-gray-300 rounded">
-                        </div>
-                        <div id="selected-users" class="selected-users"></div>
-                    </div>
-                </div>
-
-                <div>
-                    <div class="form-section">
-                        <label for="event_description" class="form-label block">Event Description</label>
-                        <input type="text" name="event_description" id="event_description" placeholder="Event description...." class="w-full p-2 border border-gray-300 rounded mt-1" required>
-                    </div>
-
-                    <div class="form-section">
-                        <label for="end_date" class="form-label block">Event End Date</label>
-                        <input type="date" name="end_date" id="end_date" class="w-full p-2 border border-gray-300 rounded mt-1" required>
-                    </div>
-
-                    <div class="form-section">
-                        <label for="end_time" class="form-label block">Event End Time</label>
-                        <input type="time" name="end_time" id="end_time" class="w-full p-2 border border-gray-300 rounded mt-1" required>
-                    </div>
-
-                    <div class="form-section">
                         <label class="form-label block">Event Guests</label>
-                        <div class="flex">
+                        <div class="flex h-11">
                             <label class="radio-label">
                                 <input type="radio" name="event_guests" value="none" checked>
                                 None
@@ -852,24 +894,70 @@
                     </div>
 
                     <div class="form-section">
-                        <label class="form-label block">Event Food</label>
-                        <div class="flex">
+                        <label class="form-label block">Event Coordinators</label>
+                        <div class="flex items-center h-10">
                             <label class="radio-label">
-                                <input type="radio" name="event_food" value="yes">
-                                Yes
+                                <input type="radio" name="event_coordinators" value="single" checked>
+                                Single
                             </label>
                             <label class="radio-label">
-                                <input type="radio" name="event_food" value="no" checked>
-                                No
+                                <input type="radio" name="event_coordinators" value="multiple">
+                                Multiple
+                            </label>
+                            <input type="text" id="coordinator-search" name="coordinator_search" placeholder="Search for Coordinators..." class="w-full p-2 border border-gray-300 rounded">
+                        </div>
+                        <div id="selected-users" class="selected-users"></div>
+                    </div>
+                </div>
+
+                <div>
+                    <div class="form-section">
+                        <label for="event_description" class="form-label block">Event Description</label>
+                        <textarea name="event_description" id="event_description" placeholder="Event description...." class="w-full h-36 p-2 border border-gray-300 rounded mt-1" required></textarea>
+                    </div>
+
+                    <div class="form-section">
+                        <label for="end_date" class="form-label block">Event End Date</label>
+                        <input type="date" name="end_date" id="end_date" class="w-full p-2 border border-gray-300 rounded mt-1" required>
+                    </div>
+
+                    <div class="form-section">
+                        <label for="end_time" class="form-label block">Event End Time</label>
+                        <input type="time" name="end_time" id="end_time" class="w-full p-2 border border-gray-300 rounded mt-1" required>
+                    </div>
+
+                    <div class="form-section2">
+                        <label class="form-label block">Event Type</label>
+                        <div class="flex h-8">
+                            <label class="radio-label">
+                                <input type="radio" name="event_type" value="online">
+                                Online
+                            </label>
+                            <label class="radio-label">
+                                <input type="radio" name="event_type" value="offline" checked>
+                                Offline
                             </label>
                         </div>
+                    </div>
+                    
+                    <div class="form-section">
+                        <label for="event_link" class="form-label block">Event Link</label>
+                        <input type="text" name="event_link" id="event_link" placeholder="Registration form link" class="w-full p-2 border border-gray-300 rounded mt-1" required>
+                        <span id="link-error" class="text-red-500 text-sm mt-1 hidden">Please shorten the URL.</span>
+                    </div>
+
+                    <!-- File upload for event poster -->
+                    <div class="form-section">
+                        <label for="event_banner" class="form-label block">Event Banner <span class="text-xs">(dimensions: 720x300)</span></label>
+                        <input type="file" name="event_banner" id="event_banner" class="w-full p-2 border border-gray-300 rounded mt-1" accept=".jpg, .jpeg, .png" onchange="validateFile(0)">
+                        <span id="banner-error" class="text-red-500 text-sm mt-1 hidden">Please upload a file with .jpg, .jpeg, or .png extension.</span>
                     </div>
 
                     <!-- File upload for event poster -->
                     <div class="form-section">
                         <label for="event_poster" class="form-label block">Event Poster</label>
-                        <input type="file" name="event_poster" id="event_poster" class="w-full p-2 border border-gray-300 rounded mt-1" accept=".jpg, .jpeg, .png" onchange="validateFile()">
-                        <span id="file-error" class="text-red-500 text-sm mt-1 hidden">Please upload a file with .jpg, .jpeg, or .png extension.</span>
+                        <input type="file" name="event_poster" id="event_poster" class="w-full p-2 border border-gray-300 rounded mt-1" accept=".jpg, .jpeg, .png" onchange="validateFile(1)">
+                        <span id="poster-error" class="text-red-500 text-sm mt-1 hidden">Please upload a file with .jpg, .jpeg, or .png extension.</span>
                     </div>
                 </div>
             </div>

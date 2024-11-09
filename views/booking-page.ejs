@@ -285,7 +285,7 @@
 
         // Function to check if all required fields are filled
         function checkRequiredFields() {
-                    const startDate = document.getElementById('start-date').value;
+            const startDate = document.getElementById('start-date').value;
             const endDate = document.getElementById('end-date').value;
             const startTime = document.getElementById('start-time').value;
             const endTime = document.getElementById('end-time').value;
@@ -399,13 +399,14 @@
 
         document.addEventListener('DOMContentLoaded', () => {
             // Attach event listeners for input fields to trigger availability check
-            ['start-date', 'end-date', 'start-time', 'end-time'].forEach((id) => {
+            ['start-date', 'end-date', 'start-time', 'end-time', 'event_title'].forEach((id) => {
                 document.getElementById(id).addEventListener('input', handleInputChange);
             });
 
             document.getElementById('start-date').addEventListener('change', updateEndDateMin);
             document.getElementById('start-time').addEventListener('change', updateEndTimeMin);
-            document.getElementById('end-date').addEventListener('change', updateEndTimeMin);
+            document.getElementById('end-date').addEventListener('change', updateEndDateMin);
+            document.getElementById('end-time').addEventListener('change', updateEndTimeMin);
 
             attachVenueButtonListeners(); // Attach venue button listeners
 
@@ -528,7 +529,7 @@
 </head>
 <body class="min-h-screen bg-gray-100">
     <!-- Navbar -->
-    <<nav class="bg-blue-600 p-4">
+    <nav class="bg-blue-600 p-4">
         <div class="container mx-auto flex justify-between items-center">
             <!-- Navbar Links -->
             <div class="flex items-center space-x-6">

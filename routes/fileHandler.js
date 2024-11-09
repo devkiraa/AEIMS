@@ -18,9 +18,8 @@ function generateRandomString(length) {
 // Function to generate a unique filename
 async function generateUniqueFilename(originalname) {
     const ext = path.extname(originalname);
-    let baseName = path.basename(originalname, ext);
     let uniqueName = `${generateRandomString(15)}-${Date.now()}${ext}`;
-    
+
     // Check if the file already exists
     while (fs.existsSync(path.join(uploadsDir, uniqueName))) {
         uniqueName = `${generateRandomString(15)}-${Date.now()}${ext}`;
@@ -50,17 +49,18 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage: storage });
 
-// Endpoint to handle file uploads
-router.post('/upload-file', upload.single('eventPoster'), (req, res) => {
-    if (!req.file) {
-        return res.status(400).send('No file uploaded.');
+// Endpoint to handle multiple file uploads
+router.post('/upload-file', upload.fields([{ name: 'eventPoster' }, { name: 'eventBanner' }]), (req, res) => {
+    if (!req.files || !req.files.eventPoster || !req.files.eventBanner) {
+        return res.status(400).send('Both eventPoster and eventBanner must be uploaded.');
     }
 
-    // Construct the URL for the uploaded file
-    const fileUrl = `${req.protocol}://${req.get('host')}/uploads/${req.file.filename}`;
+    // Construct the URLs for the uploaded files
+    const eventPosterUrl = `${req.protocol}://${req.get('host')}/uploads/${req.files.eventPoster[0].filename}`;
+    const eventBannerUrl = `${req.protocol}://${req.get('host')}/uploads/${req.files.eventBanner[0].filename}`;
 
-    // Send the URL back to the client
-    res.json({ url: fileUrl });
+    // Send the URLs back to the client
+    res.json({ eventPosterUrl, eventBannerUrl });
 });
 
 module.exports = router;
