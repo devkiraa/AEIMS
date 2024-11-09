@@ -70,6 +70,15 @@ app.use((req, res) => {
     res.status(404).render('404'); // Assuming you have a '404.ejs' template in your views folder
 });
 
+// Handle 403 errors with custom template
+app.use((err, req, res, next) => {
+    if (res.statusCode === 403) {
+        res.render('403'); // Render the custom 403 page
+    } else {
+        next(err); // Pass the error to other error handlers if it's not 403
+    }
+});
+
 // Start server
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {

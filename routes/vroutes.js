@@ -90,26 +90,58 @@ router.get('/inventory', (req, res) => {
 
 // Booking page
 router.get('/book-event', (req, res) => {
-    res.render('booking-page');
+    // if (!req.session.user_id) {
+    //     return res.redirect('/login');
+    // }
+
+    if (req.session.user_role === 'admin'|| req.session.user_role === 'hod' || req.session.user_role === 'em') {
+        const userRole = req.session.user_role;
+        const userDept = req.session.user_dept;
+        res.render('booking-page', {userRole, userDept});
+    } else {
+        res.status(403).render(403);
+    }
 });
 
 // Event details page
 router.get('/book-event/event-details', (req, res) => {
-    res.render('event-detail');
+    if (req.session.user_role === 'admin'|| req.session.user_role === 'hod' || req.session.user_role === 'em') {
+        const userRole = req.session.user_role;
+        const userDept = req.session.user_dept;
+        res.render('event-detail', {userRole, userDept});
+    } else {
+        res.status(403).render(403);
+    }
 });
 
 // Guest details page
 router.get('/book-event/guest-details', (req, res) => {
-    res.render('guest-details');
+    if (req.session.user_role === 'admin'|| req.session.user_role === 'hod' || req.session.user_role === 'em') {
+        const userRole = req.session.user_role;
+        const userDept = req.session.user_dept;
+        res.render('guest-details', {userRole, userDept});
+    } else {
+        res.status(403).render(403);
+    }
 });
 
 // Resource selection page
 router.get('/book-event/resource', (req, res) => {
-    res.render('resource-selection');
+    if (req.session.user_role === 'admin'|| req.session.user_role === 'hod' || req.session.user_role === 'em') {
+        const userRole = req.session.user_role;
+        const userDept = req.session.user_dept;
+        res.render('resource-selection', {userRole, userDept});
+    } else {
+        res.status(403).render(403);
+    }
 });
 
 // Approve and reject events route
 router.get('/event-approval', async (req, res) => {
+    if (!req.session.user_id) {
+        return res.redirect('/login');
+    }
+    
     try {
         const userRole = req.session.user_role;
         const userDept = req.session.user_dept;
@@ -125,11 +157,19 @@ router.get('/user-management', (req, res) => {
     if (!req.session.user_id) {
         return res.redirect('/login');
     }
-    const userRole = req.session.user_role;
-    const userDept = req.session.user_dept;
-    res.render('user-management', {userRole, userDept});
 
-    console.log(req.session);
+    if (req.session.user_role === 'admin'|| req.session.user_role === 'hod') {
+        const userRole = req.session.user_role;
+        const userDept = req.session.user_dept;
+        res.render('user-management', {userRole, userDept});
+    } else {
+        res.status(403).render(403);
+    }
+});
+
+router.get('/guest-new',(req, res) => {
+    const userRole = 'admin';
+    res.render('GuestDetailsNew', {userRole});
 });
 
 module.exports = router;

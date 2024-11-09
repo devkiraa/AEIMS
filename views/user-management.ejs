@@ -286,8 +286,8 @@
                     vdeletedUsers = users.filter(user => user.usr_stat === 'Deleted');
                 } else {
                     // Separate active and deleted users
-                    vactiveUsers = users.filter(user => (user.usr_stat === 'Active' || user.usr_stat === 'Disabled') && user.usr_dept === `<%= userDept === 'cs' ? 'CS & IT' : userDept === 'math' ? 'Mathematics' : userDept === 'com' ? 'Commerce' : userDept === 'vm' ? 'VM' : userDept === 'ps' ? 'PS' : 'English' %>`);
-                    vdeletedUsers = users.filter(user => user.usr_stat === 'Deleted' && user.usr_dept === `<%= userDept === 'cs' ? 'CS & IT' : userDept === 'math' ? 'Mathematics' : userDept === 'com' ? 'Commerce' : userDept === 'vm' ? 'VM' : userDept === 'ps' ? 'PS' : 'English' %>`);
+                    vactiveUsers = users.filter(user => (user.usr_stat === 'Active' || user.usr_stat === 'Disabled') && user.usr_dept === `<%- userDept === 'cs' ? 'CS & IT' : userDept === 'math' ? 'Mathematics' : userDept === 'com' ? 'Commerce' : userDept === 'vm' ? 'VM' : userDept === 'ps' ? 'PS' : 'English' %>`);
+                    vdeletedUsers = users.filter(user => user.usr_stat === 'Deleted' && user.usr_dept === `<%- userDept === 'cs' ? 'CS & IT' : userDept === 'math' ? 'Mathematics' : userDept === 'com' ? 'Commerce' : userDept === 'vm' ? 'VM' : userDept === 'ps' ? 'PS' : 'English' %>`);
                 }
 
                 const activeUsers = vactiveUsers;
