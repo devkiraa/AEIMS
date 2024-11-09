@@ -1,11 +1,16 @@
 import os
 import smtplib
 import sys
+import logging
 import mysql.connector
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from dotenv import load_dotenv
 from datetime import datetime
+
+# Configure logging
+logging.basicConfig(level=logging.INFO, format="%(message)s")
+logger = logging.getLogger()
 
 # Load environment variables from .env file
 load_dotenv()

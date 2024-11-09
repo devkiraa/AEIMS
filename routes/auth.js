@@ -34,7 +34,6 @@ router.post('/login', async (req, res) => {
 
         // Set session variables
         req.session.user_id = user.usr_id;
-        console.log('User ID set in session:', req.session.user_id); // Log session data here=
         req.session.user_role = user.usr_role;
         req.session.user_name = userDetails[0].usr_aname;
         req.session.user_dept = user.usr_dept;
@@ -44,7 +43,11 @@ router.post('/login', async (req, res) => {
         const loginDate = new Date();
         const logDate = loginDate.toISOString().split('T')[0]; // YYYY-MM-DD format
         const logTime = loginDate.toTimeString().split(' ')[0]; // HH:MM:SS format
-
+        // Log session data with user name and login time
+        console.log(
+            `User logged in the session: ${req.session.user_id}, Name: ${req.session.user_name}, Logged in at: ${logDate} ${logTime}`
+        );
+        
         // Insert login log into user_login_log table
         await db.query(
             'INSERT INTO user_login_log (usr_id, usr_log_dt, usr_log_time) VALUES (?, ?, ?)',
