@@ -114,32 +114,6 @@ router.post('/signup', async (req, res) => {
     }
 });
 
-// GET dashboard route
-router.get('/', async (req, res) => {
-    if (!req.session.user_id) {
-        return res.redirect('/login');
-    }
-
-    const { user_role: userRole, user_name: userName } = req.session;
-    const events = [];  // Placeholder: Fetch actual events as needed
-    const inventoryItems = [];  // Placeholder: Fetch actual inventory items as needed
-
-    res.render('dashboard', {
-        userRole,
-        userName,
-        events,
-        inventoryItems: userRole === 'admin' ? [] : inventoryItems // Hide inventory for admin on dashboard
-    });
-});
-
-router.get('/user-management', (req, res) => {
-    if (!req.session.user_id) {
-        return res.redirect('/login');
-    }
-    const userRole = req.session.user_role;
-    res.render('user-management', { userRole });
-});
-
 // Approve event
 router.post('/events/approve/:id', async (req, res) => {
     try {
@@ -163,20 +137,5 @@ router.post('/events/reject/:id', async (req, res) => {
         res.json({ success: false, message: 'Could not reject event.' });
     }
 });
-
-
-// Approve and reject events route
-router.get('/event-approval', async (req, res) => {
-    try {
-        const userRole = req.session.user_role;
-        const userDept = req.session.user_dept;
-        // Pass the events data to the template
-        res.render('event-approval-page', {userRole, userDept});
-    } catch (error) {
-        console.error('Error fetching events:', error);
-        res.status(500).send('Internal Server Error');
-    }
-});
-
 
 module.exports = router;
