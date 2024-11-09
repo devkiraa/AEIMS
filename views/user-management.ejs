@@ -172,14 +172,14 @@
                 <!-- User details will be populated dynamically -->
             </div>
             <div class="mt-4 text-right flex items-center justify-end space-x-2">
-                <button onclick="saveUser()" class="save-btn bg-blue-600 text-white px-4 py-2 rounded-lg flex items-center justify-center">
+                <button onclick="saveUser()" class="save-btn bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center justify-center">
                     <span id="button-text">Save</span>
                     <svg id="loader" class="hidden animate-spin h-6 w-6 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                         <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                         <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                     </svg>
                 </button>
-                <button onclick="closePopup(0)" class="bg-gray-200 text-gray-700 px-4 py-2 rounded-lg mr-2">
+                <button onclick="closePopup(0)" class="bg-gray-200 hover:bg-gray-300 text-gray-700 px-4 py-2 rounded-lg mr-2">
                     Cancel
                 </button>
             </div>
@@ -199,10 +199,10 @@
             </div>
 
             <div class="mt-4 text-right">
-                <button onclick="deleteUser()" class="bg-blue-600 text-white px-4 py-2 rounded-lg ">
+                <button onclick="deleteUser()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg ">
                     Yes
                 </button>
-                <button onclick="closePopup(1)" class="bg-gray-200 text-gray-700 px-4 py-2 rounded-lg mr-2">
+                <button onclick="closePopup(1)" class="bg-gray-200 hover:bg-gray-300 text-gray-700 px-4 py-2 rounded-lg mr-2">
                     No
                 </button>
             </div>
@@ -222,10 +222,10 @@
             </div>
 
             <div class="mt-4 text-right">
-                <button onclick="restoreUser()" class="bg-blue-600 text-white px-4 py-2 rounded-lg ">
+                <button onclick="restoreUser()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg ">
                     Yes
                 </button>
-                <button onclick="closePopup(2)" class="bg-gray-200 text-gray-700 px-4 py-2 rounded-lg mr-2">
+                <button onclick="closePopup(2)" class="bg-gray-200 hover:bg-gray-300 text-gray-700 px-4 py-2 rounded-lg mr-2">
                     No
                 </button>
             </div>
@@ -328,7 +328,7 @@
                                 </button>
                             </td>
                         ` : `
-                            <td class="p-4 text-left">
+                            <td class="p-4 text-center">
                                 <button class="text-gray-500 hover:text-blue-600 mr-4" onclick='openRestorePopup(${JSON.stringify(user)})'>
                                     <img src="/assets/icons/restore_from_trash_24dp_6B7280_FILL0_wght500_GRAD0_opsz24.svg" alt="restore" class="w-6 h-6">
                                 </button>
