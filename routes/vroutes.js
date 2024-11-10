@@ -55,11 +55,6 @@ router.get('/', (req, res) => {
     res.render('dashboard');
 });
 
-// Create Event page
-router.get('/create-event', (req, res) => {
-    res.render('booking-page');
-});
-
 // My Events page
 router.get('/my-events', (req, res) => {
     if (!req.session.user_id) {
