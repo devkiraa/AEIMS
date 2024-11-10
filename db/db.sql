@@ -48,6 +48,8 @@ CREATE TABLE `inventory` (
   `inv_add_date` date NOT NULL,
   `inv_serv_date` date DEFAULT NULL,
   `inv_rmv_date` date DEFAULT NULL,
+  `inv_in_use` int DEFAULT '0',
+  `inv_available` int DEFAULT '0',
   `inv_stat` int NOT NULL,
   `inv_type` int NOT NULL,
   PRIMARY KEY (`inv_id`)
