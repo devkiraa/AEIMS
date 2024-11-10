@@ -85,14 +85,23 @@ router.get('/logout', (req, res) => {
 
 // Inventory-management page
 router.get('/inventory', (req, res) => {
-    res.render('inventory');
+    if (!req.session.user_id) {
+        return res.redirect('/login');
+    }
+
+    if (req.session.user_role === 'admin') {
+        const userRole = req.session.user_role;
+        res.render('inventory', {userRole});
+    } else {
+        res.status(403).render(403);
+    }
 });
 
 // Booking page
 router.get('/book-event', (req, res) => {
-    // if (!req.session.user_id) {
-    //     return res.redirect('/login');
-    // }
+    if (!req.session.user_id) {
+        return res.redirect('/login');
+    }
 
     if (req.session.user_role === 'admin'|| req.session.user_role === 'hod' || req.session.user_role === 'em') {
         const userRole = req.session.user_role;

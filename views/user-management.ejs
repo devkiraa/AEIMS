@@ -349,7 +349,7 @@
                 <p class=" mb-1"><strong>Name:</strong> ${user.usr_aname}</p>
                 <p class=" mb-1"><strong>Email:</strong> ${user.usr_name}</p>
                 <p class=" mb-1"><strong>Mobile:</strong> +91${user.usr_mob}</p>
-                <p class=" mb-1"><strong>Joined On:</strong> ${new Date(user.usr_cre_date).toLocaleDateString()}</p>
+                <p class=" mb-1"><strong>Joined On:</strong> ${new Date(user.usr_cre_date).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}</p>
                 <p class=" mb-2"><strong>Club Association:</strong> 
                     ${
                         user.usr_club === 'sic' ? 'SIC' : 
