@@ -76,12 +76,10 @@ router.put('/inventory/edit', async (req, res) => {
 router.put('/inventory/restore', async (req, res) => {
     // Code here
     const { inv_id, inv_serv_count, inv_serv_date, inv_stat } = req.body;
-    console.log("restore");
 
     try {
         await db.query('UPDATE inventory SET inv_serv_cnt = ?, inv_serv_date = ?, inv_stat = ? WHERE inv_id = ?', [inv_serv_count, inv_serv_date, inv_stat, inv_id]);
         res.json({ message: 'Item added to service successfully!' });
-        console.log(inv_serv_count, inv_serv_date, inv_stat, inv_id);
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: 'Failed to add item to service.' });

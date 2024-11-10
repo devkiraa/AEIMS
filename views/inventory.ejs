@@ -281,8 +281,6 @@
                 const serviceItem = vserviceItem;
                 const removedItem = vremovedItem;
 
-                console.log(vinventoryItem);
-
                 populateTable('inventoryBody', inventoryItem);
                 populateTable('serviceBody', serviceItem);
                 populateTable('removedBody', removedItem);
@@ -534,7 +532,6 @@
                 inv_serv_date: currentServiceCount === 0 ? null : new Date(date).toISOString().split('T')[0],
                 inv_stat: (currentItemCount - currentRemoveCount) === (currentServiceCount + parseInt(document.getElementById('restore_item_count').value)) ? 0 : 1,
             };
-            console.log(new Date(currentServiceDate).toISOString().split('T')[0]);
 
             try {
                 const response = await fetch(`/api/inventory/restore`, {
