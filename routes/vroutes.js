@@ -62,7 +62,17 @@ router.get('/create-event', (req, res) => {
 
 // My Events page
 router.get('/my-events', (req, res) => {
-    res.render('event-approval-page');
+    if (!req.session.user_id) {
+        return res.redirect('/login');
+    }
+
+    if (req.session.user_role === 'admin' || req.session.user_role === 'em') {
+        const userRole = req.session.user_role;
+        const userDept = req.session.user_dept;
+        res.render('event-approval-page', {userRole, userDept});
+    } else {
+        res.status(403).render(403);
+    }
 });
 
 // Profile page
