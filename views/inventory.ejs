@@ -10,50 +10,59 @@
         body {
             font-family: 'Poppins', sans-serif;
         }
-        .hidden { display: none; }
+        .hidden { 
+            display: none; 
+        }
+        /* Popup Styles */
+        .popup-overlay {
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+        .popup-content {
+            position: relative;
+        }
+        .popup-close {
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
+            cursor: pointer;
+            font-size: 1.5rem;
+            color: #4B5563;
+            transition: color 0.3s;
+        }
+        .popup-close:hover {
+            color: #EF4444;
+        }
     </style>
 </head>
 <body class="bg-gray-50">
     <!-- Navbar -->
     <nav class="bg-blue-600 p-4">
         <div class="container mx-auto flex justify-between items-center">
-            <!-- Navbar Links -->
             <div class="flex items-center space-x-6">
                 <ul class="flex space-x-6 text-white">
-                    <!-- Home Link - Always First -->
                     <li><a href="/" class="hover:text-gray-300">Home</a></li>
-            
-                    <!-- Conditional Links for 'admin' or 'icts' -->
                     <% if (userRole === 'admin' || userRole === 'icts') { %>
                         <li><a href="/book-event" class="hover:text-gray-300">Book</a></li>
                         <li><a href="/user-management" class="hover:text-gray-300">Users</a></li>
                         <li><a href="/inventory" class="hover:text-gray-300">Inventory</a></li>
                         <li><a href="/my-events" class="hover:text-gray-300">My Events</a></li>
                     <% } %>
-            
-                    <!-- Conditional Links for 'hod' -->
                     <% if (userRole === 'hod') { %>
                         <li><a href="/book-event" class="hover:text-gray-300">Book</a></li>
                         <li><a href="/user-management" class="hover:text-gray-300">Users</a></li>
                         <li><a href="/dept-events" class="hover:text-gray-300">Dept Events</a></li>
                         <li><a href="/event-approval" class="hover:text-gray-300">Approval</a></li>
                     <% } %>
-            
-                    <!-- Conditional Links for 'em' -->
                     <% if (userRole === 'em') { %>
                         <li><a href="/book-event" class="hover:text-gray-300">Book</a></li>
                         <li><a href="/my-events" class="hover:text-gray-300">My Events</a></li>
                     <% } %>
-            
-                    <!-- About Us Link - Always Last -->
                     <li><a href="/about-us" class="hover:text-gray-300">About Us</a></li>
                 </ul>
             </div>         
-
-            <!-- Profile Dropdown (Visible on Click) -->
             <div class="relative dropdown">
                 <button class="bg-white rounded-full p-2" id="profileButton">
-                    <img src="/assets/icons/avatar.svg" alt="User Icon" class="w-6 h-6">
+                    <img src="/assets/icons/avatar.svg" alt="User  Icon" class="w-6 h-6">
                 </button>
                 <div class="dropdown-menu absolute hidden right-0 mt-2 w-48 bg-white rounded-lg shadow-lg" id="profileDropdown">
                     <a href="/profile" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">Profile</a>
@@ -65,23 +74,40 @@
     </nav>
 
     <!-- Main Content -->
-    <main class="container mx-auto p-6 max-w-5xl">
+    <main class="flex-grow container mx-auto p-6 max-w-5xl">
+        <h1 class="text-3xl font-bold mb-8">Inventory Management</h1>
+
+        <!-- Tab navigation -->
+        <div class="mb-6">
+            <ul class="flex divide-x divide-gray-300">
+                <li id="inventory-tab" class="px-4 text-blue-600 hover:text-gray-700 cursor-pointer" onclick="switchTab('inventory')">
+                    Inventory
+                </li>
+                <li id="service-tab" class="px-4 text-gray-500 hover:text-gray-700 cursor-pointer" onclick="switchTab('service')">
+                    In Service
+                </li>
+                <li id="removed-tab" class="px-4 text-gray-500 hover:text-gray-700 cursor-pointer" onclick="switchTab('removed')">
+                    Removed
+                </li>
+            </ul>
+        </div>
+
         <!-- Inventory Section -->
-        <section>
+        <div id="inventory" class="tab-content">
             <div class="flex justify-between items-center mb-4">
                 <h2 class="text-2xl font-semibold">Inventory</h2>
-                <button id="addInventoryBtn" class="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded flex items-center">
-                    Add
+                <button id="addInventoryBtn" class="bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded flex items-center">
+                    New
                     <svg xmlns="http://www.w3.org/2000/svg" class="ml-2 h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
                     </svg>
                 </button>
             </div>
-            <div class="bg-white shadow-md rounded-lg">
-                <table class="min-w-full bg-white" id="inventoryTable">
+            <div class="overflow-x-auto">
+                <table class="min-w-full bg-white border border-gray-300 rounded-lg">
                     <thead>
-                        <tr class="bg-blue-50 text-gray-600">
-                            <th class="p-4">Item</th>
+                        <tr class="bg-gray-100 text-gray-600 text-center">
+                            <th class="p-4 text-left">Item Name</th>
                             <th class="p-4">First Added Date</th>
                             <th class="p-4">Quantity</th>
                             <th class="p-4">Add to Service</th>
@@ -93,17 +119,18 @@
                     </tbody>
                 </table>
             </div>
-        </section>
+        </div>
 
         <!-- In Service Section -->
-        <section class="mt-12">
+        <div id="service" class="tab-content hidden">
             <h2 class="text-2xl font-semibold mb-4">In Service</h2>
-            <div class="bg-white shadow-md rounded-lg">
-                <table class="min-w-full bg-white">
+            <div class="overflow-x-auto">
+                <table class="min-w-full bg-white border border-gray-300 rounded-lg">
                     <thead>
-                        <tr class="bg-blue-50 text-gray-600">
-                            <th class="p-4">Item Name</th>
-                            <th class="p-4">Service Date</th>
+                        <tr class="bg-gray-100 text-gray-600 text-center">
+                            <th class="p-4 text-left">Item Name</th>
+                            <th class="p-4">Service Added Date</th>
+                            <th class="p-4">In Service</th>
                             <th class="p-4">Action</th>
                         </tr>
                     </thead>
@@ -112,12 +139,34 @@
                     </tbody>
                 </table>
             </div>
-        </section>
+        </div>
+
+        <!-- Removed Section -->
+        <div id="removed" class="tab-content hidden">
+            <h2 class="text-2xl font-semibold mb-4">Removed</h2>
+            <div class="overflow-x-auto">
+                <table class="min-w-full bg-white border border-gray-300 rounded-lg">
+                    <thead>
+                        <tr class="bg-gray-100 text-gray-600 text-center">
+                            <th class="p-4 text-left">Item Name</th>
+                            <th class="p-4">Removed Date</th>
+                            <th class="p-4">Removed</th>
+                            <th class="p-4">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="removedBody">
+                        <!-- removed items will be dynamically inserted here -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </main>
 
     <!-- Modal for adding inventory -->
-    <div id="addInventoryModal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 hidden">
-        <div class="bg-white p-6 rounded-lg shadow-lg w-96">
+    <div id="addInventoryModal" class="fixed inset-0 hidden flex items-center justify-center popup-overlay">
+        <div class="bg-white p-6 rounded-lg shadow-lg w-96 relative">
+            <!-- Close Icon -->
+            <span class="popup-close" onclick="closePopup(0)">&times;</span>
             <h2 class="text-2xl font-semibold mb-4">Add New Inventory Item</h2>
             <form id="addInventoryForm">
                 <div class="mb-4">
@@ -126,36 +175,90 @@
                 </div>
                 <div class="mb-4">
                     <label for="inv_item_count" class="block text-gray-700">Item Count:</label>
-                    <input type="number" id="inv_item_count" class="w-full px-3 py-2 border border-gray-300 rounded" required>
+                    <input type="number" id="inv_item_count" class="w-full px-3 py-2 border border-gray-300 rounded" min="1" value="1" required>
                 </div>
-                <input type="hidden" id="inv_id">
-                <input type="hidden" id="inv_first_added">
+                <div class="mb-4">
+                    <label for="inv_item_count" class="block text-gray-700">Item Kind</label>
+                    <select id="inv_kind" class="w-full p-2 border rounded-lg mb-2">
+                        <option value="1">Serviceable</option>
+                        <option value="0">Non-Serviceable</option>
+                    </select>
+                </div>
                 <div class="flex justify-end space-x-4">
-                    <button type="button" class="bg-gray-500 text-white py-2 px-4 rounded" onclick="closeModal()">Cancel</button>
-                    <button type="submit" class="bg-blue-500 text-white py-2 px-4 rounded">Add</button>
+                    <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded">Add</button>
+                    <button onclick="closePopup(0)" class="bg-gray-200 hover:bg-gray-300 text-gray-700 py-2 px-4 rounded">Cancel</button>
                 </div>
             </form>
         </div>
     </div>
 
     <!-- Modal for adding to service -->
-    <div id="addToServiceModal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 hidden">
-        <div class="bg-white p-6 rounded-lg shadow-lg w-96">
-            <h2 class="text-2xl font-semibold mb-4">Add to Service</h2>
-            <p id="inventoryDetails" class="mb-4"></p>
-            <form id="addToServiceForm">
-                <div class="mb-4">
-                    <label for="service_item_count" class="block text-gray-700">Number of items to service:</label>
-                    <input type="number" id="service_item_count" class="w-full px-3 py-2 border border-gray-300 rounded" required>
-                </div>
-                <div class="flex justify-end space-x-4">
-                    <button type="button" class="bg-gray-500 text-white py-2 px-4 rounded" onclick="closeServiceModal()">Cancel</button>
-                    <button type="submit" class="bg-blue-500 text-white py-2 px-4 rounded">OK</button>
-                </div>
-            </form>
+    <div id="serviceModal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 hidden">
+        <div class="bg-white p-6 rounded-lg shadow-lg w-96 relative">
+            <!-- Close Icon -->
+            <span class="popup-close" onclick="closePopup(1)">&times;</span>
+
+            <h2  class="text-2xl font-semibold mb-4">Add to Service</h2>
+            <div id="servicePopupContent">
+                <!-- Dynamic Content -->
+            </div>
+            <div class="flex justify-end space-x-4">
+                <button onclick="addService()" class="bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded">Add</button>
+                <button onclick="closePopup(1)" class="bg-gray-200 hover:bg-gray-300 text-gray-700 py-2 px-4 rounded">Cancel</button>
+            </div>
         </div>
     </div>
 
+    <!-- Modal for removing Item -->
+    <div id="deleteModal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 hidden">
+        <div class="bg-white p-6 rounded-lg shadow-lg w-96 relative">
+            <!-- Close Icon -->
+            <span class="popup-close" onclick="closePopup(2)">&times;</span>
+
+            <h2 class="text-2xl font-semibold mb-4">Remove Item</h2>
+            <div id="deletePopupContent">
+                <!-- Dynamic Content -->
+            </div>
+            <div class="flex justify-end space-x-4">
+                <button onclick="removeItem()" class="bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded">Remove</button>
+                <button onclick="closePopup(2)" class="bg-gray-200 hover:bg-gray-300 text-gray-700 py-2 px-4 rounded" >Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for editing Item -->
+    <div id="editModal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 hidden">
+        <div class="bg-white p-6 rounded-lg shadow-lg w-96 relative">
+            <!-- Close Icon -->
+            <span class="popup-close" onclick="closePopup(3)">&times;</span>
+
+            <h2 class="text-2xl font-semibold mb-4">Edit Item</h2>
+            <div id="editPopupContent">
+                <!-- Dynamic Content -->
+            </div>
+            <div class="flex justify-end space-x-4">
+                <button onclick="editItem()" class="bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded">Save</button>
+                <button onclick="closePopup(3)" class="bg-gray-200 hover:bg-gray-300 text-gray-700 py-2 px-4 rounded" >Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for restoring from service -->
+    <div id="restoreModal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 hidden">
+        <div class="bg-white p-6 rounded-lg shadow-lg w-96 relative">
+            <!-- Close Icon -->
+            <span class="popup-close" onclick="closePopup(4)">&times;</span>
+
+            <h2 class="text-2xl font-semibold mb-4">Restore Service Item</h2>
+            <div id="restorePopupContent">
+                <!-- Dynamic Content -->
+            </div>
+            <div class="flex justify-end space-x-4">
+                <button onclick="restoreServiceItem()" class="bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded">Restore</button>
+                <button onclick="closePopup(4)" class="bg-gray-200 hover:bg-gray-300 text-gray-700 py-2 px-4 rounded" >Cancel</button>
+            </div>
+        </div>
+    </div>
     <script>
         // Load inventory data on page load
         async function loadInventory() {
@@ -165,159 +268,368 @@
                     throw new Error('Network response was not ok ' + response.statusText);
                 }
                 const inventoryItems = await response.json();
-    
-                // Clear the table before adding new items
-                document.getElementById('inventoryBody').innerHTML = '';
-    
-                inventoryItems.forEach(item => {
-                    const newRow = `
-                        <tr>
-                            <td class="p-4">${item.inv_prd_name}</td>
-                            <td class="p-4">${new Date(item.inv_first_added).toLocaleDateString()}</td>
-                            <td class="p-4">${item.inv_item_count}</td>
-                            <td class="p-4 text-center">
-                                <button class="text-blue-500 hover:text-blue-700" onclick="showAddToServiceModal(this)">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 inline-block" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
-                                    </svg>
-                                </button>
-                            </td>
-                            <td class="p-4 text-center">
-                                <button class="text-gray-500 hover:text-red-600" onclick="deleteRow(this)">
-                                    <img src="/assets/icons/delete_24dp_6B7280_FILL0_wght500_GRAD0_opsz24.svg" alt="Delete Icon" class="w-6 h-6">
-                                </button>
-                                <button class="text-gray-500 hover:text-green-600" onclick="editRow(this)">
-                                    <img src="/assets/icons/edit_24dp_6B7280_FILL0_wght500_GRAD0_opsz24.svg" alt="Edit Icon" class="w-6 h-6">
-                                </button>
-                            </td>
-                        </tr>
-                    `;
-                    document.getElementById('inventoryBody').insertAdjacentHTML('beforeend', newRow);
-                });
+                let vinventoryItem;
+                let vserviceItem;
+                let vremovedItem;
+
+                // Separate active and deleted users
+                vinventoryItem = inventoryItems.filter(item => item.inv_stat === 1 || item.inv_stat === 0 || item.inv_stat === -1);
+                vserviceItem = inventoryItems.filter(item => (item.inv_stat === 1 || item.inv_stat === 0) && item.inv_type === 1 && item.inv_serv_cnt > 0);
+                vremovedItem = inventoryItems.filter(item => item.inv_stat === -1 || item.inv_rmv_cnt > 0);
+
+                const inventoryItem = vinventoryItem;
+                const serviceItem = vserviceItem;
+                const removedItem = vremovedItem;
+
+                console.log(vinventoryItem);
+
+                populateTable('inventoryBody', inventoryItem);
+                populateTable('serviceBody', serviceItem);
+                populateTable('removedBody', removedItem);
             } catch (error) {
                 console.error('Error loading inventory:', error);
             }
         }
+
+        function populateTable(tableId, inventoryItems) {
+            const tableBody = document.getElementById(tableId);
+            tableBody.innerHTML = ''; // Clear existing rows
+
+            inventoryItems.forEach(item => {
+                    const row = `
+                        <tr>
+                            <td class="p-4">${item.inv_prd_name}</td>
+                            ${tableId === 'inventoryBody' ? `<td class="p-4 text-center">${new Date(item.inv_add_date).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}</td>` : 
+                                tableId === 'serviceBody' ? `<td class="p-4 text-center">${new Date(item.inv_serv_date).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}</td>` : 
+                                    `<td class="p-4 text-center">${new Date(item.inv_rmv_date).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}</td>`}
+                            ${tableId === 'inventoryBody' ? `<td class="p-4 text-center">${item.inv_item_cnt-item.inv_serv_cnt-item.inv_rmv_cnt}</td>` : 
+                                tableId === 'serviceBody' ? `<td class="p-4 text-center">${item.inv_serv_cnt}</td>` : 
+                                    `<td class="p-4 text-center">${item.inv_rmv_cnt}</td>`}
+                            ${tableId === 'inventoryBody' && item.inv_type === 1 && (item.inv_item_cnt - item.inv_rmv_cnt - item.inv_serv_cnt) > 0 ? `<td class="p-4 text-center">
+                                <button class="text-blue-500 hover:text-blue-700" onclick='serviceModal(${JSON.stringify(item)})'>
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 inline-block" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                                    </svg>
+                                </button>
+                            </td>` : 
+                                tableId === 'serviceBody' ? '' :
+                                    tableId === 'removedBody' ? '' :
+                                        `<td class="p-4 text-center">
+                                            <span class="text-grey-500">-</span>
+                                        </td>`}
+                            ${tableId === 'inventoryBody' ? `<td class="p-4 text-center">
+                                <button class="text-gray-500 hover:text-red-600" onclick='deleteModal(${JSON.stringify(item)})'>
+                                    <img src="/assets/icons/delete_24dp_6B7280_FILL0_wght500_GRAD0_opsz24.svg" alt="Delete Icon" class="w-6 h-6">
+                                </button>
+                                <button class="text-gray-500 hover:text-green-600" onclick='editModal(${JSON.stringify(item)})'>
+                                    <img src="/assets/icons/edit_24dp_6B7280_FILL0_wght500_GRAD0_opsz24.svg" alt="Edit Icon" class="w-6 h-6">
+                                </button>
+                            </td>` : 
+                            tableId === 'serviceBody' ?
+                                `<td class="p-4 text-center">
+                                    <button class="text-gray-500 hover:text-red-600" onclick='restoreModal(${JSON.stringify(item)})'>
+                                        <img src="/assets/icons/reset_wrench_24dp_6B7280_FILL0_wght500_GRAD0_opsz24.svg" alt="Reset Icon" class="w-6 h-6">
+                                    </button>
+                                </td>` : 
+                                `<td class="p-4 text-center">
+                                    <span class="text-grey-500">-</span>
+                                </td>`}
+                        </tr>
+                    `;
+                    tableBody.insertAdjacentHTML('beforeend', row);
+                });
+        }
     
         // Modal handling functions
         document.getElementById('addInventoryBtn').addEventListener('click', function () {
-            openModal();
+            newInventoryModal();
         });
     
-        function openModal() {
-            const inv_id = 'INV' + Date.now();
-            document.getElementById('inv_id').value = inv_id;
-            const currentDate = new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
-            document.getElementById('inv_first_added').value = currentDate;
+        function newInventoryModal() {
+            // const inv_id = 'INV' + Date.now();
+            // document.getElementById('inv_id').value = inv_id;
             document.getElementById('addInventoryModal').classList.remove('hidden');
         }
+
+        function serviceModal(item) {
+            currentInventoryId = item.inv_id;
+            currentItemCount = item.inv_item_cnt;
+            currentServiceCount = item.inv_serv_cnt;
+            currentRemoveCount = item.inv_rmv_cnt;
+            currentServiceDate = item.inv_serv_date;
+            currentRemoveDate = item.inv_rmv_cnt;
+            const popupContent = document.getElementById('servicePopupContent');
+            popupContent.innerHTML = `
+                <p class="mb-1"><strong>Item Name: </strong>${item.inv_prd_name}</p>
+                <p class="mb-1"><strong>Item Added on: </strong>${new Date(item.inv_add_date).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}</p>
+                <p class="mb-1"><strong>Item Count: </strong>${item.inv_item_cnt-item.inv_rmv_cnt-item.inv_serv_cnt}</p>
+                <p class="mb-2"><strong>Item Kind: </strong>${item.inv_type === 1 ? 'Servicable' : 'Non-Servicable'}</p>
+                <div class="mb-4">
+                    <label for="service_item_count" class="block text-gray-700">Number of items to service:</label>
+                    <input type="number" id="service_item_count" class="w-full px-3 py-2 border border-gray-300 rounded" value="1" min="1" max="${item.inv_item_cnt-item.inv_rmv_cnt-item.inv_serv_cnt}" required>
+                </div>
+            `;
+            document.getElementById('serviceModal').classList.remove('hidden');
+        }
+
+        async function addService() {
+            const serviceItem = {
+                inv_id: currentInventoryId,
+                inv_serv_count: currentServiceCount + parseInt(document.getElementById('service_item_count').value),
+                inv_serv_date: currentServiceDate === null ? new Date().toISOString().split('T')[0] : currentServiceDate,
+                inv_stat: (currentItemCount - currentRemoveCount) === (currentServiceCount + parseInt(document.getElementById('service_item_count').value)) ? 0 : 1,
+            };
+
+            try {
+                const response = await fetch(`/api/inventory/service`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(serviceItem),
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`); 
+                }
+                
+                loadInventory(); // Refresh the user list
+                closePopup(1);
+                document.getElementById('service_item_count').value = '1'
+            } catch (error) {
+                console.error('Failed to update user:', error);
+            }
+        }
+
+        function deleteModal(item) {
+            currentInventoryId = item.inv_id;
+            currentItemCount = item.inv_item_cnt;
+            currentServiceCount = item.inv_serv_cnt;
+            currentRemoveCount = item.inv_rmv_cnt;
+            currentServiceDate = item.inv_serv_date;
+            currentRemoveDate = item.inv_rmv_cnt;
+            const popupContent = document.getElementById('deletePopupContent');
+            popupContent.innerHTML = `
+                <p class="mb-1"><strong>Item Name: </strong>${item.inv_prd_name}</p>
+                <p class="mb-1"><strong>Item Added on: </strong>${new Date(item.inv_add_date).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}</p>
+                <p class="mb-1"><strong>Item Count: </strong>${item.inv_item_cnt-item.inv_rmv_cnt-item.inv_serv_cnt}</p>
+                <p class="mb-2"><strong>Item Kind: </strong>${item.inv_type === 1 ? 'Servicable' : 'Non-Servicable'}</p>
+                <div class="mb-4">
+                    <label for="delete_item_count" class="block text-gray-700">Number of items to remove:</label>
+                    <input type="number" id="delete_item_count" class="w-full px-3 py-2 border border-gray-300 rounded" value="1" min="1" max="${item.inv_item_cnt-item.inv_rmv_cnt-item.inv_serv_cnt}" required>
+                </div>
+            `;
+            document.getElementById('deleteModal').classList.remove('hidden');
+        }
+
+        async function removeItem() {
+            const removeItem = {
+                inv_id: currentInventoryId,
+                inv_rmv_count: currentRemoveCount + parseInt(document.getElementById('delete_item_count').value),
+                inv_rmv_date: currentRemoveDate === null ? new Date().toISOString().split('T')[0] : currentRemoveDate,
+                inv_stat: (currentItemCount - currentServiceCount) === (currentRemoveCount + parseInt(document.getElementById('delete_item_count').value)) ? -1 : 1,
+            };
+
+            try {
+                const response = await fetch(`/api/inventory/remove`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(removeItem),
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`); 
+                }
+                
+                loadInventory(); // Refresh the user list
+                closePopup(2);
+                document.getElementById('delete_item_count').value = '1'
+            } catch (error) {
+                console.error('Failed to update user:', error);
+            }
+        }
+
+        function editModal(item) {
+            currentInventoryId = item.inv_id;
+            currentItemCount = item.inv_item_cnt;
+            currentServiceCount = item.inv_serv_cnt;
+            currentRemoveCount = item.inv_rmv_cnt;
+            currentServiceDate = item.inv_serv_date;
+            currentRemoveDate = item.inv_rmv_cnt;
+            const popupContent = document.getElementById('editPopupContent');
+            popupContent.innerHTML = `
+                <p class="mb-1"><strong>Item Name: </strong>${item.inv_prd_name}</p>
+                <p class="mb-1"><strong>Item Added on: </strong>${new Date(item.inv_add_date).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}</p>
+                <p class="mb-1"><strong>Item Count: </strong>${item.inv_item_cnt-item.inv_rmv_cnt-item.inv_serv_cnt}</p>
+                <p class="mb-2"><strong>Item Kind: </strong>${item.inv_type === 1 ? 'Servicable' : 'Non-Servicable'}</p>
+                <div class="mb-4">
+                    <label for="add_item_count" class="block text-gray-700">Number of items to add more:</label>
+                    <input type="number" id="add_item_count" class="w-full px-3 py-2 border border-gray-300 rounded" value="1" min="1" required>
+                </div>
+            `;
+            document.getElementById('editModal').classList.remove('hidden');
+        }
+
+        async function editItem() {
+            const editItem = {
+                inv_id: currentInventoryId,
+                inv_item_count: currentItemCount + parseInt(document.getElementById('add_item_count').value),
+                inv_stat: ((currentItemCount - currentServiceCount) + parseInt(document.getElementById('add_item_count').value)) === currentRemoveCount ? -1 : 
+                    ((currentItemCount - currentRemoveCount) + parseInt(document.getElementById('add_item_count').value)) === currentServiceCount ? 0 : 1,
+            };
+
+            try {
+                const response = await fetch(`/api/inventory/edit`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(editItem),
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`); 
+                }
+                
+                loadInventory(); // Refresh the user list
+                closePopup(3);
+                document.getElementById('add_item_count').value = '1'
+            } catch (error) {
+                console.error('Failed to update user:', error);
+            }
+        }
+
+        function restoreModal(item) {
+            currentInventoryId = item.inv_id;
+            currentItemCount = item.inv_item_cnt;
+            currentServiceCount = item.inv_serv_cnt;
+            currentRemoveCount = item.inv_rmv_cnt;
+            currentServiceDate = item.inv_serv_date;
+            currentRemoveDate = item.inv_rmv_cnt;
+            const popupContent = document.getElementById('restorePopupContent');
+            popupContent.innerHTML = `
+                <p class="mb-1"><strong>Item Name: </strong>${item.inv_prd_name}</p>
+                <p class="mb-1"><strong>Item Added on: </strong>${new Date(item.inv_add_date).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}</p>
+                <p class="mb-1"><strong>Item Service Added on: </strong>${new Date(item.inv_serv_date).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}</p>
+                <p class="mb-1"><strong>Item Count: </strong>${item.inv_item_cnt-item.inv_rmv_cnt-item.inv_serv_cnt}</p>
+                <p class="mb-1"><strong>Restorable Count: </strong>${item.inv_serv_cnt}</p>
+                <p class="mb-2"><strong>Item Kind: </strong>${item.inv_type === 1 ? 'Servicable' : 'Non-Servicable'}</p>
+                <div class="mb-4">
+                    <label for="service_item_count" class="block text-gray-700">Number of items to restore:</label>
+                    <input type="number" id="restore_item_count" class="w-full px-3 py-2 border border-gray-300 rounded" value="1" min="1" max="${item.inv_serv_cnt}" required>
+                </div>
+            `;
+            document.getElementById('restoreModal').classList.remove('hidden');
+        }
+
+        async function restoreServiceItem() {
+            const isoDate = currentServiceDate;
+            const date = new Date(isoDate);
+            date.setTime(date.getTime() + 86400000);
+            const restoreItem = {
+                inv_id: currentInventoryId,
+                inv_serv_count: currentServiceCount - parseInt(document.getElementById('restore_item_count').value),
+                inv_serv_date: currentServiceCount === 0 ? null : new Date(date).toISOString().split('T')[0],
+                inv_stat: (currentItemCount - currentRemoveCount) === (currentServiceCount + parseInt(document.getElementById('restore_item_count').value)) ? 0 : 1,
+            };
+            console.log(new Date(currentServiceDate).toISOString().split('T')[0]);
+
+            try {
+                const response = await fetch(`/api/inventory/restore`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(restoreItem),
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`); 
+                }
+                
+                loadInventory(); // Refresh the user list
+                closePopup(4);
+                document.getElementById('restore_item_count').value = '1'
+            } catch (error) {
+                console.error('Failed to update user:', error);
+            }
+        }
     
-        function closeModal() {
-            document.getElementById('addInventoryModal').classList.add('hidden');
+        function closePopup(model) {
+            if (model === 0) {
+                document.getElementById('addInventoryModal').classList.add('hidden');
+            } else if (model === 1) {
+                document.getElementById('serviceModal').classList.add('hidden');
+            } else if (model === 2) {
+                document.getElementById('deleteModal').classList.add('hidden');
+            } else if (model === 3) {
+                document.getElementById('editModal').classList.add('hidden');
+            } else if (model === 4) {
+                document.getElementById('restoreModal').classList.add('hidden');
+            } else {
+                console.error("Unknown Close Action");
+            }
         }
     
         document.getElementById('addInventoryForm').addEventListener('submit', async function (e) {
             e.preventDefault();
-            const inv_prd_name = document.getElementById('inv_prd_name').value;
-            const inv_item_count = document.getElementById('inv_item_count').value;
-            const inv_first_added = document.getElementById('inv_first_added').value;
-    
-            const newRow = `
-                <tr>
-                    <td class="p-4">${inv_prd_name}</td>
-                    <td class="p-4">${inv_first_added}</td>
-                    <td class="p-4">${inv_item_count}</td>
-                    <td class="p-4 text-center">
-                        <button class="text-blue-500 hover:text-blue-700" onclick="showAddToServiceModal(this)">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 inline-block" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
-                            </svg>
-                        </button>
-                    </td>
-                    <td class="p-4 text-center">
-                        <button class="text-gray-500 hover:text-red-600" onclick="deleteRow(this)">
-                            <img src="/assets/icons/delete_24dp_6B7280_FILL0_wght500_GRAD0_opsz24.svg" alt="Delete Icon" class="w-6 h-6">
-                        </button>
-                        <button class="text-gray-500 hover:text-green-600" onclick="editRow(this)">
-                            <img src="/assets/icons/edit_24dp_6B7280_FILL0_wght500_GRAD0_opsz24.svg" alt="Edit Icon" class="w-6 h-6">
-                        </button>
-                    </td>
-                </tr>
-            `;
-            document.getElementById('inventoryBody').insertAdjacentHTML('beforeend', newRow);
-            closeModal();
+            const newItem = {
+                inv_prd_name: document.getElementById('inv_prd_name').value,
+                inv_item_count: document.getElementById('inv_item_count').value,
+                inv_stat: 1,
+                inv_type: document.getElementById('inv_kind').value
+            };
+
+            try {
+                const response = await fetch(`/api/inventory/add`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(newItem),
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`); 
+                }
+                
+                loadInventory(); // Refresh the user list
+                closePopup(0);
+                document.getElementById('inv_prd_name').value = '';
+                document.getElementById('inv_item_count').value = '1'
+            } catch (error) {
+                console.error('Failed to update user:', error);
+            }
         });
     
-        function deleteRow(button) {
-            button.closest('tr').remove();
+        // Tab switching functionality
+        function switchTab(tabId) {
+            const tabs = ['inventory', 'service', 'removed'];
+
+            tabs.forEach(tab => {
+                document.getElementById(tab).classList.add('hidden');
+                document.getElementById(`${tab}-tab`).classList.remove('text-blue-600');
+                document.getElementById(`${tab}-tab`).classList.add('text-gray-500');
+            });
+
+            document.getElementById(tabId).classList.remove('hidden');
+            document.getElementById(`${tabId}-tab`).classList.add('text-blue-600');
+            document.getElementById(`${tabId}-tab`).classList.remove('text-gray-500');
         }
-    
-        // Add to service modal handling
-        function showAddToServiceModal(button) {
-            const row = button.closest('tr');
-            const itemName = row.cells[0].innerText;
-            const itemCount = row.cells[2].innerText;
-    
-            document.getElementById('inventoryDetails').innerText = `Item: ${itemName}, Available Quantity: ${itemCount}`;
-            document.getElementById('addToServiceModal').classList.remove('hidden');
-        }
-    
-        function closeServiceModal() {
-            document.getElementById('addToServiceModal').classList.add('hidden');
-        }
-    
-        document.getElementById('addToServiceForm').addEventListener('submit', async function (e) {
-            e.preventDefault();
-            const serviceCount = document.getElementById('service_item_count').value;
-            const inventoryDetails = document.getElementById('inventoryDetails').innerText;
-    
-            const itemName = inventoryDetails.split(',')[0].replace('Item: ', '').trim();
-    
-            const newRow = `
-                <tr>
-                    <td class="p-4">${itemName}</td>
-                    <td class="p-4">${new Date().toLocaleDateString()}</td>
-                    <td class="p-4 text-center">
-                        <button class="text-gray-500 hover:text-red-600" onclick="deleteRow(this)">
-                            <img src="/assets/icons/delete_24dp_6B7280_FILL0_wght500_GRAD0_opsz24.svg" alt="Delete Icon" class="w-6 h-6">
-                        </button>
-                    </td>
-                </tr>
-            `;
-            document.getElementById('serviceBody').insertAdjacentHTML('beforeend', newRow);
-            closeServiceModal();
-        });
-    
-        // Edit functionality
-        function editRow(button) {
-            const row = button.closest('tr');
-            const itemName = row.cells[0].innerText;
-            const itemCount = row.cells[2].innerText;
-    
-            // Open modal with pre-filled data
-            openModal();
-            document.getElementById('inv_prd_name').value = itemName;
-            document.getElementById('inv_item_count').value = itemCount;
-    
-            // Remove the current row to replace it with the edited version
-            row.remove();
-        }
-    
+
         // Load inventory when the DOM is fully loaded
         document.addEventListener('DOMContentLoaded', () => {
-            loadInventory(); // Call the loadInventory function when the DOM is fully loaded
-        });
-        document.addEventListener('DOMContentLoaded', function () {
+            loadInventory();
             const profileButton = document.getElementById('profileButton');
             const profileDropdown = document.getElementById('profileDropdown');
         
-            // Toggle dropdown on button click
             profileButton.addEventListener('click', (event) => {
                 event.stopPropagation();
                 profileDropdown.classList.toggle('hidden');
             });
         
-            // Close dropdown if clicked outside
             document.addEventListener('click', (event) => {
                 if (!profileDropdown.classList.contains('hidden') && !profileDropdown.contains(event.target) && event.target !== profileButton) {
                     profileDropdown.classList.add('hidden');
@@ -325,6 +637,5 @@
             });
         });
     </script>
-    
 </body>
 </html>

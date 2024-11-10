@@ -2,16 +2,26 @@ const express = require('express');
 const router = express.Router();
 const db = require('../models/db'); 
 
+router.get('/inventory', async (req, res) => {
+    try {
+        const [inventoryItems] = await db.query('SELECT * FROM inventory'); 
+        res.json(inventoryItems); 
+    } catch (error) {
+        console.error('Error fetching inventory:', error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+});
+
 // Add inventory item
 router.post('/inventory/add', async (req, res) => {
     // Code here
-    const { inv_prd_name, inv_item_count } = req.body;
-    const inv_first_added = new Date().toISOString().split('T')[0]; // Current date in 'YYYY-MM-DD' format
+    const { inv_prd_name, inv_item_count, inv_stat, inv_type } = req.body;
+    const inv_add_date = new Date().toISOString().split('T')[0]; // Current date in 'YYYY-MM-DD' format
 
     try {
         await db.query(
-            'INSERT INTO inventory (inv_prd_name, inv_item_count, inv_first_added) VALUES (?, ?, ?)',
-            [inv_prd_name, inv_item_count, inv_first_added]
+            'INSERT INTO inventory (inv_prd_name, inv_item_cnt, inv_add_date, inv_stat, inv_type) VALUES (?, ?, ?, ?, ?)',
+            [inv_prd_name, inv_item_count, inv_add_date, inv_stat, inv_type]
         );
         res.json({ message: 'Inventory item added successfully!' });
     } catch (error) {
@@ -21,26 +31,12 @@ router.post('/inventory/add', async (req, res) => {
 });
 
 // Add item to service
-router.post('/service/add', async (req, res) => {
+router.put('/inventory/service', async (req, res) => {
     // Code here
-    const { inv_prd_name, service_count } = req.body;
-    const service_date = new Date().toISOString().split('T')[0];
+    const { inv_id, inv_serv_count, inv_serv_date, inv_stat } = req.body;
 
     try {
-        // Decrement the inventory count
-        const [[inventory]] = await db.query('SELECT * FROM inventory WHERE inv_prd_name = ?', [inv_prd_name]);
-        if (!inventory || inventory.inv_item_count < service_count) {
-            return res.status(400).json({ message: 'Not enough items in inventory to add to service.' });
-        }
-
-        await db.query('UPDATE inventory SET inv_item_count = inv_item_count - ? WHERE inv_prd_name = ?', [service_count, inv_prd_name]);
-
-        // Add entry to service table
-        await db.query(
-            'INSERT INTO service (item_name, service_date, service_count) VALUES (?, ?, ?)',
-            [inv_prd_name, service_date, service_count]
-        );
-
+        await db.query('UPDATE inventory SET inv_serv_cnt = ?, inv_serv_date = ?, inv_stat = ? WHERE inv_id = ?', [inv_serv_count, inv_serv_date, inv_stat, inv_id]);
         res.json({ message: 'Item added to service successfully!' });
     } catch (error) {
         console.error(error);
@@ -48,14 +44,47 @@ router.post('/service/add', async (req, res) => {
     }
 });
 
-router.get('/inventory', async (req, res) => {
+// Remove Item
+router.put('/inventory/remove', async (req, res) => {
+    // Code here
+    const { inv_id, inv_rmv_count, inv_rmv_date, inv_stat } = req.body;
+
     try {
-        const inventoryItems = await db.query('SELECT * FROM inventory'); 
-        console.log(inventoryItems.rows); // Log the rows for debugging
-        res.json(inventoryItems.rows); 
+        await db.query('UPDATE inventory SET inv_rmv_cnt = ?, inv_rmv_date = ?, inv_stat = ? WHERE inv_id = ?', [inv_rmv_count, inv_rmv_date, inv_stat, inv_id]);
+        res.json({ message: 'Item added to service successfully!' });
     } catch (error) {
-        console.error('Error fetching inventory:', error);
-        res.status(500).json({ message: 'Internal server error' });
+        console.error(error);
+        res.status(500).json({ message: 'Failed to add item to service.' });
+    }
+});
+
+// Edit Item
+router.put('/inventory/edit', async (req, res) => {
+    // Code here
+    const { inv_id, inv_item_count, inv_stat } = req.body;
+
+    try {
+        await db.query('UPDATE inventory SET inv_item_cnt = ?, inv_stat = ? WHERE inv_id = ?', [inv_item_count, inv_stat, inv_id]);
+        res.json({ message: 'Item added to service successfully!' });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Failed to add item to service.' });
+    }
+});
+
+// Edit Item
+router.put('/inventory/restore', async (req, res) => {
+    // Code here
+    const { inv_id, inv_serv_count, inv_serv_date, inv_stat } = req.body;
+    console.log("restore");
+
+    try {
+        await db.query('UPDATE inventory SET inv_serv_cnt = ?, inv_serv_date = ?, inv_stat = ? WHERE inv_id = ?', [inv_serv_count, inv_serv_date, inv_stat, inv_id]);
+        res.json({ message: 'Item added to service successfully!' });
+        console.log(inv_serv_count, inv_serv_date, inv_stat, inv_id);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Failed to add item to service.' });
     }
 });
 
