@@ -40,15 +40,18 @@ CREATE TABLE `venues_bookings` (
 
 
 CREATE TABLE `inventory` (
-  `inv_id` int NOT NULL,
+  `inv_id` int NOT NULL AUTO_INCREMENT,
   `inv_prd_name` varchar(50) NOT NULL,
-  `inv_item_count` varchar(5) NOT NULL,
-  `inv_service_count` varchar(5) NOT NULL,
-  `inv_remove_count` varchar(5) NOT NULL,
-  `inv_first_added` date NOT NULL,
-  `inv_stat` varchar(20) DEFAULT NULL,
+  `inv_item_cnt` int NOT NULL,
+  `inv_serv_cnt` int NOT NULL,
+  `inv_rmv_cnt` int NOT NULL,
+  `inv_add_date` date NOT NULL,
+  `inv_serv_date` date DEFAULT NULL,
+  `inv_rmv_date` date DEFAULT NULL,
+  `inv_stat` int NOT NULL,
+  `inv_type` int NOT NULL,
   PRIMARY KEY (`inv_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=0 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 
 CREATE TABLE `user_details` (
@@ -69,7 +72,9 @@ CREATE TABLE `event_tb` (
   `evn_name` varchar(100) NOT NULL,
   `evn_desc` varchar(260) NOT NULL,
   `evn_dept` varchar(100) NOT NULL,
+  `evn_banner` varchar(100) NOT NULL,
   `event_poster` varchar(100) NOT NULL,
+  `evn_type` varchar(10) NOT NULL,
   `ven_id` int NOT NULL,
   `event_sd` date NOT NULL,
   `evn_ed` date NOT NULL,
@@ -80,6 +85,7 @@ CREATE TABLE `event_tb` (
   `evn_food` tinyint NOT NULL,
   `evn_stat` int NOT NULL,
   `evn_approval` tinyint NOT NULL,
+  `evn_form_link` varchar(250) DEFAULT NULL,
   PRIMARY KEY (`evn_id`),
   KEY `evn_ven_ref_idx` (`ven_id`),
   CONSTRAINT `evn_ven_ref` FOREIGN KEY (`ven_id`) REFERENCES `venues` (`ven_id`)
@@ -95,7 +101,7 @@ CREATE TABLE `event_coordinator` (
   KEY `evn_coor_usr_idx` (`usr_id`),
   CONSTRAINT `evn_coor` FOREIGN KEY (`evn_id`) REFERENCES `event_tb` (`evn_id`),
   CONSTRAINT `evn_coor_usr` FOREIGN KEY (`usr_id`) REFERENCES `users` (`usr_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=0 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 
 CREATE TABLE `event_guest_details` (
@@ -191,7 +197,7 @@ CREATE TABLE `mail_log` (
   PRIMARY KEY (`log_id`),
   KEY `mail_recipient_idx` (`usr_id`),
   CONSTRAINT `mail_recipient` FOREIGN KEY (`usr_id`) REFERENCES `users` (`usr_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=21 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=0 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 
 CREATE TABLE `password_resets` (
@@ -203,7 +209,7 @@ CREATE TABLE `password_resets` (
   PRIMARY KEY (`reset_id`),
   KEY `usr_id` (`usr_id`),
   CONSTRAINT `password_resets_ibfk_1` FOREIGN KEY (`usr_id`) REFERENCES `users` (`usr_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=0 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 
 CREATE TABLE `user_login_log` (
@@ -214,15 +220,15 @@ CREATE TABLE `user_login_log` (
   PRIMARY KEY (`login_id`),
   KEY `usr_login_log_idx` (`usr_id`),
   CONSTRAINT `usr_login_log` FOREIGN KEY (`usr_id`) REFERENCES `users` (`usr_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=17 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=0 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 
 CREATE TABLE `user_password_memory` (
-  `usr_pwd_mem_id` int NOT NULL,
+  `usr_pwd_mem_id` int NOT NULL AUTO_INCREMENT,
   `usr_id` int NOT NULL,
   `usr_pwd` varchar(100) NOT NULL,
   `usr_pwd_creation_dt` date NOT NULL,
   PRIMARY KEY (`usr_pwd_mem_id`),
   KEY `usr_pwd_mem_idx` (`usr_id`),
   CONSTRAINT `usr_pwd_mem` FOREIGN KEY (`usr_id`) REFERENCES `users` (`usr_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=0 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
