@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const db = require('../models/db'); // Database connection using promise-based mysql2
 
-// Route to fetch all ongoing and upcoming events
+// Route to fetch all approved events (both upcoming and past)
 router.get('/events', async (req, res) => {
     const sql = `
         SELECT 
@@ -25,12 +25,12 @@ router.get('/events', async (req, res) => {
             evn_form_link AS formLink
         FROM event_tb
         WHERE evn_approval = 1  -- Only approved events
-        AND event_sd >= NOW() -- Upcoming events
-        ORDER BY event_sd ASC`;
+        ORDER BY event_sd ASC;
+    `;
 
     try {
         const [events] = await db.query(sql);
-        res.json(events);
+        res.json(events);  // Send all events to the frontend
     } catch (err) {
         console.error(err);
         res.status(500).json({ error: 'Database query failed' });
