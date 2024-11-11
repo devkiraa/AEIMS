@@ -1,6 +1,6 @@
 DELIMITER //
 
-CREATE TRIGGER after_event_insert
+CREATE TRIGGER trg_after_insert_evn
 AFTER INSERT ON event_tb
 FOR EACH ROW
 BEGIN
@@ -12,20 +12,21 @@ BEGIN
         end_time,
         ven_stat,
         evn_id,
-        quick_evn
+        qck_evn_id
     )
     VALUES (
-		NEW.ven_id,
+        NEW.ven_id,
         NEW.event_sd,
         NEW.evn_ed,
         NEW.evn_st,
         NEW.event_et,
-        1,
+        CASE
+            WHEN NEW.evn_approval = 1 THEN 1
+            ELSE 0
+        END,
         NEW.evn_id,
         NULL
     );
 END //
 
 DELIMITER ;
-
-
