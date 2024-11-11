@@ -17,6 +17,11 @@ router.post('/login', async (req, res) => {
 
         // Ensure usr_stat is interpreted as a number
         if (parseInt(user.usr_stat) === -1) {
+            return res.render('login', { error: 'Your account is deleted.' });
+        }
+
+        // Ensure usr_stat is interpreted as a number
+        if (parseInt(user.usr_stat) === 0) {
             return res.render('login', { error: 'You are restricted from logging in.' });
         }
 
