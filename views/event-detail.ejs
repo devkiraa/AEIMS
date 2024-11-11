@@ -437,7 +437,6 @@
                 const cselectedOption = document.querySelector('input[name="event_coordinators"]:checked');
                 const gselectedOption = document.querySelector('input[name="event_guests"]:checked');
                 const fselectedOption = document.querySelector('input[name="event_food"]:checked');
-                const tselectedOption = document.querySelector('input[name="event_type"]:checked');
 
                 // Define a lookup table for event configurations
                 const eventConfigurations = {
@@ -480,7 +479,6 @@
                 const fselected = fselectedOption.value;
                 const gselected = gselectedOption.value;
                 const cselected = cselectedOption.value;
-                const eventType = tselectedOption.value;
 
                 // Construct the keys for the lookup
                 const key = `${vselected}_${fselected}`;
@@ -498,8 +496,7 @@
                         volunteerCount,
                         guestCount,
                         eventFood,
-                        eventLink,
-                        eventType
+                        eventLink
                     };
 
                     const formData = new FormData();
@@ -950,20 +947,6 @@
                     <div class="form-section">
                         <label for="end_time" class="form-label block">Event End Time</label>
                         <input type="time" name="end_time" id="end_time" class="w-full p-2 border border-gray-300 rounded mt-1" required>
-                    </div>
-
-                    <div class="form-section2">
-                        <label class="form-label block">Event Type</label>
-                        <div class="flex h-8">
-                            <label class="radio-label">
-                                <input type="radio" name="event_type" value="online">
-                                Online
-                            </label>
-                            <label class="radio-label">
-                                <input type="radio" name="event_type" value="offline" checked>
-                                Offline
-                            </label>
-                        </div>
                     </div>
                     
                     <div class="form-section">
