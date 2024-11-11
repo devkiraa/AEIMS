@@ -77,7 +77,13 @@ router.get('/profile', (req, res) => {
 
 // Change Password page
 router.get('/change-password', (req, res) => {
-    res.render('change-password');
+    if (!req.session.user_id) {
+        return res.redirect('/login');
+    }
+
+    const userRole = req.session.user_role;
+    const userId = req.session.user_id;
+    res.render('change-password',{userRole, userId});
 });
 
 // Logout route
