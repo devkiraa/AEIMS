@@ -43,8 +43,9 @@ const resetPasswordRoutes = require('./routes/resetpassword');
 const fileHandlerRoutes = require('./routes/fileHandler');
 const inventoryRoutes = require('./routes/inventory');
 const eventRoutes = require('./routes/event-approval');
-
+const dashboardRoutes = require('./routes/dashboard');
 // Use routes with prefixes to organize API routes
+app.use('/api/dashboard', dashboardRoutes);
 app.use('/api', userRoutes);
 app.use('/', authRoutes);
 app.use('/', vRoutes);

@@ -14,37 +14,26 @@
             <!-- Navbar Links -->
             <div class="flex items-center space-x-6">
                 <ul class="flex space-x-6 text-white">
-                    <!-- Home Link - Always First -->
                     <li><a href="/" class="hover:text-gray-300">Home</a></li>
-            
-                    <!-- Conditional Links for 'admin' or 'icts' -->
                     <% if (userRole === 'admin' || userRole === 'icts') { %>
                         <li><a href="/book-event" class="hover:text-gray-300">Book</a></li>
                         <li><a href="/user-management" class="hover:text-gray-300">Users</a></li>
                         <li><a href="/inventory" class="hover:text-gray-300">Inventory</a></li>
                         <li><a href="/my-events" class="hover:text-gray-300">My Events</a></li>
                     <% } %>
-            
-                    <!-- Conditional Links for 'hod' -->
                     <% if (userRole === 'hod') { %>
                         <li><a href="/book-event" class="hover:text-gray-300">Book</a></li>
                         <li><a href="/user-management" class="hover:text-gray-300">Users</a></li>
                         <li><a href="/dept-events" class="hover:text-gray-300">Dept Events</a></li>
                         <li><a href="/event-approval" class="hover:text-gray-300">Approval</a></li>
                     <% } %>
-            
-                    <!-- Conditional Links for 'em' -->
                     <% if (userRole === 'em') { %>
                         <li><a href="/book-event" class="hover:text-gray-300">Book</a></li>
                         <li><a href="/my-events" class="hover:text-gray-300">My Events</a></li>
                     <% } %>
-            
-                    <!-- About Us Link - Always Last -->
                     <li><a href="/about-us" class="hover:text-gray-300">About Us</a></li>
                 </ul>
-            </div>         
-
-            <!-- Profile Dropdown (Visible on Click) -->
+            </div>
             <div class="relative dropdown">
                 <button class="bg-white rounded-full p-2" id="profileButton">
                     <img src="/assets/icons/avatar.svg" alt="User Icon" class="w-6 h-6">
@@ -62,41 +51,186 @@
     <div class="container mx-auto px-4 py-8">
         <h1 class="text-2xl font-semibold mb-4">Welcome <%= userName %></h1>
 
-        <!-- Event Section -->
-        <h2 class="text-xl font-bold text-gray-700 mb-4">Ongoing Events</h2>
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <% events.forEach(event => { %>
-                <div class="bg-white rounded-lg shadow-lg p-4">
-                    <img src="<%= event.image || 'https://via.placeholder.com/300' %>" alt="Event" class="w-full h-40 object-cover rounded-t-lg">
-                    <div class="mt-4">
-                        <h3 class="text-lg font-bold text-gray-800"><%= event.name %></h3>
-                        <p class="text-sm text-blue-500 mt-2"><%= event.date %></p>
-                        <p class="text-sm text-gray-500 mt-1"><%= event.location %></p>
-                    </div>
-                </div>
-            <% }); %>
+        <!-- Upcoming Events Section -->
+        <h2 class="text-xl font-bold text-gray-700 mb-4">Upcoming Events</h2>
+        <div id="upcoming-events-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <!-- Upcoming events will be populated here by JavaScript -->
+        </div>
+
+        <!-- Past Events Section -->
+        <h2 class="text-xl font-bold text-gray-700 mb-4 mt-8">Past Events</h2>
+        <div id="past-events-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <!-- Past events will be populated here by JavaScript -->
         </div>
     </div>
 
-    <!-- JavaScript for Profile Dropdown -->
+    <!-- Event Details Modal -->
+    <div id="eventModal" class="fixed inset-0 bg-gray-800 bg-opacity-75 flex justify-center items-center hidden">
+        <div class="bg-white p-6 rounded-lg shadow-lg max-w-md w-full">
+            <button id="closeModal" class="absolute top-2 right-2 text-gray-600">X</button>
+            <h3 id="modalEventName" class="text-xl font-semibold mb-4"></h3>
+            <p id="modalEventDescription" class="text-gray-700 mb-4"></p>
+            <p id="modalEventDate" class="text-blue-500"></p>
+            <p id="modalEventLocation" class="text-gray-500"></p>
+        </div>
+    </div>
+
+    <!-- JavaScript for Profile Dropdown, Events Loading, and Modal -->
     <script>
-        document.addEventListener('DOMContentLoaded', function () {
+        document.addEventListener('DOMContentLoaded', async function () {
             const profileButton = document.getElementById('profileButton');
             const profileDropdown = document.getElementById('profileDropdown');
-
-            // Toggle dropdown on button click
+            const eventModal = document.getElementById('eventModal');
+            const closeModal = document.getElementById('closeModal');
+        
             profileButton.addEventListener('click', (event) => {
                 event.stopPropagation();
                 profileDropdown.classList.toggle('hidden');
             });
-
-            // Close dropdown if clicked outside
+        
             document.addEventListener('click', (event) => {
                 if (!profileDropdown.classList.contains('hidden') && !profileDropdown.contains(event.target) && event.target !== profileButton) {
                     profileDropdown.classList.add('hidden');
                 }
             });
-        });
+        
+            closeModal.addEventListener('click', () => {
+                eventModal.classList.add('hidden');
+            });
+        
+            // Close modal when clicking outside of it
+            window.addEventListener('click', (event) => {
+                if (event.target === eventModal) {
+                    eventModal.classList.add('hidden');
+                }
+            });
+        
+            try {
+                const response = await fetch('/api/dashboard/events');
+                const events = await response.json();
+                const upcomingEventsContainer = document.getElementById('upcoming-events-container');
+                const pastEventsContainer = document.getElementById('past-events-container');
+                
+                // Define current UTC date
+                const currentDateUTC = new Date(Date.UTC(
+                    new Date().getUTCFullYear(),
+                    new Date().getUTCMonth(),
+                    new Date().getUTCDate(),
+                    new Date().getUTCHours(),
+                    new Date().getUTCMinutes()
+                ));
+        
+                if (events.length === 0) {
+                    upcomingEventsContainer.innerHTML = '<p class="text-gray-500">No ongoing events at the moment.</p>';
+                    pastEventsContainer.innerHTML = '<p class="text-gray-500">No past events.</p>';
+                } else {
+                    events.forEach(event => {
+                        // Parse event start and end dates as UTC
+                        const eventStartDate = new Date(Date.UTC(
+                            parseInt(event.startDate.slice(0, 4)),      // Year
+                            parseInt(event.startDate.slice(5, 7)) - 1,  // Month (zero-indexed)
+                            parseInt(event.startDate.slice(8, 10)),     // Day
+                            parseInt(event.startTime.slice(0, 2)),      // Hour
+                            parseInt(event.startTime.slice(3, 5))       // Minute
+                        ));
+        
+                        const eventEndDate = new Date(Date.UTC(
+                            parseInt(event.endDate.slice(0, 4)),
+                            parseInt(event.endDate.slice(5, 7)) - 1,
+                            parseInt(event.endDate.slice(8, 10)),
+                            parseInt(event.endTime.slice(0, 2)),
+                            parseInt(event.endTime.slice(3, 5))
+                        ));
+        
+                        // Display upcoming events if approved and start in the future
+                        if (event.approvalStatus === 1 && eventStartDate >= currentDateUTC) {
+                            const eventCard = createEventCard(event);
+                            upcomingEventsContainer.appendChild(eventCard);
+                        }
+        
+                        // Display past events
+                        if (eventEndDate < currentDateUTC) {
+                            const eventCard = createEventCard(event);
+                            pastEventsContainer.appendChild(eventCard);
+                        }
+                    });
+                }
+            } catch (error) {
+                console.error('Failed to load events:', error);
+                document.getElementById('events-container').innerHTML = '<p class="text-red-500">Failed to load events.</p>';
+            }
+        
+            function createEventCard(event) {
+                const eventCard = document.createElement('div');
+                eventCard.className = 'bg-white rounded-lg shadow-lg p-4';
+        
+                // Parse start date and time for display
+                const eventStartDate = new Date(Date.UTC(
+                    parseInt(event.startDate.slice(0, 4)),
+                    parseInt(event.startDate.slice(5, 7)) - 1,
+                    parseInt(event.startDate.slice(8, 10)),
+                    parseInt(event.startTime.slice(0, 2)),
+                    parseInt(event.startTime.slice(3, 5))
+                ));
+        
+                const formattedDate = eventStartDate.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+                const formattedTime = eventStartDate.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+        
+                // Time remaining logic
+                let eventStatus = '';
+                let timeRemaining = '';
+                const currentDateUTC = new Date(Date.UTC(
+                    new Date().getUTCFullYear(),
+                    new Date().getUTCMonth(),
+                    new Date().getUTCDate(),
+                    new Date().getUTCHours(),
+                    new Date().getUTCMinutes()
+                ));
+        
+                if (eventStartDate > currentDateUTC) {
+                    const timeDiff = eventStartDate - currentDateUTC;
+                    const daysRemaining = Math.floor(timeDiff / (1000 * 60 * 60 * 24));
+                    const hoursRemaining = Math.floor((timeDiff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                    timeRemaining = `${daysRemaining} days, ${hoursRemaining} hours remaining`;
+                    eventStatus = 'Upcoming';
+                } else if (currentDateUTC >= eventStartDate && currentDateUTC <= eventEndDate) {
+                    eventStatus = 'Happening Now';
+                } else {
+                    eventStatus = 'Event Ended';
+                }
+        
+                eventCard.innerHTML = `
+                    <img src="${event.banner || 'https://via.placeholder.com/720x300'}" alt="Event Banner" class="w-full h-40 object-cover rounded-t-lg">
+                    <div class="mt-4">
+                        <h3 class="text-lg font-bold text-gray-800">${event.name}</h3>
+                        <p class="text-sm text-blue-500 mt-2">${formattedDate} at ${formattedTime}</p>
+                        <p class="text-sm text-gray-500">${eventStatus}</p>
+                        <p class="text-sm text-gray-500">${timeRemaining}</p>
+                    </div>
+                `;
+                eventCard.addEventListener('click', () => showModal(event));
+                return eventCard;
+            }
+        
+            function showModal(event) {
+                document.getElementById('modalEventName').textContent = event.name;
+                document.getElementById('modalEventDescription').textContent = event.description;
+        
+                const formattedDate = new Date(Date.UTC(
+                    parseInt(event.startDate.slice(0, 4)),
+                    parseInt(event.startDate.slice(5, 7)) - 1,
+                    parseInt(event.startDate.slice(8, 10)),
+                    parseInt(event.startTime.slice(0, 2)),
+                    parseInt(event.startTime.slice(3, 5))
+                )).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+                
+                const formattedTime = new Date('1970-01-01T' + event.startTime).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+        
+                document.getElementById('modalEventDate').textContent = `${formattedDate} at ${formattedTime}`;
+                document.getElementById('modalEventLocation').textContent = `Venue ID: ${event.venueId}`;
+                eventModal.classList.remove('hidden');
+            }
+        });        
     </script>
 </body>
 </html>
