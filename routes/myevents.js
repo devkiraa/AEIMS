@@ -1,11 +1,11 @@
 // myevents.js
 const express = require('express');
 const router = express.Router();
-const { Event, EventCoordinator } = require('../models'); // Sequelize models setup assumed
+// const { Event, EventCoordinator } = require('../models'); // Sequelize models setup assumed ---<kiraa check this>
 const db = require('../models/db'); // Database connection setup
 
 // Route to fetch user's events along with associated coordinators
-router.get('/api/myevents', async (req, res) => {
+router.get('/myevents', async (req, res) => {
     try {
         const userId = req.session.user_id; // Ensure session handling is correct
         if (!userId) return res.status(401).json({ message: 'Unauthorized' });
@@ -43,7 +43,7 @@ router.get('/api/myevents', async (req, res) => {
 });
 
 // Route to fetch coordinators for a specific event
-router.get('/api/event-coordinators', async (req, res) => {
+router.get('/event-coordinators', async (req, res) => {
     try {
         const { evn_id } = req.query;
 
