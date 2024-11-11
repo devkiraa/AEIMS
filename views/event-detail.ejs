@@ -736,11 +736,37 @@
                     const filePath = fileInput.value;
         
                     if (!allowedExtensions.exec(filePath)) {
+                        errorMessage.textContent = 'Please upload a file with .jpg, .jpeg, or .png extension.';
                         errorMessage.classList.remove('hidden');  // Show the error message
                         fileInput.value = '';  // Clear the file input
                         return false;
                     } else {
-                        errorMessage.classList.add('hidden');  // Hide the error message if the file is valid
+                        errorMessage.classList.add('hidden'); // Hide the error message if the file is valid
+                    }
+
+                    // Log and validate file details
+                    const file = fileInput.files[0];
+                    if (file) {        
+                        // Use FileReader to get image dimensions
+                        const reader = new FileReader();
+                        reader.onload = function(e) {
+                            const img = new Image();
+                            img.src = e.target.result;
+
+                            img.onload = function() {
+                                // Additional check for specific dimensions
+                                if (img.width !== 1080 || img.height !== 1350) {
+                                    errorMessage.textContent = 'Image must be 1080x1350 pixels.';
+                                    errorMessage.classList.remove('hidden');
+                                    fileInput.value = '';  // Clear the file input if dimensions are incorrect
+                                } else {
+                                    errorMessage.classList.add('hidden');  // Hide error if file is valid
+                                }
+                            };
+                        };
+                        reader.readAsDataURL(file); // Read the file as Data URL for image preview
+                    } else {
+                        console.log("No file selected");
                     }
                 }
             }
@@ -942,7 +968,7 @@
                     
                     <div class="form-section">
                         <label for="event_link" class="form-label block">Event Link</label>
-                        <input type="text" name="event_link" id="event_link" placeholder="Registration form link" class="w-full p-2 border border-gray-300 rounded mt-1" required>
+                        <input type="text" name="event_link" id="event_link" placeholder="Registration form link" class="w-full p-2 border border-gray-300 rounded mt-1">
                         <span id="link-error" class="text-red-500 text-sm mt-1 hidden">Please shorten the URL.</span>
                     </div>
 
@@ -955,7 +981,7 @@
 
                     <!-- File upload for event poster -->
                     <div class="form-section">
-                        <label for="event_poster" class="form-label block">Event Poster</label>
+                        <label for="event_poster" class="form-label block">Event Poster <span class="text-xs">(dimensions: 1080x1350)</span></label>
                         <input type="file" name="event_poster" id="event_poster" class="w-full p-2 border border-gray-300 rounded mt-1" accept=".jpg, .jpeg, .png" onchange="validateFile(1)">
                         <span id="poster-error" class="text-red-500 text-sm mt-1 hidden">Please upload a file with .jpg, .jpeg, or .png extension.</span>
                     </div>
