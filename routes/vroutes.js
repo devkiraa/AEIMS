@@ -75,6 +75,20 @@ router.get('/profile', (req, res) => {
     res.render('profile');
 });
 
+router.get('/eventspage', (req, res) => {
+    if (!req.session.user_id) {
+        return res.redirect('/login');
+    }
+
+    if (req.session.user_role === 'admin') {
+        const userRole = req.session.user_role;
+        res.render('myevents', {userRole});
+    } else {
+        res.status(403).render(403);
+    }
+});
+
+
 // Change Password page
 router.get('/change-password', (req, res) => {
     res.render('change-password');
