@@ -48,8 +48,6 @@ CREATE TABLE `inventory` (
   `inv_add_date` date NOT NULL,
   `inv_serv_date` date DEFAULT NULL,
   `inv_rmv_date` date DEFAULT NULL,
-  `inv_in_use` int DEFAULT '0',
-  `inv_available` int DEFAULT '0',
   `inv_stat` int NOT NULL,
   `inv_type` int NOT NULL,
   PRIMARY KEY (`inv_id`)
@@ -76,7 +74,6 @@ CREATE TABLE `event_tb` (
   `evn_dept` varchar(100) NOT NULL,
   `evn_banner` varchar(100) NOT NULL,
   `event_poster` varchar(100) NOT NULL,
-  `evn_type` varchar(10) NOT NULL,
   `ven_id` int NOT NULL,
   `event_sd` date NOT NULL,
   `evn_ed` date NOT NULL,
