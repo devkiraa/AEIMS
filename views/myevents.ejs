@@ -161,23 +161,30 @@
     </div>
 
     <script>
-        // Fetch events and separate by upcoming or completed
+        // Fetch events and separate them by upcoming and completed
         async function fetchUserEvents() {
             try {
                 const response = await fetch('/api/myevents');
+                if (!response.ok) throw new Error("Failed to fetch events");
+                
                 const events = await response.json();
+                console.log("Fetched events:", events); // Debugging line
         
-                // Assuming each event object contains evn_id, fetch user info based on event_coordinator
+                // Fetch coordinators for each event
                 for (let event of events) {
                     const coordinatorResponse = await fetch(`/api/event-coordinators?evn_id=${event.evn_id}`);
                     const coordinators = await coordinatorResponse.json();
-                    event.coordinators = coordinators.map(coordinator => coordinator.usr_id); // Assign user IDs
+                    console.log(`Fetched coordinators for event ${event.evn_id}:`, coordinators); // Debugging line
+        
+                    event.coordinators = coordinators.map(coordinator => coordinator.usr_id);
                 }
         
-                // Separate events by date
                 const currentDate = new Date().toISOString().split('T')[0];
                 const upcomingEvents = events.filter(event => event.event_sd >= currentDate);
                 const completedEvents = events.filter(event => event.event_sd < currentDate);
+        
+                console.log("Upcoming events:", upcomingEvents); // Debugging line
+                console.log("Completed events:", completedEvents); // Debugging line
         
                 populateTable('upcomingEventTable', upcomingEvents);
                 populateTable('completedEventTable', completedEvents);
@@ -187,49 +194,58 @@
         }
         
 
-        function populateTable(tableId, events) {
-            const table = document.getElementById(tableId);
-            table.innerHTML = ''; // Clear previous content
+function populateTable(tableId, events) {
+    const table = document.getElementById(tableId);
+    table.innerHTML = ''; // Clear previous content
 
-            events.forEach(event => {
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td class="p-4">${event.evn_name}</td>
-                    <td class="p-4">${event.event_sd}</td>
-                    <td class="p-4">
-                        <button onclick="openPopup(${event.evn_id}, '${event.evn_name}', '${event.event_sd}')" class="text-blue-600 hover:text-blue-800">Edit</button>
-                    </td>
-                `;
-                table.appendChild(row);
-            });
-        }
+    if (events.length === 0) {
+        table.innerHTML = '<tr><td colspan="3" class="p-4 text-center text-gray-500">No events found</td></tr>';
+        return;
+    }
 
-        // Popup functions for edit/delete
-        function openPopup(evn_id, evn_name, event_sd) {
-            document.getElementById('popupEventContent').innerHTML = `
-                <p><strong>Event Name:</strong> ${evn_name}</p>
-                <p><strong>Event Date:</strong> ${event_sd}</p>
-            `;
-            document.getElementById('eventPopup').classList.remove('hidden');
-        }
+    events.forEach(event => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td class="p-4">${event.evn_name}</td>
+            <td class="p-4">${event.event_sd}</td>
+            <td class="p-4">
+                <button onclick="openPopup(${event.evn_id}, '${event.evn_name}', '${event.event_sd}', '${event.coordinators}')" class="text-blue-600 hover:text-blue-800">Edit</button>
+            </td>
+        `;
+        table.appendChild(row);
+    });
+}
 
-        function closePopup() {
-            document.getElementById('eventPopup').classList.add('hidden');
-        }
 
-        // Dummy functions for edit/delete actions
-        function updateEvent() {
-            alert("Event updated successfully.");
-            closePopup();
-        }
+// Open popup for editing an event
+function openPopup(evn_id, evn_name, event_sd, coordinators) {
+    document.getElementById('popupEventContent').innerHTML = `
+        <p><strong>Event Name:</strong> ${evn_name}</p>
+        <p><strong>Event Date:</strong> ${event_sd}</p>
+        <p><strong>Coordinators:</strong> ${coordinators}</p>
+    `;
+    document.getElementById('eventPopup').classList.remove('hidden');
+}
 
-        function deleteEvent() {
-            alert("Event deleted successfully.");
-            closePopup();
-        }
+// Close popup
+function closePopup() {
+    document.getElementById('eventPopup').classList.add('hidden');
+}
 
-        // Initialize
-        document.addEventListener('DOMContentLoaded', fetchUserEvents);
+// Dummy functions for edit/delete actions
+function updateEvent() {
+    alert("Event updated successfully.");
+    closePopup();
+}
+
+function deleteEvent() {
+    alert("Event deleted successfully.");
+    closePopup();
+}
+
+// Initialize events on page load
+document.addEventListener('DOMContentLoaded', fetchUserEvents);
+
     </script>
 </body>
 </html>
