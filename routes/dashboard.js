@@ -11,7 +11,6 @@ router.get('/events', async (req, res) => {
             evn_desc AS description,
             evn_banner AS banner,
             event_poster AS image,
-            evn_type AS type,
             ven_id AS venueId,
             event_sd AS startDate,
             evn_ed AS endDate,
