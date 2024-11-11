@@ -300,7 +300,7 @@
                             ${tableId === 'inventoryBody' ? `<td class="p-4 text-center">${new Date(item.inv_add_date).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}</td>` : 
                                 tableId === 'serviceBody' ? `<td class="p-4 text-center">${new Date(item.inv_serv_date).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}</td>` : 
                                     `<td class="p-4 text-center">${new Date(item.inv_rmv_date).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}</td>`}
-                            ${tableId === 'inventoryBody' ? `<td class="p-4 text-center">${item.inv_item_cnt-item.inv_serv_cnt-item.inv_rmv_cnt}</td>` : 
+                            ${tableId === 'inventoryBody' ? `<td class="p-4 text-center">${item.inv_type === 2 ? '-' : item.inv_item_cnt-item.inv_serv_cnt-item.inv_rmv_cnt}</td>` : 
                                 tableId === 'serviceBody' ? `<td class="p-4 text-center">${item.inv_serv_cnt}</td>` : 
                                     `<td class="p-4 text-center">${item.inv_rmv_cnt}</td>`}
                             ${tableId === 'inventoryBody' && item.inv_type === 1 && (item.inv_item_cnt - item.inv_rmv_cnt - item.inv_serv_cnt) > 0 ? `<td class="p-4 text-center">
@@ -315,14 +315,15 @@
                                         `<td class="p-4 text-center">
                                             <span class="text-grey-500">-</span>
                                         </td>`}
-                            ${tableId === 'inventoryBody' ? `<td class="p-4 text-center">
-                                <button class="text-gray-500 hover:text-red-600" onclick='deleteModal(${JSON.stringify(item)})'>
-                                    <img src="/assets/icons/delete_24dp_6B7280_FILL0_wght500_GRAD0_opsz24.svg" alt="Delete Icon" class="w-6 h-6">
-                                </button>
-                                <button class="text-gray-500 hover:text-green-600" onclick='editModal(${JSON.stringify(item)})'>
-                                    <img src="/assets/icons/edit_24dp_6B7280_FILL0_wght500_GRAD0_opsz24.svg" alt="Edit Icon" class="w-6 h-6">
-                                </button>
-                            </td>` : 
+                            ${tableId === 'inventoryBody' ? item.inv_type === 2 ? '<td class="p-4 text-center">- -</td>' : 
+                                `<td class="p-4 text-center">
+                                    <button class="text-gray-500 hover:text-red-600" onclick='deleteModal(${JSON.stringify(item)})'>
+                                        <img src="/assets/icons/delete_24dp_6B7280_FILL0_wght500_GRAD0_opsz24.svg" alt="Delete Icon" class="w-6 h-6">
+                                    </button>
+                                    <button class="text-gray-500 hover:text-green-600" onclick='editModal(${JSON.stringify(item)})'>
+                                        <img src="/assets/icons/edit_24dp_6B7280_FILL0_wght500_GRAD0_opsz24.svg" alt="Edit Icon" class="w-6 h-6">
+                                    </button>
+                                </td>` : 
                             tableId === 'serviceBody' ?
                                 `<td class="p-4 text-center">
                                     <button class="text-gray-500 hover:text-red-600" onclick='restoreModal(${JSON.stringify(item)})'>
