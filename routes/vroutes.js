@@ -139,6 +139,10 @@ router.get('/book-event', (req, res) => {
 
 // Event details page
 router.get('/book-event/event-details', (req, res) => {
+    if (!req.session.user_id) {
+        return res.redirect('/login');
+    }
+
     if (req.session.user_role === 'admin'|| req.session.user_role === 'hod' || req.session.user_role === 'em') {
         const userRole = req.session.user_role;
         const userDept = req.session.user_dept;
@@ -150,6 +154,10 @@ router.get('/book-event/event-details', (req, res) => {
 
 // Guest details page
 router.get('/book-event/guest-details', (req, res) => {
+    if (!req.session.user_id) {
+        return res.redirect('/login');
+    }
+
     if (req.session.user_role === 'admin'|| req.session.user_role === 'hod' || req.session.user_role === 'em') {
         const userRole = req.session.user_role;
         const userDept = req.session.user_dept;
@@ -161,6 +169,10 @@ router.get('/book-event/guest-details', (req, res) => {
 
 // Resource selection page
 router.get('/book-event/resource', (req, res) => {
+    if (!req.session.user_id) {
+        return res.redirect('/login');
+    }
+    
     if (req.session.user_role === 'admin'|| req.session.user_role === 'hod' || req.session.user_role === 'em') {
         const userRole = req.session.user_role;
         const userDept = req.session.user_dept;
