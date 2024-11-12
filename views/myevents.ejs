@@ -96,43 +96,45 @@
                 </ul>
             </div>
 
-            <!-- Upcoming Events Table -->
-            <div id="upcoming" class="tab-content">
-                <h2 class="text-xl font-semibold mb-4">Upcoming Events</h2>
-                <div class="overflow-x-auto">
-                    <table class="min-w-full bg-white border border-gray-300 rounded-lg">
-                        <thead>
-                            <tr class="bg-gray-100 text-gray-600 text-left">
-                                <th class="p-4">Event Name</th>
-                                <th class="p-4">Event Date</th>
-                                <th class="p-4">Action</th>
-                            </tr>
-                        </thead>
-                        <tbody id="upcomingEventTable">
-                            <!-- Events will be populated dynamically -->
-                        </tbody>
-                    </table>
-                </div>
+           <!-- Upcoming Events Table -->
+           <div id="upcoming" class="tab-content">
+            <h2 class="text-xl font-semibold mb-4">Upcoming Events</h2>
+            <div class="overflow-x-auto">
+                <table class="min-w-full bg-white border border-gray-300 rounded-lg">
+                    <thead>
+                        <tr class="bg-gray-100 text-gray-600 text-left">
+                            <th class="p-4">Event Name</th>
+                            <th class="p-4">Event Date</th>
+                            <th class="p-4">Start Time</th>
+                            <th class="p-4">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="upcomingEventTable">
+                        <!-- Events will be populated dynamically -->
+                    </tbody>
+                </table>
             </div>
+        </div>
 
-            <!-- Completed Events Table -->
-            <div id="completed" class="tab-content hidden">
-                <h2 class="text-xl font-semibold mb-4">Completed Events</h2>
-                <div class="overflow-x-auto">
-                    <table class="min-w-full bg-white border border-gray-300 rounded-lg">
-                        <thead>
-                            <tr class="bg-gray-100 text-gray-600 text-left">
-                                <th class="p-4">Event Name</th>
-                                <th class="p-4">Event Date</th>
-                                <th class="p-4">Action</th>
-                            </tr>
-                        </thead>
-                        <tbody id="completedEventTable">
-                            <!-- Events will be populated dynamically -->
-                        </tbody>
-                    </table>
-                </div>
+        <!-- Completed Events Table -->
+        <div id="completed" class="tab-content hidden">
+            <h2 class="text-xl font-semibold mb-4">Completed Events</h2>
+            <div class="overflow-x-auto">
+                <table class="min-w-full bg-white border border-gray-300 rounded-lg">
+                    <thead>
+                        <tr class="bg-gray-100 text-gray-600 text-left">
+                            <th class="p-4">Event Name</th>
+                            <th class="p-4">Event Date</th>
+                            <th class="p-4">Start Time</th>
+                            <th class="p-4">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="completedEventTable">
+                        <!-- Events will be populated dynamically -->
+                    </tbody>
+                </table>
             </div>
+        </div>
         </main>
     </div>
 
@@ -161,20 +163,20 @@
     <script>
 
         // Profile Dropdown Toggle
-const profileButton = document.getElementById('profileButton');
-const profileDropdown = document.getElementById('profileDropdown');
+        const profileButton = document.getElementById('profileButton');
+        const profileDropdown = document.getElementById('profileDropdown');
 
-profileButton.addEventListener('click', (event) => {
-    event.stopPropagation(); // Prevent click from triggering document click listener
-    profileDropdown.classList.toggle('hidden');
-});
+        profileButton.addEventListener('click', (event) => {
+            event.stopPropagation(); // Prevent click from triggering document click listener
+            profileDropdown.classList.toggle('hidden');
+        });
 
-// Close dropdown if clicked outside
-document.addEventListener('click', (event) => {
-    if (!profileButton.contains(event.target) && !profileDropdown.contains(event.target)) {
-        profileDropdown.classList.add('hidden');
-    }
-});
+        // Close dropdown if clicked outside
+        document.addEventListener('click', (event) => {
+            if (!profileButton.contains(event.target) && !profileDropdown.contains(event.target)) {
+                profileDropdown.classList.add('hidden');
+            }
+        });
 
         // Fetch events and separate them by upcoming and completed
         async function fetchUserEvents() {
@@ -192,76 +194,85 @@ document.addEventListener('click', (event) => {
                     console.log(`Fetched coordinators for event ${event.evn_id}:`, coordinators); // Debugging line
         
                     event.coordinators = coordinators.map(coordinator => coordinator.usr_id);
+                    
                 }
         
                 const currentDate = new Date().toISOString().split('T')[0];
                 const upcomingEvents = events.filter(event => event.event_sd >= currentDate);
                 const completedEvents = events.filter(event => event.event_sd < currentDate);
-        
-                console.log("Upcoming events:", upcomingEvents); // Debugging line
-                console.log("Completed events:", completedEvents); // Debugging line
-        
-                populateTable('upcomingEventTable', upcomingEvents);
-                populateTable('completedEventTable', completedEvents);
+                populateEventTable(upcomingEvents, 'upcomingEventTable');
+                populateEventTable(completedEvents, 'completedEventTable');
             } catch (error) {
                 console.error("Error fetching events:", error);
             }
         }
         
-
-function populateTable(tableId, events) {
-    const table = document.getElementById(tableId);
-    table.innerHTML = ''; // Clear previous content
-
-    if (events.length === 0) {
-        table.innerHTML = '<tr><td colspan="3" class="p-4 text-center text-gray-500">No events found</td></tr>';
-        return;
-    }
-
-    events.forEach(event => {
-        const row = document.createElement('tr');
-        row.innerHTML = `
-            <td class="p-4">${event.evn_name}</td>
-            <td class="p-4">${event.event_sd}</td>
-            <td class="p-4">
-                <button onclick="openPopup(${event.evn_id}, '${event.evn_name}', '${event.event_sd}', '${event.coordinators}')" class="text-blue-600 hover:text-blue-800">Edit</button>
-            </td>
-        `;
-        table.appendChild(row);
-    });
-}
-
-
-// Open popup for editing an event
-function openPopup(evn_id, evn_name, event_sd, coordinators) {
-    document.getElementById('popupEventContent').innerHTML = `
-        <p><strong>Event Name:</strong> ${evn_name}</p>
-        <p><strong>Event Date:</strong> ${event_sd}</p>
-        <p><strong>Coordinators:</strong> ${coordinators}</p>
-    `;
-    document.getElementById('eventPopup').classList.remove('hidden');
-}
-
-// Close popup
-function closePopup() {
-    document.getElementById('eventPopup').classList.add('hidden');
-}
-
-// Dummy functions for edit/delete actions
-function updateEvent() {
-    alert("Event updated successfully.");
-    closePopup();
-}
-
-function deleteEvent() {
-    alert("Event deleted successfully.");
-    closePopup();
-}
-
-
-// Initialize events on page load
-document.addEventListener('DOMContentLoaded', fetchUserEvents);
-
+        // Populate Event Table
+        function populateEventTable(events, tableId) {
+            const tableBody = document.getElementById(tableId);
+            tableBody.innerHTML = ''; // Clear existing content
+        
+            events.forEach(event => {
+                const row = document.createElement('tr');
+                row.classList.add('border-t', 'border-gray-200');
+        
+                row.innerHTML = `
+                    <td class="p-4">${event.evn_name}</td>
+                    <td class="p-4">${event.event_sd}</td>
+                    <td class="p-4">${event.event_et}</td>
+                    <td class="p-4">
+                        <button class="text-blue-600 hover:text-blue-800" onclick="editEvent(${event.evn_id})">Edit</button>
+                    </td>
+                `;
+        
+                tableBody.appendChild(row);
+            });
+        }
+        
+        // Switch between upcoming and completed tabs
+        function switchTab(tab) {
+            const upcomingTab = document.getElementById('upcoming');
+            const completedTab = document.getElementById('completed');
+            const upcomingTabButton = document.getElementById('upcoming-tab');
+            const completedTabButton = document.getElementById('completed-tab');
+        
+            if (tab === 'upcoming') {
+                upcomingTab.classList.remove('hidden');
+                completedTab.classList.add('hidden');
+                upcomingTabButton.classList.add('text-blue-600', 'hover:text-gray-700');
+                completedTabButton.classList.remove('text-blue-600');
+                completedTabButton.classList.add('text-gray-500');
+            } else {
+                completedTab.classList.remove('hidden');
+                upcomingTab.classList.add('hidden');
+                completedTabButton.classList.add('text-blue-600', 'hover:text-gray-700');
+                upcomingTabButton.classList.remove('text-blue-600');
+                upcomingTabButton.classList.add('text-gray-500');
+            }
+        }
+        
+        // Edit Event
+        function editEvent(evn_id) {
+            // Implement editing functionality here
+            console.log('Editing event:', evn_id);
+        }
+        
+        // Update Event
+        function updateEvent() {
+            console.log('Event updated!');
+        }
+        
+        // Delete Event
+        function deleteEvent() {
+            console.log('Event deleted!');
+        }
+        
+        // Close Popup
+        function closePopup() {
+            document.getElementById('eventPopup').classList.add('hidden');
+        }
+        
+        // Initial Fetch of Events
+        fetchUserEvents();
     </script>
-</body>
-</html>
+    

@@ -1,36 +1,54 @@
-// myevents.js
 const express = require('express');
 const router = express.Router();
-// const { Event, EventCoordinator } = require('../models'); // Sequelize models setup assumed ---<kiraa check this>
 const db = require('../models/db'); // Database connection setup
 
-// Route to fetch user's events along with associated coordinators
+// Route to fetch user's events with associated coordinators
 router.get('/myevents', async (req, res) => {
     try {
-        const userId = req.session.user_id; // Ensure session handling is correct
+        const userId = req.session.user_id;
         if (!userId) return res.status(401).json({ message: 'Unauthorized' });
 
-        // Fetch events where the user is a coordinator
-        const userCoordinatedEvents = await EventCoordinator.findAll({
-            where: { usr_id: userId },
-            attributes: ['evn_id']
-        });
+        // SQL to fetch events where the user is a coordinator
+        const sqlEvents = `
+            SELECT 
+                e.evn_id, 
+                e.evn_name, 
+                e.event_sd, 
+                e.evn_desc,
+                e.evn_dept,
+                e.evn_banner,
+                e.event_poster,
+                e.ven_id,
+                e.evn_ed,
+                e.evn_st,
+                e.event_et,
+                e.evn_vol_cnt,
+                e.evn_snk,
+                e.evn_food,
+                e.evn_stat,
+                e.evn_approval,
+                e.evn_form_link
+            FROM 
+                event_tb AS e
+            INNER JOIN 
+                event_coordinator AS ec 
+            ON 
+                e.evn_id = ec.evn_id
+            WHERE 
+                ec.usr_id = ?
+            ORDER BY 
+                e.event_sd ASC;
+        `;
+        const [events] = await db.query(sqlEvents, [userId]);
 
-        const eventIds = userCoordinatedEvents.map(eventCoord => eventCoord.evn_id);
-
-        // Fetch event details for the user's coordinated events
-        const events = await Event.findAll({
-            where: { evn_id: eventIds }
-        });
-
-        // For each event, fetch associated coordinators
+        // Fetch coordinators for each event
         const eventsWithCoordinators = await Promise.all(events.map(async (event) => {
-            const coordinators = await EventCoordinator.findAll({
-                where: { evn_id: event.evn_id },
-                attributes: ['usr_id']
-            });
+            const sqlCoordinators = `
+                SELECT usr_id FROM event_coordinator WHERE evn_id = ?;
+            `;
+            const [coordinators] = await db.query(sqlCoordinators, [event.evn_id]);
             return {
-                ...event.toJSON(),
+                ...event,
                 coordinators: coordinators.map(coord => coord.usr_id)
             };
         }));
@@ -46,14 +64,10 @@ router.get('/myevents', async (req, res) => {
 router.get('/event-coordinators', async (req, res) => {
     try {
         const { evn_id } = req.query;
-
         if (!evn_id) return res.status(400).json({ message: 'Event ID is required' });
 
-        // Fetch coordinators for the given event ID
-        const coordinators = await EventCoordinator.findAll({
-            where: { evn_id },
-            attributes: ['usr_id']
-        });
+        const sqlCoordinators = `SELECT usr_id FROM event_coordinator WHERE evn_id = ?;`;
+        const [coordinators] = await db.query(sqlCoordinators, [evn_id]);
 
         res.json(coordinators);
     } catch (error) {
