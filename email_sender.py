@@ -23,6 +23,7 @@ DB_PASS = os.getenv("DB_PASS")
 DB_NAME = os.getenv("DB_NAME")
 
 def get_user_id(email):
+    connection = None  # Ensure connection is always defined
     try:
         # Connect to the database
         connection = mysql.connector.connect(
@@ -46,7 +47,7 @@ def get_user_id(email):
         return None
 
     finally:
-        if connection.is_connected():
+        if connection and connection.is_connected():  # Check if connection was established
             cursor.close()
             connection.close()
 
@@ -70,13 +71,13 @@ def send_email(subject, recipient, body, is_html):
             server.login(EMAIL_ADDRESS, EMAIL_PASSWORD)  # Login
             server.send_message(message)  # Send the email
 
-        print(f"{subject} Email has sent to {recipient}")
+        print(f"{subject} Email has been sent to {recipient}")
 
         # Get user ID from email
         usr_id = get_user_id(recipient)
         if usr_id is None:
             print(f"Error: User ID not found for the email address: {recipient}")
-            log_email(subject, recipient, "failed")  # Log failure
+            log_email(subject, recipient, "failed", None)  # Log failure with usr_id as None
             return
 
         # Log email info to the database
@@ -84,10 +85,11 @@ def send_email(subject, recipient, body, is_html):
 
     except Exception as e:
         print(f"Error: {e}")
-        # Log error to database
-        log_email(subject, recipient, "failed")
+        # Log error to database with usr_id as None
+        log_email(subject, recipient, "failed", None)
 
 def log_email(subject, recipient, status, usr_id):
+    connection = None  # Ensure connection is always defined
     try:
         # Connect to the database
         connection = mysql.connector.connect(
@@ -108,7 +110,7 @@ def log_email(subject, recipient, status, usr_id):
             INSERT INTO mail_log (mail_kind, mail_date, mail_time, mail_stat, usr_id, receiver_email)
             VALUES (%s, %s, %s, %s, %s, %s)
         """
-        values = ("email", mail_date, mail_time, status, usr_id, recipient)  # Include receiver email
+        values = ("email", mail_date, mail_time, status, usr_id, recipient)
         cursor.execute(insert_query, values)
         connection.commit()
 
@@ -116,9 +118,10 @@ def log_email(subject, recipient, status, usr_id):
         print(f"Database error: {err}")
 
     finally:
-        if connection.is_connected():
+        if connection and connection.is_connected():  # Check if connection was established
             cursor.close()
             connection.close()
+
 
 # CLI for execution
 if __name__ == "__main__":
