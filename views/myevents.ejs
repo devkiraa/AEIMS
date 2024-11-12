@@ -67,7 +67,6 @@
                     </ul>
                 </div>         
     
-                <!-- Profile Dropdown (Visible on Click) -->
                 <div class="relative dropdown">
                     <button class="bg-white rounded-full p-2" id="profileButton">
                         <img src="/assets/icons/avatar.svg" alt="User Icon" class="w-6 h-6">
@@ -160,6 +159,23 @@
     </div>
 
     <script>
+
+        // Profile Dropdown Toggle
+const profileButton = document.getElementById('profileButton');
+const profileDropdown = document.getElementById('profileDropdown');
+
+profileButton.addEventListener('click', (event) => {
+    event.stopPropagation(); // Prevent click from triggering document click listener
+    profileDropdown.classList.toggle('hidden');
+});
+
+// Close dropdown if clicked outside
+document.addEventListener('click', (event) => {
+    if (!profileButton.contains(event.target) && !profileDropdown.contains(event.target)) {
+        profileDropdown.classList.add('hidden');
+    }
+});
+
         // Fetch events and separate them by upcoming and completed
         async function fetchUserEvents() {
             try {
@@ -241,6 +257,7 @@ function deleteEvent() {
     alert("Event deleted successfully.");
     closePopup();
 }
+
 
 // Initialize events on page load
 document.addEventListener('DOMContentLoaded', fetchUserEvents);

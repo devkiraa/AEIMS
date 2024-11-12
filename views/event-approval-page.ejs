@@ -201,21 +201,6 @@
         }
         
         document.addEventListener('DOMContentLoaded', function () {
-            const profileButton = document.getElementById('profileButton');
-            const profileDropdown = document.getElementById('profileDropdown');
-
-            // Toggle dropdown on button click
-            profileButton.addEventListener('click', (event) => {
-                event.stopPropagation();
-                profileDropdown.classList.toggle('hidden');
-            });
-
-            // Close dropdown if clicked outside
-            document.addEventListener('click', (event) => {
-                if (!profileDropdown.classList.contains('hidden') && !profileDropdown.contains(event.target) && event.target !== profileButton) {
-                    profileDropdown.classList.add('hidden');
-                }
-            });
         });
 
     </script>
