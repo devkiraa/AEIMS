@@ -251,11 +251,38 @@
             }
         }
         
-        // Edit Event
-        function editEvent(evn_id) {
-            // Implement editing functionality here
-            console.log('Editing event:', evn_id);
-        }
+        // Store the current event's data for editing
+let currentEventData = null;
+
+function editEvent(evn_id) {
+    // Fetch event details for the selected event
+    fetch(`/api/event/${evn_id}`)
+        .then(response => response.json())
+        .then(event => {
+            currentEventData = event; // Store current event data
+
+            // Populate popup with event data
+            document.getElementById('popupEventContent').innerHTML = `
+                <label class="block mb-2 text-gray-700">Event Name:</label>
+                <input type="text" id="eventName" class="w-full p-2 border border-gray-300 rounded-lg mb-4" value="${event.evn_name}" />
+                
+                <label class="block mb-2 text-gray-700">Event Date:</label>
+                <input type="date" id="eventDate" class="w-full p-2 border border-gray-300 rounded-lg mb-4" value="${event.event_sd}" />
+                
+                <label class="block mb-2 text-gray-700">Start Time:</label>
+                <input type="time" id="startTime" class="w-full p-2 border border-gray-300 rounded-lg mb-4" value="${event.event_st}" />
+                
+                <label class="block mb-2 text-gray-700">End Time:</label>
+                <input type="time" id="endTime" class="w-full p-2 border border-gray-300 rounded-lg mb-4" value="${event.event_et}" />
+            `;
+
+            // Display the popup modal
+            document.getElementById('eventPopup').classList.remove('hidden');
+        })
+        .catch(error => {
+            console.error("Error fetching event details:", error);
+        });
+}
         
         // Update Event
         function updateEvent() {
