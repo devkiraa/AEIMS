@@ -75,9 +75,29 @@ router.get('/profile', (req, res) => {
     res.render('profile');
 });
 
+router.get('/eventspage', (req, res) => {
+    if (!req.session.user_id) {
+        return res.redirect('/login');
+    }
+
+    if (req.session.user_role === 'admin') {
+        const userRole = req.session.user_role;
+        res.render('myevents', {userRole});
+    } else {
+        res.status(403).render(403);
+    }
+});
+
+
 // Change Password page
 router.get('/change-password', (req, res) => {
-    res.render('change-password');
+    if (!req.session.user_id) {
+        return res.redirect('/login');
+    }
+
+    const userRole = req.session.user_role;
+    const userId = req.session.user_id;
+    res.render('change-password',{userRole, userId});
 });
 
 // Logout route
@@ -119,6 +139,10 @@ router.get('/book-event', (req, res) => {
 
 // Event details page
 router.get('/book-event/event-details', (req, res) => {
+    if (!req.session.user_id) {
+        return res.redirect('/login');
+    }
+
     if (req.session.user_role === 'admin'|| req.session.user_role === 'hod' || req.session.user_role === 'em') {
         const userRole = req.session.user_role;
         const userDept = req.session.user_dept;
@@ -130,6 +154,10 @@ router.get('/book-event/event-details', (req, res) => {
 
 // Guest details page
 router.get('/book-event/guest-details', (req, res) => {
+    if (!req.session.user_id) {
+        return res.redirect('/login');
+    }
+
     if (req.session.user_role === 'admin'|| req.session.user_role === 'hod' || req.session.user_role === 'em') {
         const userRole = req.session.user_role;
         const userDept = req.session.user_dept;
@@ -141,6 +169,10 @@ router.get('/book-event/guest-details', (req, res) => {
 
 // Resource selection page
 router.get('/book-event/resource', (req, res) => {
+    if (!req.session.user_id) {
+        return res.redirect('/login');
+    }
+    
     if (req.session.user_role === 'admin'|| req.session.user_role === 'hod' || req.session.user_role === 'em') {
         const userRole = req.session.user_role;
         const userDept = req.session.user_dept;

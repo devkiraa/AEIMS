@@ -35,8 +35,16 @@
             background-color: #D1D5DB; /* Tailwind gray-400 */
         }
     </style>
-    <!-- JavaScript for Filtering and Adding Resources -->
     <script>
+        let currentResource; // Store the resource currently being added
+
+        // Retrieve data from sessionStorage
+        const eventData = JSON.parse(sessionStorage.getItem('eventData'));
+        const eventDetails = JSON.parse(sessionStorage.getItem('eventDetails'));
+        const eventBannerURL = sessionStorage.getItem('eventBannerUrl');
+        const eventPosterURL = sessionStorage.getItem('eventBannerUrl');
+        const guestDetails = JSON.parse(sessionStorage.getItem('guestDetails'));
+
         document.addEventListener('DOMContentLoaded', function () {
             const profileButton = document.getElementById('profileButton');
             const profileDropdown = document.getElementById('profileDropdown');
@@ -46,6 +54,22 @@
                 event.stopPropagation();
                 profileDropdown.classList.toggle('hidden');
             });
+
+            if (!eventData) {
+                // Redirect to the previous page if eventData is not found
+                window.location.href = '/book-event';
+                return;
+            } else if (!eventDetails || !eventBannerURL || !eventPosterURL) {
+                // Redirect to the previous page if eventDetails are not found
+                window.location.href = '/book-event/event-details';
+                return;
+            }
+
+            if (eventDetails.guestCount > 0 && !guestDetails) {
+                // Redirect to the previous page if guestDetails is not found
+                window.location.href = '/book-event/guest-details';
+                return;
+            }
         
             // Close dropdown if clicked outside
             document.addEventListener('click', (event) => {
@@ -53,95 +77,177 @@
                     profileDropdown.classList.add('hidden');
                 }
             });
+
+            // Load inventory data
+            loadInventory();
         });
-        // Example for filtering inventory
-        document.getElementById('searchInventory').addEventListener('input', function() {
-            const searchTerm = this.value.toLowerCase();
-            const rows = document.querySelectorAll('#inventoryTable tr');
-            rows.forEach(row => {
-                const itemName = row.cells[0].innerText.toLowerCase();
-                if (itemName.includes(searchTerm)) {
-                    row.style.display = '';
-                } else {
-                    row.style.display = 'none';
+
+        // Load inventory data from API
+        async function loadInventory() {
+
+            const startDate = eventData.startDate;
+            const endDate = eventData.endDate;
+            const startTime = eventData.startTime;
+            const endTime = eventData.endTime;
+            try {
+                const response = await fetch('/api/resource-available',{
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ startDate, endDate, startTime, endTime }),
+                });
+                if (!response.ok) {
+                    throw new Error('Network response was not ok ' + response.statusText);
                 }
-            });
-        });
+                const inventoryItems = await response.json();
+                populateInventoryTable(inventoryItems);
+            } catch (error) {
+                console.error('Error loading inventory:', error);
+            }
+        }
 
-        // Functionality to add resources to event
-        document.querySelectorAll('#inventoryTable button').forEach(button => {
-            button.addEventListener('click', function() {
-                const row = this.closest('tr');
-                const name = row.cells[0].innerText;
-                const count = row.cells[3].innerText;
-                const today = new Date().toLocaleDateString();
+        // Populate inventory table
+        function populateInventoryTable(inventoryItems) {
+            const tableBody = document.getElementById('inventoryTable');
+            tableBody.innerHTML = ''; // Clear existing rows
 
-                const newRow = `
-                    <tr>
-                        <td class="p-4">${name}</td>
-                        <td class="p-4">${count}</td>
-                        <td class="p-4">${today}</td>
-                        <td class="p-4">${today}</td>
-                        <td class="p-4"><button class="bg-red-500 text -white px-3 py-1 rounded-lg">x</button></td>
-                    </tr>
+            inventoryItems.forEach(item => {
+                const row = `
+                    ${item.inv_stat === 1 ? `<tr class="text-center">
+                        <td class="p-4 text-left">${item.inv_prd_name}</td>
+                        <td class="p-4">${item.inv_type === 0 ? 'Non-Serviceable' : item.inv_type === 1 ? 'Serviceable' : 'Assistance'}</td>
+                        <td class="p-4">${item.inv_type === 0 || item.inv_type === 1 ? item.inv_in_use : '-'}</td>
+                        <td class="p-4">${item.inv_type === 0 || item.inv_type === 1 ? item.inv_available : '-'}</td>
+                        <td class="p-4 text-center">
+                            <button id="addButton-${item.inv_id}" class="text-gray-500 hover:text-red-600" onclick='openAddResourceModal(${JSON.stringify(item)})'>
+                                <img src="/assets/icons/add_24dp_6B7280_FILL0_wght500_GRAD0_opsz24.svg" alt="delete" class="w-6 h-6">
+                            </button>
+                        </td>
+                    </tr>` : ``}
                 `;
-
-                document.getElementById('eventResourcesTable').innerHTML += newRow;
+                tableBody.insertAdjacentHTML('beforeend', row);
             });
-        });
+        }
+
+        // Add resource to event resources table
+        function addResourceToEvent() {
+            const countToAdd = parseInt(document.getElementById('resourceCount').value);
+            const newRow = `
+                <tr data-resource-id="${currentResource.inv_id}" data-count="${countToAdd}" class="text-center">
+                    <td class="p-4 text-left">${currentResource.inv_prd_name}</td>
+                    <td class="p-4">${currentResource.inv_type === 2 ? '-' : countToAdd}</td>
+                    <td class="p-4">${eventData.startDate}</td>
+                    <td class="p-4">${eventData.endDate}</td>
+                    <td class="p-4">
+                        <button class="text-gray-500 hover:text-red-600" onclick="removeResource(this, ${currentResource.inv_id})">
+                            <img src="/assets/icons/delete_24dp_6B7280_FILL0_wght500_GRAD0_opsz24.svg" alt="delete" class="w-6 h-6">
+                        </button>
+                    </td>
+                </tr>
+            `;
+            document.getElementById('eventResourcesTable').insertAdjacentHTML('beforeend', newRow);
+
+            // Disable the Add button for the resource
+            document.getElementById(`addButton-${currentResource.inv_id}`).disabled = true;
+            closeAddResourceModal();
+        }
+
+        // Function to remove resource from the event resources table
+        function removeResource(button, resourceId) {
+            // Enable the "Add" button in the inventory table for the respective item
+            document.getElementById(`addButton-${resourceId}`).disabled = false;
+
+            // Remove the resource row from the event resources table
+            button.closest('tr').remove();
+        }
+
+        async function submitEvent() {
+            const rows = document.querySelectorAll('#eventResourcesTable tr');
+            const resources = Array.from(rows).map(row => ({
+                inv_id: row.getAttribute('data-resource-id'),
+                count: row.getAttribute('data-count')
+            }));
+
+            try {
+                const response = await fetch('/api/create-event', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ resources })
+                });
+
+                if (response.ok) {
+                    window.location.href = '/my-events';
+                } else {
+                    throw new Error('Failed to create event');
+                }
+            } catch (error) {
+                console.error('Error creating event:', error);
+            }
+        }
+
+        function openAddResourceModal(item) {
+            currentResource = item; // Store the entire item object
+            const popupContent = document.getElementById('popupContent');
+            popupContent.innerHTML = `
+                <h2 class="text-2xl font-semibold mb-4">Add Resource</h2>
+                <p><strong>Resource Name:</strong>${currentResource.inv_prd_name}</p>
+                <p><strong>Available Count:</strong> ${currentResource.inv_available}</p>
+                <div class="mb-4">
+                    <label for="resourceCount" class="block text-gray-700">Count to Add:</label>
+                    <input type="number" id="resourceCount" class="w-full px-3 py-2 border border-gray-300 rounded" value="1" min="1" max='${currentResource.inv_available}' required>
+                </div>
+                <div class="flex justify-end space-x-4">
+                    <button onclick="addResourceToEvent()" class="bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded">Add</button>
+                    <button onclick="closeAddResourceModal()" class="bg-gray-200 hover:bg-gray-300 text-gray-700 py-2 px-4 rounded">Cancel</button>
+                </div>
+            `;
+            document.getElementById('addResourceModal').classList.remove('hidden');
+        }
+
+        function closeAddResourceModal() {
+            document.getElementById('addResourceModal').classList.add('hidden');
+            document.getElementById('resourceCount').value = ''; // Reset input
+        }
+
     </script>
 </head>
 <body class="bg-gray-50">
     <div class="min-h-screen flex flex-col">
         <!-- Navbar -->
-    <nav class="bg-blue-600 p-4">
-        <div class="container mx-auto flex justify-between items-center">
-            <!-- Navbar Links -->
-            <div class="flex items-center space-x-6">
-                <ul class="flex space-x-6 text-white">
-                    <!-- Home Link - Always First -->
-                    <li><a href="/" class="hover:text-gray-300">Home</a></li>
-            
-                    <!-- Conditional Links for 'admin' or 'icts' -->
-                    <% if (userRole === 'admin' || userRole === 'icts') { %>
-                        <li><a href="/book-event" class="hover:text-gray-300">Book</a></li>
-                        <li><a href="/user-management" class="hover:text-gray-300">Users</a></li>
-                        <li><a href="/inventory" class="hover:text-gray-300">Inventory</a></li>
-                        <li><a href="/my-events" class="hover:text-gray-300">My Events</a></li>
-                    <% } %>
-            
-                    <!-- Conditional Links for 'hod' -->
-                    <% if (userRole === 'hod') { %>
-                        <li><a href="/book-event" class="hover:text-gray-300">Book</a></li>
-                        <li><a href="/user-management" class="hover:text-gray-300">Users</a></li>
-                        <li><a href="/dept-events" class="hover:text-gray-300">Dept Events</a></li>
-                        <li><a href="/event-approval" class="hover:text-gray-300">Approval</a></li>
-                    <% } %>
-            
-                    <!-- Conditional Links for 'em' -->
-                    <% if (userRole === 'em') { %>
-                        <li><a href="/book-event" class="hover:text-gray-300">Book</a></li>
-                        <li><a href="/my-events" class="hover:text-gray-300">My Events</a></li>
-                    <% } %>
-            
-                    <!-- About Us Link - Always Last -->
-                    <li><a href="/about-us" class="hover:text-gray-300">About Us</a></li>
-                </ul>
-            </div>         
-
-            <!-- Profile Dropdown (Visible on Click) -->
-            <div class="relative dropdown">
-                <button class="bg-white rounded-full p-2" id="profileButton">
-                    <img src="/assets/icons/avatar.svg" alt="User Icon" class="w-6 h-6">
-                </button>
-                <div class="dropdown-menu absolute hidden right-0 mt-2 w-48 bg-white rounded-lg shadow-lg" id="profileDropdown">
-                    <a href="/profile" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">Profile</a>
-                    <a href="/change-password" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">Change Password</a>
-                    <a href="/logout" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">Logout</a>
+        <nav class="bg-blue-600 p-4">
+            <div class="container mx-auto flex justify-between items-center">
+                <div class="flex items-center space-x-6">
+                    <ul class="flex space-x-6 text-white">
+                        <li><a href="/" class="hover:text-gray-300">Home</a></li>
+                        <% if (userRole === 'admin' || userRole === 'icts') { %>
+                            <li><a href="/book-event" class="hover:text-gray-300">Book</a></li>
+                            <li><a href="/user-management" class="hover:text-gray-300">Users</a></li>
+                            <li><a href="/inventory" class="hover:text-gray-300">Inventory</a></li>
+                            <li><a href="/my-events" class="hover:text-gray-300">My Events</a></li>
+                        <% } %>
+                        <% if (userRole === 'hod') { %>
+                            <li><a href="/user-management" class="hover:text-gray-300">Users</a></li>
+                            <li><a href="/dept-events" class="hover:text-gray-300">Dept Events</a></li>
+                            <li><a href="/event-approval" class="hover:text-gray-300">Approval</a></li>
+                        <% } %>
+                        <% if (userRole === 'em') { %>
+                            <li><a href="/book-event" class="hover:text-gray-300">Book</a></li>
+                            <li><a href="/my-events" class="hover:text-gray-300">My Events</a></li>
+                        <% } %>
+                        <li><a href="/about-us" class="hover:text-gray-300">About Us</a></li>
+                    </ul>
+                </div>         
+                <div class="relative dropdown">
+                    <button class="bg-white rounded-full p-2" id="profileButton">
+                        <img src="/assets/icons/avatar.svg" alt="User  Icon" class="w-6 h-6">
+                    </button>
+                    <div class="dropdown-menu absolute hidden right-0 mt-2 w-48 bg-white rounded-lg shadow-lg" id="profileDropdown">
+                        <a href="/profile" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">Profile</a>
+                        <a href="/change-password" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">Change Password</a>
+                        <a href="/logout" class="block px-4 py-2 text-gray-700 hover:bg-gray-100" onclick="sessionStorage.clear()">Logout</a>
+                    </div>
                 </div>
             </div>
-        </div>
-    </nav>
+        </nav>
 
         <!-- Main Content -->
         <main class="flex-grow container mx-auto p-6 max-w-5xl">
@@ -160,37 +266,16 @@
                 <div class="overflow-x-auto">
                     <table class="min-w-full bg-white border border-gray-300 rounded-lg">
                         <thead>
-                            <tr class="bg-gray-100 text-gray-600 text-left">
-                                <th class="p-4">Name</th>
+                            <tr class="bg-gray-100 text-gray-600 text-center">
+                                <th class="p-4 text-left">Name</th>
                                 <th class="p-4">Category</th>
                                 <th class="p-4">In Use</th>
                                 <th class="p-4">Available</th>
-                                <th class="p-4"></th>
+                                <th class="p-4">Action</th>
                             </tr>
                         </thead>
                         <tbody id="inventoryTable">
-                            <!-- Inventory Data (Replace with dynamic data later) -->
-                            <tr>
-                                <td class="p-4">Chair</td>
-                                <td class="p-4">850</td>
-                                <td class="p-4"> 450</td>
-                                <td class="p-4">550</td>
-                                <td class="p-4"><button class="bg-blue-500 text-white px-3 py-1 rounded-lg">+</button></td>
-                            </tr>
-                            <tr>
-                                <td class="p-4">Lamp</td>
-                                <td class="p-4">10</td>
-                                <td class="p-4">4</td>
-                                <td class="p-4">6</td>
-                                <td class="p-4"><button class="bg-blue-500 text-white px-3 py-1 rounded-lg">+</button></td>
-                            </tr>
-                            <tr>
-                                <td class="p-4">Projector</td>
-                                <td class="p-4">5</td>
-                                <td class="p-4">2</td>
-                                <td class="p-4">3</td>
-                                <td class="p-4"><button class="bg-blue-500 text-white px-3 py-1 rounded-lg">+</button></td>
-                            </tr>
+                            <!-- Inventory Data will be populated here -->
                         </tbody>
                     </table>
                 </div>
@@ -202,30 +287,16 @@
                 <div class="overflow-x-auto">
                     <table class="min-w-full bg-white border border-gray-300 rounded-lg">
                         <thead>
-                            <tr class="bg-gray-100 text-gray-600 text-left">
-                                <th class="p-4">Name</th>
+                            <tr class="bg-gray-100 text-gray-600 text-center">
+                                <th class="p-4 text-left">Name</th>
                                 <th class="p-4">Count</th>
                                 <th class="p-4">Taken Date</th>
                                 <th class="p-4">Return Date</th>
-                                <th class="p-4"></th>
+                                <th class="p-4">Action</th>
                             </tr>
                         </thead>
                         <tbody id="eventResourcesTable">
-                            <!-- Event Resources Data -->
-                            <tr>
-                                <td class="p-4">Chair</td>
-                                <td class="p-4">50</td>
-                                <td class="p-4">24 Oct, 2024</td>
-                                <td class="p-4">24 Oct, 2024</td>
-                                <td class="p-4"><button class="bg-red-500 text-white px-3 py-1 rounded-lg">x</button></td>
-                            </tr>
-                            <tr>
-                                <td class="p-4">Lamp</td>
-                                <td class="p-4">2</td>
-                                <td class="p-4">24 Oct, 2024</td>
-                                <td class="p-4">24 Oct, 2024</td>
-                                <td class="p-4"><button class="bg-red-500 text-white px-3 py-1 rounded-lg">x</button></td>
-                            </tr>
+                            <!-- Event Resources Data will be populated here -->
                         </tbody>
                     </table>
                 </div>
@@ -239,7 +310,7 @@
                     </svg>
                     Back
                 </button>
-                <button class="btn-primary flex items-center">
+                <button class="btn-primary flex items-center" onclick="submitEvent()">
                     Submit
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-2" viewBox="0 0 20 20" fill="currentColor">
                         <path fill-rule="evenodd" d="M12.293 10.707l-5.146 5.146a.5.5 0 01-.708-.708L11.293 10 6.44 5.146a.5.5 0 01.708-.708l5.146 5.146a.5.5 0 010 .708z" clip-rule="evenodd" />
@@ -247,6 +318,13 @@
                 </button>
             </div>
         </main>
+
+        <!-- Add Resource Modal -->
+        <div id="addResourceModal" class="fixed inset-0 hidden flex items-center justify-center bg-black bg-opacity-50">
+            <div id="popupContent" class="bg-white p-6 rounded-lg shadow-lg w-96 relative">
+                <!-- Dynamic Content -->
+            </div>
+        </div>
 
         <!-- Footer -->
         <footer class="bg-blue-600 p-4 mt-8">

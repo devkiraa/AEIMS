@@ -48,8 +48,6 @@ CREATE TABLE `inventory` (
   `inv_add_date` date NOT NULL,
   `inv_serv_date` date DEFAULT NULL,
   `inv_rmv_date` date DEFAULT NULL,
-  `inv_in_use` int DEFAULT '0',
-  `inv_available` int DEFAULT '0',
   `inv_stat` int NOT NULL,
   `inv_type` int NOT NULL,
   PRIMARY KEY (`inv_id`)
@@ -76,7 +74,6 @@ CREATE TABLE `event_tb` (
   `evn_dept` varchar(100) NOT NULL,
   `evn_banner` varchar(100) NOT NULL,
   `event_poster` varchar(100) NOT NULL,
-  `evn_type` varchar(10) NOT NULL,
   `ven_id` int NOT NULL,
   `event_sd` date NOT NULL,
   `evn_ed` date NOT NULL,
@@ -116,6 +113,7 @@ CREATE TABLE `event_guest_details` (
   `gst_cnv` tinyint DEFAULT NULL,
   `gst_acc` tinyint DEFAULT NULL,
   `gst_fee` tinyint DEFAULT NULL,
+  `gst_other` VARCHAR(200) DEFAULT NULL,
   PRIMARY KEY (`gst_id`),
   KEY `gst_evn_ref_idx` (`evn_id`),
   CONSTRAINT `gst_evn_ref` FOREIGN KEY (`evn_id`) REFERENCES `event_tb` (`evn_id`)
@@ -125,10 +123,9 @@ CREATE TABLE `event_guest_details` (
 CREATE TABLE `event_modification_log` (
   `evn_mod_id` int NOT NULL,
   `evn_id` int NOT NULL,
-  `evn_lst_mod_date` date NOT NULL,
-  `evn_lst_mod_time` time NOT NULL,
+  `evn_mod_date` date NOT NULL,
+  `evn_mod_time` time NOT NULL,
   `usr_id` int NOT NULL,
-  `evn_mod_data` varchar(45) NOT NULL,
   PRIMARY KEY (`evn_mod_id`),
   KEY `evn_mod_id_idx` (`evn_id`),
   KEY `evn_mod_usr_ref_idx` (`usr_id`),
@@ -153,23 +150,6 @@ CREATE TABLE `event_resources` (
   CONSTRAINT `evn_inv_ref` FOREIGN KEY (`inv_id`) REFERENCES `inventory` (`inv_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
-
-CREATE TABLE `notification_tb` (
-  `noti_id` int NOT NULL,
-  `noti_message` varchar(150) NOT NULL,
-  `evn_id` int DEFAULT NULL,
-  `noti_date` date NOT NULL,
-  `noti_time` time NOT NULL,
-  `noti_stat` int NOT NULL,
-  `usr_id` int NOT NULL,
-  PRIMARY KEY (`noti_id`),
-  KEY `noti_evn_ref_idx` (`evn_id`),
-  KEY `noti_usr_ref_idx` (`usr_id`),
-  CONSTRAINT `noti_evn_ref` FOREIGN KEY (`evn_id`) REFERENCES `event_tb` (`evn_id`),
-  CONSTRAINT `noti_usr_ref` FOREIGN KEY (`usr_id`) REFERENCES `users` (`usr_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-
-
 CREATE TABLE `event_quick` (
   `evn_qk_id` int NOT NULL,
   `evn_qk_name` varchar(100) NOT NULL,
@@ -179,28 +159,29 @@ CREATE TABLE `event_quick` (
   `evn_qk_st` time NOT NULL,
   `evn_qk_et` time NOT NULL,
   `usr_id` int NOT NULL,
+  `evn_id` int DEFAULT NULL,
   `qck_stat` int NOT NULL,
   PRIMARY KEY (`evn_qk_id`),
   KEY `quick_event_usr_idx` (`usr_id`),
   KEY `quick_event_ven_idx` (`ven_id`),
+  KEY `quick_event_id_idx` (`evn_id`),
+  CONSTRAINT `quick_event_id` FOREIGN KEY (`evn_id`) REFERENCES `event_tb` (`evn_id`),
   CONSTRAINT `quick_event_usr` FOREIGN KEY (`usr_id`) REFERENCES `users` (`usr_id`),
   CONSTRAINT `quick_event_ven` FOREIGN KEY (`ven_id`) REFERENCES `venues` (`ven_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 CREATE TABLE `mail_log` (
   `log_id` int NOT NULL AUTO_INCREMENT,
-  `mail_kind` varchar(100) DEFAULT NULL,
-  `mail_date` date DEFAULT NULL,
-  `mail_time` time DEFAULT NULL,
-  `mail_stat` varchar(15) DEFAULT NULL,
-  `usr_id` int DEFAULT NULL,
-  `receiver_email` varchar(255) DEFAULT NULL,
+  `mail_kind` varchar(100) NOT NULL,
+  `mail_date` date NOT NULL,
+  `mail_time` time NOT NULL,
+  `mail_stat` varchar(15) NOT NULL,
+  `usr_id` int NOT NULL,
+  `receiver_email` varchar(255) NOT NULL,
   PRIMARY KEY (`log_id`),
   KEY `mail_recipient_idx` (`usr_id`),
   CONSTRAINT `mail_recipient` FOREIGN KEY (`usr_id`) REFERENCES `users` (`usr_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=0 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-
+) ENGINE=InnoDB AUTO_INCREMENT=22 DEFAULT CHARSET=latin1;
 
 CREATE TABLE `password_resets` (
   `reset_id` int NOT NULL AUTO_INCREMENT,
@@ -222,15 +203,4 @@ CREATE TABLE `user_login_log` (
   PRIMARY KEY (`login_id`),
   KEY `usr_login_log_idx` (`usr_id`),
   CONSTRAINT `usr_login_log` FOREIGN KEY (`usr_id`) REFERENCES `users` (`usr_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=0 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-
-
-CREATE TABLE `user_password_memory` (
-  `usr_pwd_mem_id` int NOT NULL AUTO_INCREMENT,
-  `usr_id` int NOT NULL,
-  `usr_pwd` varchar(100) NOT NULL,
-  `usr_pwd_creation_dt` date NOT NULL,
-  PRIMARY KEY (`usr_pwd_mem_id`),
-  KEY `usr_pwd_mem_idx` (`usr_id`),
-  CONSTRAINT `usr_pwd_mem` FOREIGN KEY (`usr_id`) REFERENCES `users` (`usr_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=0 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;

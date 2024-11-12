@@ -231,7 +231,6 @@
             
                     <!-- Conditional Links for 'hod' -->
                     <% if (userRole === 'hod') { %>
-                        <li><a href="/book-event" class="hover:text-gray-300">Book</a></li>
                         <li><a href="/user-management" class="hover:text-gray-300">Users</a></li>
                         <li><a href="/dept-events" class="hover:text-gray-300">Dept Events</a></li>
                         <li><a href="/event-approval" class="hover:text-gray-300">Approval</a></li>
@@ -256,7 +255,7 @@
                 <div class="dropdown-menu absolute hidden right-0 mt-2 w-48 bg-white rounded-lg shadow-lg" id="profileDropdown">
                     <a href="/profile" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">Profile</a>
                     <a href="/change-password" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">Change Password</a>
-                    <a href="/logout" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">Logout</a>
+                    <a href="/logout" class="block px-4 py-2 text-gray-700 hover:bg-gray-100" onclick="sessionStorage.clear()">Logout</a>
                 </div>
             </div>
         </div>

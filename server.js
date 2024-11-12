@@ -44,6 +44,9 @@ const fileHandlerRoutes = require('./routes/fileHandler');
 const inventoryRoutes = require('./routes/inventory');
 const eventRoutes = require('./routes/event-approval');
 const dashboardRoutes = require('./routes/dashboard');
+const resourceAvailabilityRoutes = require('./routes/resourceAvailability');
+const myEventsRoutes = require('./routes/myevents');
+
 // Use routes with prefixes to organize API routes
 app.use('/api/dashboard', dashboardRoutes);
 app.use('/api', userRoutes);
@@ -57,6 +60,8 @@ app.use('/api', fileHandlerRoutes);
 app.use('/uploads', express.static('uploads'));
 app.use('/api', inventoryRoutes);
 app.use('/api', eventRoutes);
+app.use('/api', resourceAvailabilityRoutes);
+app.use('/api', myEventsRoutes);
 
 // Set session data globally for views
 app.use((req, res, next) => {
