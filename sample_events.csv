@@ -1,3 +1,4 @@
-evn_id,evn_name,evn_desc,evn_dept,evn_banner,event_poster,evn_type,ven_id,event_sd,evn_ed,evn_st,event_et,evn_vol_cnt,evn_snk,evn_food,evn_stat,evn_approval,evn_form_link
-1,"Gaming Contest","This event is about playing PUBG Tournament",cs,http://localhost:3000/uploads/1.png,sgdf,offline,1,2024-11-15,2024-11-15,10:00:00,13:00:00,1,1,1,1,1,http://localhost:3000/uploads/1.png
-2,"Capture The Flag","Hacking Made easy",cs,http://localhost:3000/uploads/2.png,sdgf,ofline,1,2024-11-14,2024-11-14,09:00:00,10:00:00,2,0,0,1,1,http://localhost:3000/uploads/1.png
+evn_id,evn_name,evn_desc,evn_dept,evn_banner,event_poster,ven_id,event_sd,evn_ed,evn_st,event_et,evn_vol_cnt,evn_snk,evn_food,evn_stat,evn_approval,evn_form_link
+1,"Gaming Contest","This event is about playing PUBG Tournament",cs,http://localhost:3000/uploads/1.png,http://localhost:3000/uploads/4.png,1,2024-11-15,2024-11-15,10:00:00,13:00:00,1,1,1,1,1,http://localhost:3000/uploads/1.png
+2,"Capture The Flag","Hacking Made easy",cs,http://localhost:3000/uploads/2.png,http://localhost:3000/uploads/5.png,1,2024-11-14,2024-11-14,09:00:00,10:00:00,2,0,0,1,1,http://localhost:3000/uploads/1.png
+3,BGMI,"BGMI Tournament",cs,http://localhost:3000/uploads/3.png,fsfsf,7,2024-11-10,2024-11-11,23:00:00,00:00:00,3,0,0,1,1,http://localhost:3000/uploads/2.png
