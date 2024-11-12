@@ -92,15 +92,33 @@ router.post('/signup', async (req, res) => {
 
         // Send welcome email after successful insertion
         try {
-            const emailResponse = await fetch(`${req.protocol}://${req.get('host')}/api/send-email`, {
+            const emailResponse = await fetch(`http://127.0.0.1:5000/send-email`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    subject: "Welcome to AEIMS!",
-                    recipient: email,
-                    body: `<p>Hi ${full_name},</p> <p>&emsp;Welcome to AEIMS. Your account has been registered successfully. Please wait until your Administrator approves your account.</p>`,
-                    isHtml: true
-                })
+                    "subject": "Welcome to AEIMS!",
+                    "recipient": email,
+                    "body": `
+                        <html>
+                            <body style="font-family: Arial, sans-serif; background-color: #ffffff; padding: 20px; color: #333;">
+                                <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff; padding: 30px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
+                                    <h2 style="color: #1d4ed8; text-align: center;">Welcome to AEIMS, ${full_name}!</h2>
+                                    <p style="font-size: 1rem; color: #555; text-align: center;">
+                                        We are excited to have you on board. Your account has been registered successfully!
+                                    </p>
+                                    <p style="font-size: 1rem; color: #555; text-align: center;">
+                                        Please wait until your Administrator approves your account to gain full access.
+                                    </p>
+                                    <p style="font-size: 1rem; color: #555; text-align: center;">
+                                        Best Regards,<br>
+                                        AEIMS Team
+                                    </p>
+                                </div>
+                            </body>
+                        </html>
+                    `,
+                    "is_html": true
+                })            
             });
 
             if (emailResponse.ok) {

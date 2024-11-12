@@ -8,9 +8,6 @@ router.post("/send-email", (req, res) => {
     const { subject, recipient, body, isHtml } = req.body;
     console.log("request recieved");
 
-    // Command to call the Python script with arguments
-    const command = `python email_sender.py "${subject}" "${recipient}" "${body}" "${isHtml}"`;
-
     exec(command, (error, stdout, stderr) => {
         if (error) {
             console.error(`exec error: ${error}`);

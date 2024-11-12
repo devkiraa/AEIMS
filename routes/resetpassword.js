@@ -49,16 +49,32 @@ router.post('/forgot-password', async (req, res) => {
         // Prepare the reset link
         const resetLink = `${req.protocol}://${req.get('host')}/reset-password/${resetToken}`;
 
-        // Send reset email
-        const emailResponse = await fetch(`${req.protocol}://${req.get('host')}/api/send-email`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                subject: 'Password Reset Request',
-                recipient: email,
-                body: `Hello,You requested a password reset. Click the link below to reset your password: ${resetLink} This link is valid for 10 minutes. If you did not request this, please ignore this email.`
-            })
-        });
+       // Send reset email
+const emailResponse = await fetch(`http://127.0.0.1:5000/send-email`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+        "subject": 'Password Reset Request',
+        "recipient": email,
+        "body": `
+            <html>
+                <body style='font-family: Arial, sans-serif; background-color: #ffffff; padding: 20px; color: #333;'>
+                    <div style='max-width: 600px; margin: 0 auto; background-color: #ffffff; padding: 30px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);'>
+                        <h2 style='text-align: center; color: #1d4ed8;'>Password Reset Request</h2>
+                        <p style='font-size: 1rem; color: #1d4ed8; text-align: center;'>You requested a password reset. Please click the button below to reset your password:</p>
+                        <div style='text-align: center; margin-top: 20px;'>
+                            <a href="${resetLink}" style='display: inline-block; padding: 10px 20px; background-color: #1d4ed8; color: white; border: none; border-radius: 5px; text-decoration: none; font-size: 1rem;'>Reset Password</a>
+                        </div>
+                        <p style='font-size: 0.9rem; color: #333; text-align: center; margin-top: 20px;'>This link is valid for <strong>10 minutes</strong>. If you did not request this reset, you may ignore this email.</p>
+                        <p style='font-size: 0.9rem; color: #333; text-align: center; margin-top: 20px;'>Thank you,<br>AEIMS Support Team</p>
+                        <p style='font-size: 0.9rem; text-align: center; color: #1d4ed8; margin-top: 10px;'>If you have any issues, feel free to <a href='mailto:mail.aeims@gmail.com' style='color: #1d4ed8; text-decoration: underline;'>contact us</a>.</p>
+                    </div>
+                </body>
+            </html>
+        `,
+        "is_html": true
+    })
+});
 
         if (emailResponse.ok) {
             res.redirect('/forgot-password-request');
