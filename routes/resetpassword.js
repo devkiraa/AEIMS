@@ -32,9 +32,6 @@ router.post('/forgot-password', async (req, res) => {
         const resetToken = crypto.randomBytes(32).toString('hex');
         const resetTokenExpiry = calculateExpiry();
 
-        // const [[{ max_id }]] = await db.query('SELECT MAX(reset_id) AS max_id FROM password_resets');
-        // const reset_id = (max_id || 0) + 1;
-
         // Insert or update the reset token, expiry, and increment reset count
         await db.query(
             `INSERT INTO password_resets (usr_id, reset_token, reset_token_expiry, reset_link_stat)
@@ -49,39 +46,23 @@ router.post('/forgot-password', async (req, res) => {
         // Prepare the reset link
         const resetLink = `${req.protocol}://${req.get('host')}/reset-password/${resetToken}`;
 
-       // Send reset email
-const emailResponse = await fetch(`http://127.0.0.1:5000/send-email`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-        "subject": 'Password Reset Request',
-        "recipient": email,
-        "body": `
-            <html>
-                <body style='font-family: Arial, sans-serif; background-color: #ffffff; padding: 20px; color: #333;'>
-                    <div style='max-width: 600px; margin: 0 auto; background-color: #ffffff; padding: 30px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);'>
-                        <h2 style='text-align: center; color: #1d4ed8;'>Password Reset Request</h2>
-                        <p style='font-size: 1rem; color: #1d4ed8; text-align: center;'>You requested a password reset. Please click the button below to reset your password:</p>
-                        <div style='text-align: center; margin-top: 20px;'>
-                            <a href="${resetLink}" style='display: inline-block; padding: 10px 20px; background-color: #1d4ed8; color: white; border: none; border-radius: 5px; text-decoration: none; font-size: 1rem;'>Reset Password</a>
-                        </div>
-                        <p style='font-size: 0.9rem; color: #333; text-align: center; margin-top: 20px;'>This link is valid for <strong>10 minutes</strong>. If you did not request this reset, you may ignore this email.</p>
-                        <p style='font-size: 0.9rem; color: #333; text-align: center; margin-top: 20px;'>Thank you,<br>AEIMS Support Team</p>
-                        <p style='font-size: 0.9rem; text-align: center; color: #1d4ed8; margin-top: 10px;'>If you have any issues, feel free to <a href='mailto:mail.aeims@gmail.com' style='color: #1d4ed8; text-decoration: underline;'>contact us</a>.</p>
-                    </div>
-                </body>
-            </html>
-        `,
-        "is_html": true
-    })
-});
+        // Set email status as "Sent" by default
+        const status = 'Sent';
 
-        if (emailResponse.ok) {
-            res.redirect('/forgot-password-request');
-        } else {
-            console.error('Error sending email');
-            res.status(500).send('Error sending email');
-        }
+        // Get current date and time for logging
+        const now = new Date();
+        const mail_date = now.toISOString().split('T')[0]; // Format as YYYY-MM-DD
+        const mail_time = now.toTimeString().split(' ')[0]; // Format as HH:MM:SS
+
+        // Insert log into mail_log table
+        await db.query(
+            `INSERT INTO mail_log (mail_kind, mail_date, mail_time, mail_stat, usr_id, receiver_email)
+             VALUES (?, ?, ?, ?, ?, ?)`,
+            ["email", mail_date, mail_time, status, usr_id, email]
+        );
+
+        // Redirect after email logging
+        res.redirect('/forgot-password-request');
     } catch (error) {
         console.error("Error during password reset:", error);
         res.status(500).send("Internal server error. Please try again later.");

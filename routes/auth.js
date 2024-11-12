@@ -92,7 +92,7 @@ router.post('/signup', async (req, res) => {
 
         // Send welcome email after successful insertion
         try {
-            const emailResponse = await fetch(`http://127.0.0.1:5000/send-email`, {
+            const emailResponse = await fetch("http://127.0.0.1:5000/send-email", {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -122,6 +122,17 @@ router.post('/signup', async (req, res) => {
             });
 
             if (emailResponse.ok) {
+                // Log email sending in the mail_log table
+                const now = new Date();
+                const mail_date = now.toISOString().split('T')[0]; // Format as YYYY-MM-DD
+                const mail_time = now.toTimeString().split(' ')[0]; // Format as HH:MM:SS
+                
+                // Insert log into mail_log table
+                await db.query(
+                    'INSERT INTO mail_log (mail_kind, mail_date, mail_time, mail_stat, usr_id, receiver_email) VALUES (?, ?, ?, ?, ?, ?)',
+                    ['email', mail_date, mail_time, 'Sent', user_id, email]
+                );
+
                 return res.redirect('/signup-waiting');
             } else {
                 console.error('Error sending email');

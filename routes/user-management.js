@@ -50,6 +50,7 @@ router.get('/users', async (req, res) => {
     }
 });
 
+
 router.put('/users/:id', async (req, res) => {
     const userId = req.params.id;
     const { usr_role, usr_dept, usr_stat, restore } = req.body;
@@ -95,17 +96,48 @@ router.put('/users/:id', async (req, res) => {
                     return res.status(404).json({ error: 'User not found' });
                 }
 
-                const emailResponse = await fetch(`${req.protocol}://${req.get('host')}/api/send-email`, {
+                const emailResponse = await fetch(`http://127.0.0.1:5000/send-email`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        subject: "Account Approval Notification",
-                        recipient: email,
-                        body: `<p>Hey ${useraname[0].usr_aname},</p><p>Your registration has been approved! You can now access your account.</p>`,
-                        isHtml: true
+                        "subject": "Account Approval Notification",
+                        "recipient": email,
+                        "body": `
+                            <html>
+                                <body style="font-family: Arial, sans-serif; background-color: #ffffff; padding: 20px; color: #333;">
+                                    <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff; padding: 30px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
+                                        <h2 style="color: #1d4ed8; text-align: center;">Hello ${useraname[0].usr_aname},</h2>
+                                        <p style="font-size: 1rem; color: #555; text-align: center;">
+                                            Your registration has been approved! You can now access your account and explore all the features available.
+                                        </p>
+                                        <p style="font-size: 1rem; color: #555; text-align: center;">
+                                            We are excited to have you onboard and look forward to your contributions.
+                                        </p>
+                                        <p style="font-size: 1rem; color: #555; text-align: center;">
+                                            Best Regards,<br>
+                                            AEIMS Team
+                                        </p>
+                                    </div>
+                                </body>
+                            </html>
+                        `,
+                        "is_html": true
                     })
                 });
-            
+
+                // Log the email sending status
+                const status = 'Sent';
+                const now = new Date();
+                const mail_date = now.toISOString().split('T')[0]; // Format as YYYY-MM-DD
+                const mail_time = now.toTimeString().split(' ')[0]; // Format as HH:MM:SS
+
+                // Insert log into mail_log table
+                await db.query(
+                    `INSERT INTO mail_log (mail_kind, mail_date, mail_time, mail_stat, usr_id, receiver_email)
+                     VALUES (?, ?, ?, ?, ?, ?)`,
+                    ["email", mail_date, mail_time, status, userId, email]
+                );
+
                 if (!emailResponse.ok) {
                     console.error(`Error sending approval email: ${emailResponse.message}`);
                     return res.status(500).send('Error sending email');
