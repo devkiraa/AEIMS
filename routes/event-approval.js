@@ -22,4 +22,28 @@ router.get('/events', async (req, res) => {
     }
 });
 
+// Approve event
+router.post('/events/approve/:id', async (req, res) => {
+    try {
+        const eventId = req.params.id;
+        await Event.updateOne({ _id: eventId }, { approval_status: 'Approved' });
+        res.json({ success: true });
+    } catch (error) {
+        console.error(error);
+        res.json({ success: false, message: 'Could not approve event.' });
+    }
+});
+
+// Reject event
+router.post('/events/reject/:id', async (req, res) => {
+    try {
+        const eventId = req.params.id;
+        await Event.updateOne({ _id: eventId }, { approval_status: 'Rejected' });
+        res.json({ success: true });
+    } catch (error) {
+        console.error(error);
+        res.json({ success: false, message: 'Could not reject event.' });
+    }
+});
+
 module.exports = router;
