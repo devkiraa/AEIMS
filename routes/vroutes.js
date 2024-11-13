@@ -27,7 +27,7 @@ router.get('/login', (req, res) => {
 
 // Signup route
 router.get('/signup', (req, res) => {
-    res.render('signup');
+    res.render('signup', { errorMessage: null });
 });
 
 // Forgot-password route

@@ -37,7 +37,16 @@
         <div class="text-center mb-10">
             <h2 class="text-2xl lg:text-3xl font-semibold">Welcome to <span class="text-blue-600">AEIMS</span></h2>
         </div>
+
+        <!-- Display error message if email already exists -->
+        <% if (errorMessage) { %>
+            <div class="bg-red-100 text-red-700 px-4 py-3 rounded mb-4">
+                <p><%= errorMessage %></p>
+            </div>
+        <% } %>
+
         <form id="signup-form" action="/signup" method="POST">
+            <!-- Form fields here -->
             <div class="mb-3">
                 <label for="full_name" class="block text-gray-700">Name</label>
                 <input type="text" name="full_name" id="full_name" placeholder="Full Name" class="w-full p-2 border border-gray-300 rounded mt-1" required>

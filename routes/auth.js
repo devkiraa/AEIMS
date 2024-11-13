@@ -62,7 +62,7 @@ router.post('/login', async (req, res) => {
         res.redirect('/');
     } catch (error) {
         console.error("Login Error:", error);
-        res.status(500).send('Database query failed');
+        res.status(500).render('error', { status: 500, title: 'Login Error', message: 'There was an issue with logging in. Please try again later.' });
     }
 });
 
@@ -71,6 +71,17 @@ router.post('/signup', async (req, res) => {
     const { full_name, mobile, email, password, club, dept } = req.body;
 
     try {
+         // Check if the user already exists
+const [existingUser] = await db.query('SELECT * FROM users WHERE usr_name = ?', [email]);
+
+if (existingUser.length > 0) {
+    // Render the signup page with an error message if the email is already registered
+    return res.render('signup', { errorMessage: 'Email is already registered. Please use a different email.' });
+} else {
+    // Render the signup page with errorMessage set to null
+    res.render('signup', { errorMessage: null });
+}
+
         // Hash password
         const hashedPassword = await bcrypt.hash(password, 10);
 
@@ -136,15 +147,15 @@ router.post('/signup', async (req, res) => {
                 return res.redirect('/signup-waiting');
             } else {
                 console.error('Error sending email');
-                return res.status(500).send('Error sending email');
+                return res.status(500).render('error', { status: 500, title: 'Email Error', message: 'Failed to send the welcome email. Please try again later.' });
             }
         } catch (error) {
             console.error("Email Sending Error:", error);
-            return res.status(500).send('Error processing sign-up');
+            return res.status(500).render('error', { status: 500, title: 'Email Error', message: 'There was an error while sending the welcome email. Please try again later.' });
         }
     } catch (error) {
         console.error("Signup Database Error:", error);
-        res.status(500).send('Server Error');
+        res.status(500).render('error', { status: 500, title: 'Signup Error', message: 'There was an issue with your signup. Please try again later.' });
     }
 });
 
