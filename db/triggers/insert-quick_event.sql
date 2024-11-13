@@ -1,5 +1,3 @@
-SELECT * FROM aeims.event_quick;
-
 DELIMITER //
 
 CREATE TRIGGER insert_into_vnb_from_qck

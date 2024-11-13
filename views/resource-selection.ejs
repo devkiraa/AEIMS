@@ -44,6 +44,7 @@
         const eventBannerURL = sessionStorage.getItem('eventBannerUrl');
         const eventPosterURL = sessionStorage.getItem('eventBannerUrl');
         const guestDetails = JSON.parse(sessionStorage.getItem('guestDetails'));
+        const currentGuestcount = JSON.parse(sessionStorage.getItem('currentGuestIndex'));
 
         document.addEventListener('DOMContentLoaded', function () {
             const profileButton = document.getElementById('profileButton');
@@ -167,21 +168,40 @@
                 count: row.getAttribute('data-count')
             }));
 
-            try {
-                const response = await fetch('/api/create-event', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ resources })
-                });
+            if (currentGuestcount !== null) {
+                try {
+                    const response = await fetch('/api/create-event', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ eventData, eventDetails, eventPosterURL, eventBannerURL, resources})
+                    });
 
-                if (response.ok) {
-                    window.location.href = '/my-events';
-                } else {
-                    throw new Error('Failed to create event');
+                    if (response.ok) {
+                        window.location.href = '/my-events';
+                    } else {
+                        throw new Error('Failed to create event');
+                    }
+                } catch (error) {
+                    console.error('Error creating event:', error);
                 }
-            } catch (error) {
-                console.error('Error creating event:', error);
+            } else if(currentGuestcount >= 0) {
+                try {
+                    const response = await fetch('/api/create-event', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ eventData, eventDetails, eventPosterURL, eventBannerURL, guestDetails, resources})
+                    });
+
+                    if (response.ok) {
+                        window.location.href = '/my-events';
+                    } else {
+                        throw new Error('Failed to create event');
+                    }
+                } catch (error) {
+                    console.error('Error creating event:', error);
+                }
             }
+
         }
 
         function openAddResourceModal(item) {

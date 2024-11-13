@@ -1,3 +1,5 @@
+DELIMITER //
+
 CREATE TRIGGER trg_after_update_evn
 AFTER UPDATE ON event_tb
 FOR EACH ROW
