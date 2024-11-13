@@ -22,12 +22,11 @@ router.post('/forgot-password', async (req, res) => {
             [email, mobile]
         );
 
-        if (user.length === 0) {
+        if (!user || user.length === 0) {
             return res.status(404).send("User not found. Please check your email and mobile.");
         }
 
         const usr_id = user[0].usr_id;
-
         // Generate reset token and set expiry time to 10 minutes
         const resetToken = crypto.randomBytes(32).toString('hex');
         const resetTokenExpiry = calculateExpiry();
@@ -46,10 +45,34 @@ router.post('/forgot-password', async (req, res) => {
         // Prepare the reset link
         const resetLink = `${req.protocol}://${req.get('host')}/reset-password/${resetToken}`;
 
-        // Set email status as "Sent" by default
-        const status = 'Sent';
+        // Send reset email
+        const emailResponse = await fetch("http://127.0.0.1:5000/send-email", {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                "subject": 'Password Reset Request',
+                "recipient": email,
+                "body": `
+                    <html>
+                        <body style='font-family: Arial, sans-serif; background-color: #ffffff; padding: 20px; color: #333;'>
+                            <div style='max-width: 600px; margin: 0 auto; background-color: #ffffff; padding: 30px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);'>
+                                <h2 style='text-align: center; color: #1d4ed8;'>Password Reset Request</h2>
+                                <p style='font-size: 1rem; color: #1d4ed8; text-align: center;'>You requested a password reset. Please click the button below to reset your password:</p>
+                                <div style='text-align: center; margin-top: 20px;'>
+                                    <a href="${resetLink}" style='display: inline-block; padding: 10px 20px; background-color: #1d4ed8; color: white; border: none; border-radius: 5px; text-decoration: none; font-size: 1rem;'>Reset Password</a>
+                                </div>
+                                <p style='font-size: 0.9rem; color: #333; text-align: center; margin-top: 20px;'>This link is valid for <strong>10 minutes</strong>. If you did not request this reset, you may ignore this email.</p>
+                                <p style='font-size: 0.9rem; color: #333; text-align: center; margin-top: 20px;'>Thank you,<br>AEIMS Support Team</p>
+                                <p style='font-size: 0.9rem; text-align: center; color: #1d4ed8; margin-top: 10px;'>If you have any issues, feel free to <a href='mailto:mail.aeims@gmail.com' style='color: #1d4ed8; text-decoration: underline;'>contact us</a>.</p>
+                            </div>
+                        </body>
+                    </html>`,
+                "is_html": true
+            })
+        });
 
-        // Get current date and time for logging
+        // Assume email status as "Sent" and prepare data for mail_log entry
+        const status = 'Sent';
         const now = new Date();
         const mail_date = now.toISOString().split('T')[0]; // Format as YYYY-MM-DD
         const mail_time = now.toTimeString().split(' ')[0]; // Format as HH:MM:SS
@@ -58,17 +81,20 @@ router.post('/forgot-password', async (req, res) => {
         await db.query(
             `INSERT INTO mail_log (mail_kind, mail_date, mail_time, mail_stat, usr_id, receiver_email)
              VALUES (?, ?, ?, ?, ?, ?)`,
-            ["email", mail_date, mail_time, status, usr_id, email]
+            ["reset password", mail_date, mail_time, status, usr_id, email]
         );
 
-        // Redirect after email logging
-        res.redirect('/forgot-password-request');
+        if (emailResponse.ok) {
+            res.redirect('/forgot-password-request');
+        } else {
+            console.error('Error sending email');
+            res.status(500).send('Error sending email');
+        }
     } catch (error) {
         console.error("Error during password reset:", error);
         res.status(500).send("Internal server error. Please try again later.");
     }
 });
-
 
 // Route to validate token and render the reset password page
 router.get('/reset-password/:token', async (req, res) => {
@@ -77,7 +103,7 @@ router.get('/reset-password/:token', async (req, res) => {
     try {
         const currentTime = new Date();
 
-        // Validate the token and expiry in the `password_resets` table
+        // Validate the token and expiry in the password_resets table
         const [user] = await db.query(
             `SELECT usr_id FROM password_resets WHERE reset_token = ? AND reset_token_expiry > ? AND reset_link_stat = 1`,
             [token, currentTime]
@@ -95,7 +121,6 @@ router.get('/reset-password/:token', async (req, res) => {
     }
 });
 
-
 // Route to handle new password submission
 router.post('/reset-password/:token', async (req, res) => {
     const { token } = req.params;
@@ -108,7 +133,7 @@ router.post('/reset-password/:token', async (req, res) => {
             [token, new Date()]
         );
 
-        if (user.length === 0) {
+        if (!user || user.length === 0) {
             return res.status(400).send("Invalid or expired token.");
         }
 
@@ -117,13 +142,13 @@ router.post('/reset-password/:token', async (req, res) => {
         // Hash the new password
         const hashedPassword = bcrypt.hashSync(newPassword, 10);
 
-        // Update the user's password in `users` table and remove the reset token
+        // Update the user's password in users table and remove the reset token
         await db.query(
             'UPDATE users SET usr_pass = ? WHERE usr_id = ?',
             [hashedPassword, usr_id]
         );
 
-        // Delete reset token from `password_resets` table after successful password reset
+        // Delete reset token from password_resets table after successful password reset
         await db.query('UPDATE password_resets SET reset_link_stat = 0 WHERE usr_id = ?', [usr_id]);
 
         // Render the reset-password page with a success message
