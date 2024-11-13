@@ -66,14 +66,28 @@
     <!-- Navbar -->
     <nav class="bg-blue-600 p-4">
         <div class="container mx-auto flex justify-between items-center">
-            <ul class="flex space-x-6 text-white">
-                <li><a href="/" class="hover:text-gray-300">Home</a></li>
-                <li><a href="/book-event" class="hover:text-gray-300">Book</a></li>
-                <li><a href="/user-management" class="hover:text-gray-300">Users</a></li>
-                <li><a href="/inventory" class="hover:text-gray-300">Inventory</a></li>
-                <li><a href="/my-events" class="hover:text-gray-300">My Events</a></li>
-                <li><a href="/about-us" class="hover:text-gray-300">About Us</a></li>
-            </ul>
+            <!-- Navbar Links -->
+            <div class="flex items-center space-x-6">
+                <ul class="flex space-x-6 text-white">
+                    <li><a href="/" class="hover:text-gray-300">Home</a></li>
+                    <% if (userRole === 'admin' || userRole === 'icts') { %>
+                        <li><a href="/book-event" class="hover:text-gray-300">Book</a></li>
+                        <li><a href="/user-management" class="hover:text-gray-300">Users</a></li>
+                        <li><a href="/inventory" class="hover:text-gray-300">Inventory</a></li>
+                        <li><a href="/my-events" class="hover:text-gray-300">My Events</a></li>
+                    <% } %>
+                    <% if (userRole === 'hod') { %>
+                        <li><a href="/user-management" class="hover:text-gray-300">Users</a></li>
+                        <li><a href="/dept-events" class="hover:text-gray-300">Dept Events</a></li>
+                        <li><a href="/event-approval" class="hover:text-gray-300">Approval</a></li>
+                    <% } %>
+                    <% if (userRole === 'em') { %>
+                        <li><a href="/book-event" class="hover:text-gray-300">Book</a></li>
+                        <li><a href="/my-events" class="hover:text-gray-300">My Events</a></li>
+                    <% } %>
+                    <li><a href="/about-us" class="hover:text-gray-300">About Us</a></li>
+                </ul>
+            </div>
             <div class="relative dropdown">
                 <button class="bg-white rounded-full p-2" id="profileButton">
                     <img src="/assets/icons/avatar.svg" alt="User Icon" class="w-6 h-6">
@@ -81,7 +95,7 @@
                 <div class="dropdown-menu absolute hidden right-0 mt-2 w-48 bg-white rounded-lg shadow-lg" id="profileDropdown">
                     <a href="/profile" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">Profile</a>
                     <a href="/change-password" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">Change Password</a>
-                    <a href="/logout" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">Logout</a>
+                    <a href="/logout" class="block px-4 py-2 text-gray-700 hover:bg-gray-100" onclick="sessionStorage.clear()">Logout</a>
                 </div>
             </div>
         </div>
@@ -104,58 +118,81 @@
             <div class="flex flex-wrap justify-center gap-8">
                 <!-- Erick Xavier Card -->
                 <div class="photo-card">
-                    <img src="/public/assets/erick.jpg" alt="Erick Xavier">
+                    <img src="/assets/images/erick.jpg" alt="Erick Xavier">
                     <p>Erick Xavier</p>
                     <div class="social-buttons">
                         <a href="https://github.com/TechnoTOG" target="_blank" aria-label="GitHub">
-                            <img src="/public/assets/github.svg" alt="GitHub"> GitHub
+                            <img src="/assets/images/github.svg" alt="GitHub"> GitHub
                         </a>
                         <a href="https://linkedin.com/in/erickxavier" target="_blank" aria-label="LinkedIn">
-                            <img src="/public/assets/linkedin.svg" alt="LinkedIn"> LinkedIn
+                            <img src="/assets/images/linkedin.svg" alt="LinkedIn"> LinkedIn
                         </a>
                     </div>
                 </div>
                 <!-- Gopikirshnan M Card -->
                 <div class="photo-card">
-                    <img src="/public/assets/gopi.jpg" alt="Gopikirshnan M">
+                    <img src="/assets/images/gopi.jpg" alt="Gopikirshnan M">
                     <p>Gopikirshnan M</p>
                     <div class="social-buttons">
                         <a href="https://github.com/Gopikirshnan" target="_blank" aria-label="GitHub">
-                            <img src="/public/assets/github.svg" alt="GitHub"> GitHub
+                            <img src="/assets/images/github.svg" alt="GitHub"> GitHub
                         </a>
                         <a href="https://linkedin.com/in/gopikirshnan" target="_blank" aria-label="LinkedIn">
-                            <img src="/public/assets/linkedin.svg" alt="LinkedIn"> LinkedIn
+                            <img src="/assets/images/linkedin.svg" alt="LinkedIn"> LinkedIn
                         </a>
                     </div>
                 </div>
                 <!-- Kiran S Card -->
                 <div class="photo-card">
-                    <img src="/public/assets/kiran.jpg" alt="Kiran S">
+                    <img src="/assets/images/kiran.jpg" alt="Kiran S">
                     <p>Kiran S</p>
                     <div class="social-buttons">
                         <a href="https://github.com/devkiraa" target="_blank" aria-label="GitHub">
-                            <img src="/public/assets/github.svg" alt="GitHub"> GitHub
+                            <img src="/assets/images/github.svg" alt="GitHub"> GitHub
                         </a>
                         <a href="https://linkedin.com/in/kirans" target="_blank" aria-label="LinkedIn">
-                            <img src="/public/assets/linkedin.svg" alt="LinkedIn"> LinkedIn
+                            <img src="/assets/images/linkedin.svg" alt="LinkedIn"> LinkedIn
                         </a>
                     </div>
                 </div>
                 <!-- Narayanan G Card -->
                 <div class="photo-card">
-                    <img src="/public/assets/nanu.jpg" alt="Narayanan G">
+                    <img src="/assets/images/nanu.jpg" alt="Narayanan G">
                     <p>Narayanan G</p>
                     <div class="social-buttons">
                         <a href="https://github.com/NarayananG" target="_blank" aria-label="GitHub">
-                            <img src="/public/assets/github.svg" alt="GitHub"> GitHub
+                            <img src="/assets/images/github.svg" alt="GitHub"> GitHub
                         </a>
                         <a href="https://linkedin.com/in/narayanang" target="_blank" aria-label="LinkedIn">
-                            <img src="/public/assets/linkedin.svg" alt="LinkedIn"> LinkedIn
+                            <img src="/assets/images/linkedin.svg" alt="LinkedIn"> LinkedIn
                         </a>
                     </div>
                 </div>
             </div>
         </div>
     </main>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const profileButton = document.getElementById("profileButton");
+            const profileDropdown = document.getElementById("profileDropdown");
+    
+            // Toggle dropdown on button click
+            profileButton.addEventListener("click", (event) => {
+              event.stopPropagation();
+              profileDropdown.classList.toggle("hidden");
+            });
+    
+            // Close dropdown if clicked outside
+            document.addEventListener("click", (event) => {
+              if (
+                !profileDropdown.classList.contains("hidden") &&
+                !profileDropdown.contains(event.target) &&
+                event.target !== profileButton
+              ) {
+                profileDropdown.classList.add("hidden");
+              }
+            });
+          });
+    </script>
 </body>
 </html>
