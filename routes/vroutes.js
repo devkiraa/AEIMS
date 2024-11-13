@@ -137,6 +137,20 @@ router.get('/book-event', (req, res) => {
     }
 });
 
+// Booking page
+router.get('/about-us', (req, res) => {
+    if (!req.session.user_id) {
+        return res.redirect('/login');
+    }
+
+    if (req.session.user_role === 'admin'|| req.session.user_role === 'hod' || req.session.user_role === 'em') {
+        const userRole = req.session.user_role;
+        res.render('aboutUs', {userRole});
+    } else {
+        res.status(403).render(403);
+    }
+});
+
 // Event details page
 router.get('/book-event/event-details', (req, res) => {
     if (!req.session.user_id) {

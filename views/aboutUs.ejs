@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inventory and In Service</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            margin: 0;
+        }
+        .photo-card {
+            width: 200px;
+            padding: 15px;
+            background-color: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s;
+        }
+        .photo-card:hover {
+            transform: translateY(-5px);
+        }
+        .photo-card img {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+            border-radius: px;
+        }
+        .photo-card p {
+            margin-top: 10px;
+            font-weight: 600;
+            text-align: center;
+        }
+        .social-buttons {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 8px;
+            gap: 5px;
+        }
+        .social-buttons a {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            text-decoration: none;
+            color: #1a202c; /* Dark text color */
+            font-weight: 500;
+            background-color: #f1f5f9;
+            padding: 6px 10px;
+            border-radius: 20px;
+            transition: background-color 0.2s;
+        }
+        .social-buttons a:hover {
+            background-color: #e2e8f0;
+        }
+        .social-buttons img {
+            width: 18px;
+            height: 18px;
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Navbar -->
+    <nav class="bg-blue-600 p-4">
+        <div class="container mx-auto flex justify-between items-center">
+            <!-- Navbar Links -->
+            <div class="flex items-center space-x-6">
+                <ul class="flex space-x-6 text-white">
+                    <li><a href="/" class="hover:text-gray-300">Home</a></li>
+                    <% if (userRole === 'admin' || userRole === 'icts') { %>
+                        <li><a href="/book-event" class="hover:text-gray-300">Book</a></li>
+                        <li><a href="/user-management" class="hover:text-gray-300">Users</a></li>
+                        <li><a href="/inventory" class="hover:text-gray-300">Inventory</a></li>
+                        <li><a href="/my-events" class="hover:text-gray-300">My Events</a></li>
+                    <% } %>
+                    <% if (userRole === 'hod') { %>
+                        <li><a href="/user-management" class="hover:text-gray-300">Users</a></li>
+                        <li><a href="/dept-events" class="hover:text-gray-300">Dept Events</a></li>
+                        <li><a href="/event-approval" class="hover:text-gray-300">Approval</a></li>
+                    <% } %>
+                    <% if (userRole === 'em') { %>
+                        <li><a href="/book-event" class="hover:text-gray-300">Book</a></li>
+                        <li><a href="/my-events" class="hover:text-gray-300">My Events</a></li>
+                    <% } %>
+                    <li><a href="/about-us" class="hover:text-gray-300">About Us</a></li>
+                </ul>
+            </div>
+            <div class="relative dropdown">
+                <button class="bg-white rounded-full p-2" id="profileButton">
+                    <img src="/assets/icons/avatar.svg" alt="User Icon" class="w-6 h-6">
+                </button>
+                <div class="dropdown-menu absolute hidden right-0 mt-2 w-48 bg-white rounded-lg shadow-lg" id="profileDropdown">
+                    <a href="/profile" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">Profile</a>
+                    <a href="/change-password" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">Change Password</a>
+                    <a href="/logout" class="block px-4 py-2 text-gray-700 hover:bg-gray-100" onclick="sessionStorage.clear()">Logout</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="flex-grow bg-white min-h-screen p-6">
+        <div class="container mx-auto">
+            <h1 class="text-center text-2xl font-semibold mb-4">ABOUT US</h1>
+            <p class="text-center mb-8 px-6" style="text-align: justify;">
+                Welcome to the Event Management System, a dedicated platform designed to enhance the organization and management of events and programs 
+                at Amrita Vishwa Vidyapeetham, Kochi campus. Built with the specific needs of our faculty and staff in 
+                mind, this system provides a seamless experience for event scheduling, venue booking, 
+                and inventory tracking. Our mission is to simplify the event planning process, 
+                moving from manual methods to a streamlined digital solution that saves time and reduces administrative load. 
+                With this system, we aim to foster a more efficient and collaborative environment for managing campus events.
+            </p>            
+            <h2 class="text-center text-xl font-semibold mb-4">MEET THE DEVELOPERS</h2>
+            <p class="text-center mb-8">The minds behind the system: 2022 BCA Data Science students transforming event management at Amrita Vishwa Vidyapeetham, Kochi Campus.</p>
+            <div class="flex flex-wrap justify-center gap-8">
+                <!-- Erick Xavier Card -->
+                <div class="photo-card">
+                    <img src="/assets/images/erick.jpg" alt="Erick Xavier">
+                    <p>Erick Xavier</p>
+                    <div class="social-buttons">
+                        <a href="https://github.com/TechnoTOG" target="_blank" aria-label="GitHub">
+                            <img src="/assets/images/github.svg" alt="GitHub"> GitHub
+                        </a>
+                        <a href="https://linkedin.com/in/erickxavier" target="_blank" aria-label="LinkedIn">
+                            <img src="/assets/images/linkedin.svg" alt="LinkedIn"> LinkedIn
+                        </a>
+                    </div>
+                </div>
+                <!-- Gopikirshnan M Card -->
+                <div class="photo-card">
+                    <img src="/assets/images/gopi.jpg" alt="Gopikirshnan M">
+                    <p>Gopikirshnan M</p>
+                    <div class="social-buttons">
+                        <a href="https://github.com/Gopikirshnan" target="_blank" aria-label="GitHub">
+                            <img src="/assets/images/github.svg" alt="GitHub"> GitHub
+                        </a>
+                        <a href="https://linkedin.com/in/gopikirshnan" target="_blank" aria-label="LinkedIn">
+                            <img src="/assets/images/linkedin.svg" alt="LinkedIn"> LinkedIn
+                        </a>
+                    </div>
+                </div>
+                <!-- Kiran S Card -->
+                <div class="photo-card">
+                    <img src="/assets/images/kiran.jpg" alt="Kiran S">
+                    <p>Kiran S</p>
+                    <div class="social-buttons">
+                        <a href="https://github.com/devkiraa" target="_blank" aria-label="GitHub">
+                            <img src="/assets/images/github.svg" alt="GitHub"> GitHub
+                        </a>
+                        <a href="https://linkedin.com/in/kirans" target="_blank" aria-label="LinkedIn">
+                            <img src="/assets/images/linkedin.svg" alt="LinkedIn"> LinkedIn
+                        </a>
+                    </div>
+                </div>
+                <!-- Narayanan G Card -->
+                <div class="photo-card">
+                    <img src="/assets/images/nanu.jpg" alt="Narayanan G">
+                    <p>Narayanan G</p>
+                    <div class="social-buttons">
+                        <a href="https://github.com/NarayananG" target="_blank" aria-label="GitHub">
+                            <img src="/assets/images/github.svg" alt="GitHub"> GitHub
+                        </a>
+                        <a href="https://linkedin.com/in/narayanang" target="_blank" aria-label="LinkedIn">
+                            <img src="/assets/images/linkedin.svg" alt="LinkedIn"> LinkedIn
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const profileButton = document.getElementById("profileButton");
+            const profileDropdown = document.getElementById("profileDropdown");
+    
+            // Toggle dropdown on button click
+            profileButton.addEventListener("click", (event) => {
+              event.stopPropagation();
+              profileDropdown.classList.toggle("hidden");
+            });
+    
+            // Close dropdown if clicked outside
+            document.addEventListener("click", (event) => {
+              if (
+                !profileDropdown.classList.contains("hidden") &&
+                !profileDropdown.contains(event.target) &&
+                event.target !== profileButton
+              ) {
+                profileDropdown.classList.add("hidden");
+              }
+            });
+          });
+    </script>
+</body>
+</html>
