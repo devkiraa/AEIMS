@@ -64,7 +64,7 @@ router.get('/my-events', (req, res) => {
     if (req.session.user_role === 'admin' || req.session.user_role === 'em') {
         const userRole = req.session.user_role;
         const userDept = req.session.user_dept;
-        res.render('event-approval-page', {userRole, userDept});
+        res.render('myevents', {userRole, userDept});
     } else {
         res.status(403).render(403);
     }
@@ -74,20 +74,6 @@ router.get('/my-events', (req, res) => {
 router.get('/profile', (req, res) => {
     res.render('profile');
 });
-
-router.get('/eventspage', (req, res) => {
-    if (!req.session.user_id) {
-        return res.redirect('/login');
-    }
-
-    if (req.session.user_role === 'admin') {
-        const userRole = req.session.user_role;
-        res.render('myevents', {userRole});
-    } else {
-        res.status(403).render(403);
-    }
-});
-
 
 // Change Password page
 router.get('/change-password', (req, res) => {
@@ -143,12 +129,8 @@ router.get('/about-us', (req, res) => {
         return res.redirect('/login');
     }
 
-    if (req.session.user_role === 'admin'|| req.session.user_role === 'hod' || req.session.user_role === 'em') {
-        const userRole = req.session.user_role;
-        res.render('aboutUs', {userRole});
-    } else {
-        res.status(403).render(403);
-    }
+    const userRole = req.session.user_role;
+    res.render('aboutUs', {userRole});
 });
 
 // Event details page
@@ -202,15 +184,14 @@ router.get('/event-approval', async (req, res) => {
     if (!req.session.user_id) {
         return res.redirect('/login');
     }
-    
-    try {
+
+    if (req.session.user_role === 'admin' || req.session.user_role === 'hod') {
         const userRole = req.session.user_role;
         const userDept = req.session.user_dept;
         // Pass the events data to the template
         res.render('event-approval-page', {userRole, userDept});
-    } catch (error) {
-        console.error('Error fetching events:', error);
-        res.status(500).send('Internal Server Error');
+    } else {
+        res.status(403).render(403);
     }
 });
 
