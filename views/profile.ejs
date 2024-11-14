@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: white;
+            margin: 0;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Navbar -->
+    <nav class="bg-blue-600 p-4">
+        <div class="container mx-auto flex justify-between items-center">
+            <div class="flex items-center space-x-6">
+                <ul class="flex space-x-6 text-white">
+                    <li><a href="/" class="hover:text-gray-300">Home</a></li>
+                    <% if (userRole === 'admin' || userRole === 'icts') { %>
+                        <li><a href="/book-event" class="hover:text-gray-300">Book</a></li>
+                        <li><a href="/user-management" class="hover:text-gray-300">Users</a></li>
+                        <li><a href="/inventory" class="hover:text-gray-300">Inventory</a></li>
+                        <li><a href="/my-events" class="hover:text-gray-300">My Events</a></li>
+                    <% } %>
+                    <% if (userRole === 'hod') { %>
+                        <li><a href="/user-management" class="hover:text-gray-300">Users</a></li>
+                        <li><a href="/dept-events" class="hover:text-gray-300">Dept Events</a></li>
+                        <li><a href="/event-approval" class="hover:text-gray-300">Approval</a></li>
+                    <% } %>
+                    <% if (userRole === 'em') { %>
+                        <li><a href="/book-event" class="hover:text-gray-300">Book</a></li>
+                        <li><a href="/my-events" class="hover:text-gray-300">My Events</a></li>
+                    <% } %>
+                    <li><a href="/about-us" class="hover:text-gray-300">About Us</a></li>
+                </ul>
+            </div>         
+            <div class="relative dropdown">
+                <button class="bg-white rounded-full p-2" id="profileButton">
+                    <img src="/assets/icons/avatar.svg" alt="User Icon" class="w-6 h-6">
+                </button>
+                <div class="dropdown-menu absolute hidden right-0 mt-2 w-48 bg-white rounded-lg shadow-lg" id="profileDropdown">
+                    <a href="/profile" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">Profile</a>
+                    <a href="/change-password" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">Change Password</a>
+                    <a href="/logout" class="block px-4 py-2 text-gray-700 hover:bg-gray-100" onclick="sessionStorage.clear()">Logout</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="max-w-4xl mx-auto p-6 bg-white shadow-lg mt-8">
+        <h2 class="text-3xl font-semibold text-center mb-6">Profile</h2>
+
+        <% if (message) { %>
+            <div class="bg-green-100 text-green-700 p-4 rounded mb-4">
+                <p><%= message %></p>
+            </div>
+        <% } %>
+        
+        <% if (errorMessage) { %>
+            <div class="bg-red-100 text-red-700 p-4 rounded mb-4">
+                <p><%= errorMessage %></p>
+            </div>
+        <% } %>
+             
+
+        <!-- Profile Form -->
+        <form action="/profile" method="POST">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="mb-3">
+                    <label for="full_name" class="block text-gray-700">Full Name</label>
+                    <input type="text" name="full_name" id="full_name" value="<%= user.usr_aname %>" class="w-full p-2 border border-gray-300 rounded mt-1" required>
+                </div>
+                <div class="mb-3">
+                    <label for="email" class="block text-gray-700">Email</label>
+                    <input type="email" name="email" id="email" value="<%= user.usr_name %>" class="w-full p-2 border border-gray-300 rounded mt-1" required disabled>
+                </div>
+                <div class="mb-3">
+                    <label for="mobile" class="block text-gray-700">Mobile</label>
+                    <input type="text" name="mobile" id="mobile" value='<%= user.mobile %>' class="w-full p-2 border border-gray-300 rounded mt-1" required>
+                </div>
+                <div class="mb-3">
+                    <label for="dept" class="block text-gray-700">Department</label>
+                    <select name="dept" id="dept" class="w-full p-2 border border-gray-300 rounded mt-1" required>
+                        <option value="cs" <%= user.dept === 'cs' ? 'selected' : '' %>>Computer Science and IT</option>
+                        <option value="math" <%= user.dept === 'math' ? 'selected' : '' %>>Mathematics</option>
+                        <option value="com" <%= user.dept === 'com' ? 'selected' : '' %>>Commerce</option>
+                        <option value="vm" <%= user.dept === 'vm' ? 'selected' : '' %>>Visual Media</option>
+                        <option value="phs" <%= user.dept === 'phs' ? 'selected' : '' %>>Physical Sciences</option>
+                        <option value="eng" <%= user.dept === 'eng' ? 'selected' : '' %>>English</option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label for="club" class="block text-gray-700">Club Association</label>
+                    <select name="club" id="club" class="w-full p-2 border border-gray-300 rounded mt-1">
+                        <option value="none" <%= user.club === 'none' ? 'selected' : '' %>>None</option>
+                        <option value="iedc" <%= user.club === 'iedc' ? 'selected' : '' %>>IEDC</option>
+                        <option value="sic" <%= user.club === 'sic' ? 'selected' : '' %>>Software Innovator's Club</option>
+                        <option value="iic" <%= user.club === 'iic' ? 'selected' : '' %>>Institutions Innovation Council</option>
+                        <option value="csi" <%= user.club === 'csi' ? 'selected' : '' %>>Computer Society of India</option>
+                    </select>
+                </div>
+            </div>
+        
+            <button type="submit" class="bg-blue-500 text-white py-2 px-6 rounded mt-6 w-full">
+                Update Profile
+            </button>
+        </form>        
+    </div>
+
+    <script>
+        console.log("<%= user.usr_name %> hello");
+        // JavaScript for toggling profile dropdown menu
+        document.addEventListener('DOMContentLoaded', () => {
+            const profileButton = document.getElementById('profileButton');
+            const profileDropdown = document.getElementById('profileDropdown');
+        
+            profileButton.addEventListener('click', (event) => {
+                event.stopPropagation();
+                profileDropdown.classList.toggle('hidden');
+            });
+        
+            document.addEventListener('click', (event) => {
+                if (!profileDropdown.classList.contains('hidden') && !profileDropdown.contains(event.target) && event.target !== profileButton) {
+                    profileDropdown.classList.add('hidden');
+                }
+            });
+        });
+    </script>
+</body>
+</html>
