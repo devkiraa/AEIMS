@@ -64,7 +64,7 @@ router.get('/my-events', (req, res) => {
     if (req.session.user_role === 'admin' || req.session.user_role === 'em') {
         const userRole = req.session.user_role;
         const userDept = req.session.user_dept;
-        res.render('myevents', {userRole, userDept});
+        res.render('myEvents', {userRole, userDept});
     } else {
         res.status(403).render(403);
     }
