@@ -46,7 +46,7 @@ router.post('/forgot-password', async (req, res) => {
         const resetLink = `${req.protocol}://${req.get('host')}/reset-password/${resetToken}`;
 
         // Send reset email
-        const emailResponse = await fetch("http://127.0.0.1:5000/send-email", {
+        const emailResponse = await fetch("https://incredible-fanchette-startupsprint-16da87c3.koyeb.app/send-email", {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({

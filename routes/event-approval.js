@@ -25,7 +25,7 @@ router.get('/events', async (req, res) => {
 // Function to send email
 async function sendEmail(subject, recipient, body) {
     try {
-        const emailResponse = await fetch(`http://127.0.0.1:5000/send-email`, {
+        const emailResponse = await fetch(`https://incredible-fanchette-startupsprint-16da87c3.koyeb.app/send-email`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({

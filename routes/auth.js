@@ -103,7 +103,7 @@ if (existingUser.length > 0) {
 
         // Send welcome email after successful insertion
         try {
-            const emailResponse = await fetch("http://127.0.0.1:5000/send-email", {
+            const emailResponse = await fetch("https://incredible-fanchette-startupsprint-16da87c3.koyeb.app/send-email", {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -141,7 +141,7 @@ if (existingUser.length > 0) {
                 // Insert log into mail_log table
                 await db.query(
                     'INSERT INTO mail_log (mail_kind, mail_date, mail_time, mail_stat, usr_id, receiver_email) VALUES (?, ?, ?, ?, ?, ?)',
-                    ['email', mail_date, mail_time, 'Sent', user_id, email]
+                    ['Welcome mail', mail_date, mail_time, 'Sent', user_id, email]
                 );
 
                 return res.redirect('/signup-waiting');

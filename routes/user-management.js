@@ -96,7 +96,7 @@ router.put('/users/:id', async (req, res) => {
                     return res.status(404).json({ error: 'User not found' });
                 }
 
-                const emailResponse = await fetch(`http://127.0.0.1:5000/send-email`, {
+                const emailResponse = await fetch(`https://incredible-fanchette-startupsprint-16da87c3.koyeb.app/send-email`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
@@ -135,7 +135,7 @@ router.put('/users/:id', async (req, res) => {
                 await db.query(
                     `INSERT INTO mail_log (mail_kind, mail_date, mail_time, mail_stat, usr_id, receiver_email)
                      VALUES (?, ?, ?, ?, ?, ?)`,
-                    ["email", mail_date, mail_time, status, userId, email]
+                    ["user approval", mail_date, mail_time, status, userId, email]
                 );
 
                 if (!emailResponse.ok) {
