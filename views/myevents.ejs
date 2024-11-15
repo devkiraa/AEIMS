@@ -165,17 +165,20 @@
                 row.classList.add('border-t', 'border-gray-200');
 
                 row.innerHTML = `
-    <td class="p-4">${event.evn_name}</td>
-    <td class="p-4">${formatDate(event.event_sd)}</td>
-    <td class="p-4">${event.evn_st}</td>
-    <td class="p-4">${event.evn_approval === 1 ? 'Approved' : 'Not Approved'}</td> <!-- Approval Status -->
-    ${showActions ? `
-        <td class="p-4">
-            <button class="text-blue-600 hover:text-blue-800" onclick="editEvent(${event.evn_id})">Edit</button>
-            <button class="text-red-600 hover:text-red-800 ml-2" onclick="deleteEvent(${event.evn_id})">Delete</button>
-        </td>
-    ` : ''}
-`;
+                    <td class="p-4">${event.evn_name}</td>
+                    <td class="p-4">${formatDate(event.event_sd)}</td>
+                    <td class="p-4">${event.evn_st}</td>
+                    <td class="p-4">${event.evn_approval === 1 ? 'Approved' : 'Not Approved'}</td> <!-- Approval Status -->
+                     ${showActions ? `
+                    <td class="p-4">
+                        <button class="text-blue-600 hover:text-blue-800" onclick="editEvent(${event.evn_id})">
+                            <img src="/assets/icons/edit_24dp_6B7280_FILL0_wght500_GRAD0_opsz24.svg" alt="edit" class="w-6 h-6">
+                        </button>
+                        <button class="text-red-600 hover:text-red-800 ml-2" onclick="deleteEvent(${event.evn_id})">
+                            <img src="/assets/icons/delete_24dp_6B7280_FILL0_wght500_GRAD0_opsz24.svg" alt="delete" class="w-6 h-6">
+                        </button>
+                    </td>` : ''}
+                `;
 
                 tableBody.appendChild(row);
             });
@@ -211,7 +214,7 @@
         }
 
         function editEvent(eventId) {
-            window.location.href = `/edit-event/${eventId}`;
+            window.location.href = `/edit-event/details/${eventId}`;
         }
 
         // Load events on page load

@@ -4,6 +4,9 @@ const db = require('../models/db'); // Ensure the db module is correctly set up
 
 // Route to fetch user's events with associated coordinators
 router.get('/myevents', async (req, res) => {
+    if (!req.session.user_id) {
+        return res.redirect('/login');
+    }
     try {
         const userId = req.session.user_id;
         if (!userId) return res.status(401).json({ message: 'Unauthorized' });
@@ -44,6 +47,9 @@ router.get('/myevents', async (req, res) => {
 
 // Route to fetch coordinators for a specific event
 router.get('/event-coordinators', async (req, res) => {
+    if (!req.session.user_id) {
+        return res.redirect('/login');
+    }
     try {
         const { evn_id } = req.query;
         if (!evn_id) return res.status(400).json({ message: 'Event ID is required' });

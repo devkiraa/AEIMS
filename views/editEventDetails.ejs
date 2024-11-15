@@ -165,9 +165,34 @@
         let userList; // Declare userList globally
         let highlightedIndex = -1; // Track the highlighted index in the user list
 
-        const user_id = '<%=userID%>'
+        // Function to decode HTML entities
+        function decodeHtmlEntities(str) {
+            const txt = document.createElement("textarea");
+            txt.innerHTML = str;
+            return txt.value;
+        }
+
+        function formatDate(dateString) {
+            const eventStartDate = new Date(dateString);
+            eventStartDate.setTime(eventStartDate.getTime());
+            const year = eventStartDate.getFullYear();
+            const month = String(eventStartDate.getMonth() + 1).padStart(2, '0');
+            const day = String(eventStartDate.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        }
         
         document.addEventListener("DOMContentLoaded", async function() {
+            const eventDetailsEncoded = '<%= eventdetails %>'; // This is the encoded string from the backend
+            const eventDetailsDecoded = decodeHtmlEntities(eventDetailsEncoded); // Decode HTML entities
+            let eventDetails;
+
+            try {
+                eventDetails = JSON.parse(eventDetailsDecoded); // Parse the JSON string
+                // console.log(eventDetails[0]);
+            } catch (error) {
+                console.error("Error parsing JSON:", error);
+                return; // Exit if JSON parsing fails
+            }
             const coordinatorRadios = document.querySelectorAll('input[name="event_coordinators"]');
             coordinatorRadios.forEach(radio => {
                 radio.addEventListener('change', toggleCoordinatorSearch);
@@ -183,21 +208,28 @@
                 radio.addEventListener('change', toggleVolunteerCounter);
             });
 
-            // Retrieve event data from sessionStorage
-            const eventData = JSON.parse(sessionStorage.getItem('eventData'));
-            if (!eventData) {
-                // Redirect to the previous page if eventData is not found
-                window.location.href = '/book-event';
-                return;
-            }
+            // // Retrieve event data from sessionStorage
+            // const eventData = JSON.parse(sessionStorage.getItem('eventData'));
+            // if (!eventData) {
+            //     // Redirect to the previous page if eventData is not found
+            //     window.location.href = '/book-event';
+            //     return;
+            // }
 
             // Check if eventData exists
-            if (eventData) {
+            if (eventDetails) {
                 // Populate the fields with the retrieved data
-                document.getElementById('start_date').value = eventData.startDate;
-                document.getElementById('end_date').value = eventData.endDate;
-                document.getElementById('start_time').value = eventData.startTime;
-                document.getElementById('end_time').value = eventData.endTime;
+                document.getElementById('event_title').value = eventDetails[0].evn_name;
+                document.getElementById('event_description').value = eventDetails[0].evn_desc;
+                document.getElementById('event_link').value = eventDetails[0].evn_form_link;
+                document.getElementById('start_date').value = formatDate(eventDetails[0].event_sd);
+                document.getElementById('end_date').value = formatDate(eventDetails[0].evn_ed);
+                document.getElementById('start_time').value = eventDetails[0].evn_st;
+                document.getElementById('end_time').value = eventDetails[0].event_et;
+
+                if (eventDetails[0].evn_vol_cnt === 0) {
+
+                }
 
                 // Check if the venue value
                 const venueSelect = document.getElementById('venue');
@@ -282,13 +314,6 @@
                     venueSelect.appendChild(newOption);
                     venueSelect.value = newOption.value;
                 }
-
-                // Disable the fields
-                document.getElementById('start_date').disabled = true;
-                document.getElementById('end_date').disabled = true;
-                document.getElementById('start_time').disabled = true;
-                document.getElementById('end_time').disabled = true;
-                document.getElementById('venue').disabled = true;
             } else {
                 console.error('No event data found in sessionStorage.');
             }

@@ -36,7 +36,7 @@ router.get('/forgot-password', (req, res) => {
 });
 
 // Forgot-password reset using token route
-router.get('/forgot-password/:Token', (req, res) => {
+router.get('/forgot-password/:token', (req, res) => {
     res.render('forgot-password-request');
 });
 
