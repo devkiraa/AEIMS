@@ -165,6 +165,19 @@
         let userList; // Declare userList globally
         let highlightedIndex = -1; // Track the highlighted index in the user list
 
+        const venueMapping = {
+            'cslb1': "CS Lab 1", 'cslb2': "CS Lab 2",
+            'cslb3': "CS Lab 3", 'cslb4': "CS Lab 4", 'cslb5': "CS Lab 5", 'cslb6': "CS Lab 6",
+            'audt': "Auditorium", 'semh': "Seminar Hall", 'confh': "Conference Room", 'prah': "Prayer Hall",
+            'lib': "Library", 'dal': "Data Analytics Lab", 'cirsh': "CIR Seminar Hall"
+        };
+
+        const venueMappingId = {
+            1: "CS Lab 1", 2: "CS Lab 2", 3: "CS Lab 3", 4: "CS Lab 4", 5: "CS Lab 5", 6: "CS Lab 6",
+            7: "Auditorium", 8: "Seminar Hall", 9: "Conference Room", 10: "Prayer Hall", 11: "Library",
+            12: "Data Analytics Lab", 13: "CIR Seminar Hall"
+        };
+
         // Function to decode HTML entities
         function decodeHtmlEntities(str) {
             const txt = document.createElement("textarea");
@@ -180,11 +193,86 @@
             const day = String(eventStartDate.getDate()).padStart(2, '0');
             return `${year}-${month}-${day}`;
         }
+
+        async function checkAvailability(eventDetails) {
+            const startDate = document.getElementById('start_date').value;
+            const endDate = document.getElementById('end_date').value;
+            const startTime = document.getElementById('start_time').value;
+            const endTime = document.getElementById('end_time').value;
+
+            if (!(startDate && endDate && startTime && endTime)) return;
+
+            try {
+                const response = await fetch('/api/check-availability', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ startDate, endDate, startTime, endTime }),
+                });
+
+                if (!response.ok) throw new Error('Failed to fetch venue availability');
+                const venues = await response.json();
+                updateVenues(venues, eventDetails);
+            } catch (error) {
+                console.error('Error fetching availability:', error);
+            }
+        }
+
+        function handleInputChange() {
+            const allFilled = ['start_date', 'end_date', 'start_time', 'end_time']
+                .every((id) => document.getElementById(id).value);
+
+            if (allFilled) checkAvailability();
+            checkRequiredFields();
+        }
+
+        function updateVenues(venues, eventDetails) {
+            const venueSelect = document.getElementById("venue");
+            const selectedVenueName = venueMappingId[eventDetails[0].ven_id]; // Get the venue name from the ID
+            const selectedVenueKey = Object.keys(venueMapping).find(
+                key => venueMapping[key] === selectedVenueName
+            ); // Find the corresponding key in venueMapping
+            let selectedVenueFound = false;
+
+            // Clear any existing options
+            venueSelect.innerHTML = "";
+
+            // Iterate over the venues object to add available venues
+            for (const [venue, status] of Object.entries(venues)) {
+                if (status === "available") {
+                    const option = document.createElement("option");
+                    option.value = venue;
+                    option.textContent = venueMapping[venue] || venue;
+
+                    // Check if this is the selected venue and mark it as selected
+                    if (venue === selectedVenueKey) {
+                        option.selected = true;
+                        selectedVenueFound = true;
+                    }
+
+                    venueSelect.appendChild(option);
+                }
+            }
+
+            // If the selected venue is missing, add it with blue text
+            if (!selectedVenueFound && selectedVenueKey) {
+                const missingOption = document.createElement("option");
+                missingOption.value = selectedVenueKey; // Set the key as the value
+                missingOption.textContent = selectedVenueName; // Display the mapped name
+                missingOption.style.color = "blue"; // Set text color to blue
+                missingOption.selected = true;
+                venueSelect.appendChild(missingOption);
+            }
+        }
         
         document.addEventListener("DOMContentLoaded", async function() {
             const eventDetailsEncoded = '<%= eventdetails %>'; // This is the encoded string from the backend
             const eventDetailsDecoded = decodeHtmlEntities(eventDetailsEncoded); // Decode HTML entities
             let eventDetails;
+
+            // Attach event listeners for input fields to trigger availability check
+            ['start_date', 'end_date', 'start_time', 'end_time', 'event_title'].forEach((id) => {
+                document.getElementById(id).addEventListener('input', handleInputChange);
+            });
 
             try {
                 eventDetails = JSON.parse(eventDetailsDecoded); // Parse the JSON string
@@ -227,92 +315,22 @@
                 document.getElementById('start_time').value = eventDetails[0].evn_st;
                 document.getElementById('end_time').value = eventDetails[0].event_et;
 
+                checkAvailability(eventDetails);
+
+                console.log(eventDetails[0]);
+
                 if (eventDetails[0].evn_vol_cnt === 0) {
-
+                    document.querySelector('input[name="event_volunteers"][value="no"]').checked = true;
+                } else {
+                    document.querySelector('input[name="event_volunteers"][value="yes"]').checked = true;
+                    document.getElementById('volunteer-counter').value = eventDetails[0].evn_vol_cnt;
+                    toggleVolunteerCounter();
                 }
 
-                // Check if the venue value
-                const venueSelect = document.getElementById('venue');
-                let newOption;
-
-                switch (eventData.venue) {
-                    case 1:
-                        newOption = document.createElement('option');
-                        newOption.value = 'cslb1';
-                        newOption.textContent = 'CS Lab 1';
-                        break;
-                    case 2:
-                        newOption = document.createElement('option');
-                        newOption.value = 'cslb2';
-                        newOption.textContent = 'CS Lab 2';
-                        break;
-                    case 3:
-                        newOption = document.createElement('option');
-                        newOption.value = 'cslb3';
-                        newOption.textContent = 'CS Lab 3';
-                        break;
-                    case 4:
-                        newOption = document.createElement('option');
-                        newOption.value = 'cslb4';
-                        newOption.textContent = 'CS Lab 4';
-                        break;
-                    case 5:
-                        newOption = document.createElement('option');
-                        newOption.value = 'cslb5';
-                        newOption.textContent = 'CS Lab 5';
-                        break;
-                    case 6:
-                        newOption = document.createElement('option');
-                        newOption.value = 'cslb6';
-                        newOption.textContent = 'CS Lab 6';
-                        break;
-                    case 7:
-                        newOption = document.createElement('option');
-                        newOption.value = 'audt';
-                        newOption.textContent = 'Auditorium';
-                        break;
-                    case 8:
-                        newOption = document.createElement('option');
-                        newOption.value = 'semh';
-                        newOption.textContent = 'Seminar Hall';
-                        break;
-                    case 9:
-                        newOption = document.createElement('option');
-                        newOption.value = 'confh';
-                        newOption.textContent = 'Conference Room';
-                        break;
-                    case 10:
-                        newOption = document.createElement('option');
-                        newOption.value = 'prah';
-                        newOption.textContent = 'Prayer Hall';
-                        break;
-                    case 11:
-                        newOption = document.createElement('option');
-                        newOption.value = 'lib';
-                        newOption.textContent = 'Library';
-                        break;
-                    case 12:
-                        newOption = document.createElement('option');
-                        newOption.value = 'dal';
-                        newOption.textContent = 'Data Analytics Lab';
-                        break;
-                    case 13:
-                        newOption = document.createElement('option');
-                        newOption.value = 'cirsh';
-                        newOption.textContent = 'CIR Seminar Hall';
-                        break;
-                    default:
-                        // showErrorPopup('Unknown Venue selected!.');
-                        // console.error('404 Not Found: Unknown venue selected');
-                        // return;
-                        document.getElementById('venue').value = eventData.venue;
-                        console.error("Unknown");
-                }
-
-                // Append the new option to the venue dropdown and set it as selected
-                if (newOption) {
-                    venueSelect.appendChild(newOption);
-                    venueSelect.value = newOption.value;
+                if (eventDetails[0].evn_food === 0) {
+                    document.querySelector('input[name="event_food][value="no"]').checked = true;
+                } else {
+                    document.querySelector('input[name="event_food"][value="yes"]').checked = true;
                 }
             } else {
                 console.error('No event data found in sessionStorage.');
