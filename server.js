@@ -52,6 +52,7 @@ const myEventsRoutes = require('./routes/myevents');
 const createEventRoutes = require('./routes/createEvent');
 const profileRouter = require('./routes/profile');
 const editEventRouter = require('./routes/editEvent');
+const changePasswordRoutes = require('./routes/changePassword');
 
 // Use routes with prefixes to organize API routes
 app.use('/api/dashboard', dashboardRoutes);
@@ -71,6 +72,7 @@ app.use('/api', myEventsRoutes);
 app.use('/api', createEventRoutes);
 app.use('/', profileRouter);
 app.use('/', editEventRouter);
+app.use('/api', changePasswordRoutes);
 
 // Set session data globally for views
 app.use((req, res, next) => {
