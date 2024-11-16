@@ -157,48 +157,72 @@
         }
 
         // Function to approve the event
-        async function approveEvent(eventId) {
-            try {
-                const response = await fetch(`/api/events/${eventId}/approve`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    }
-                });
+async function approveEvent(eventId) {
+    const approveButton = document.getElementById('approveButton');
+    const approveLoader = document.getElementById('approveLoader');
+    const approveButtonText = document.getElementById('approveButtonText');
+    
+    try {
+        // Show loader and disable button
+        approveLoader.classList.remove('hidden');
+        approveButtonText.classList.add('hidden');
+        approveButton.disabled = true;
 
-                if (response.ok) {
-                    closePopup();
-                    fetchEvents(); // Refresh the events list to show updated status
-                } else {
-                    alert("Failed to approve event.");
-                }
-            } catch (error) {
-                console.error("Error approving event:", error);
-                alert("An error occurred while approving the event.");
-            }
+        const response = await fetch(`/api/events/${eventId}/approve`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+        });
+
+        if (response.ok) {
+            closePopup();
+            fetchEvents(); // Refresh the events list to show updated status
+        } else {
+            alert("Failed to approve event.");
         }
+    } catch (error) {
+        console.error("Error approving event:", error);
+        alert("An error occurred while approving the event.");
+    } finally {
+        // Hide loader and enable button
+        approveLoader.classList.add('hidden');
+        approveButtonText.classList.remove('hidden');
+        approveButton.disabled = false;
+    }
+}
 
-        // Function to reject the event
-        async function rejectEvent(eventId) {
-            try {
-                const response = await fetch(`/api/events/${eventId}/reject`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    }
-                });
+// Function to reject the event
+async function rejectEvent(eventId) {
+    const rejectButton = document.getElementById('rejectButton');
+    const rejectLoader = document.getElementById('rejectLoader');
+    const rejectButtonText = document.getElementById('rejectButtonText');
+    
+    try {
+        // Show loader and disable button
+        rejectLoader.classList.remove('hidden');
+        rejectButtonText.classList.add('hidden');
+        rejectButton.disabled = true;
 
-                if (response.ok) {
-                    closePopup();
-                    fetchEvents(); // Refresh the events list to show updated status
-                } else {
-                    alert("Failed to reject event.");
-                }
-            } catch (error) {
-                console.error("Error rejecting event:", error);
-                alert("An error occurred while rejecting the event.");
-            }
+        const response = await fetch(`/api/events/${eventId}/reject`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+        });
+
+        if (response.ok) {
+            closePopup();
+            fetchEvents(); // Refresh the events list to show updated status
+        } else {
+            alert("Failed to reject event.");
         }
+    } catch (error) {
+        console.error("Error rejecting event:", error);
+        alert("An error occurred while rejecting the event.");
+    } finally {
+        // Hide loader and enable button
+        rejectLoader.classList.add('hidden');
+        rejectButtonText.classList.remove('hidden');
+        rejectButton.disabled = false;
+    }
+}
         
         document.addEventListener('DOMContentLoaded', function () {
         });
@@ -359,18 +383,25 @@
             <div id="popupEventContent">
                 <!-- Event details will be populated dynamically -->
             </div>
-            <div class="mt-4 text-right">
-                <button id="approveButton" class="bg-blue-600 text-white px-4 py-2 rounded-lg">
-                    Approve
+            <div class="mt-4 flex justify-end space-x-2">
+                <button id="approveButton" class="bg-blue-600 text-white px-4 py-2 rounded-lg flex items-center">
+                    <svg id="approveLoader" class="hidden animate-spin h-5 w-5 text-white mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    <span id="approveButtonText">Approve</span>
                 </button>
-                <button id="rejectButton" class="bg-red-600 text-white px-4 py-2 rounded-lg mr-2">
-                    Reject
+                <button id="rejectButton" class="bg-red-600 text-white px-4 py-2 rounded-lg flex items-center">
+                    <svg id="rejectLoader" class="hidden animate-spin h-5 w-5 text-white mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    <span id="rejectButtonText">Reject</span>
                 </button>
                 <button onclick="closePopup()" class="bg-gray-200 text-gray-700 px-4 py-2 rounded-lg">
                     Cancel
                 </button>
-            </div>
-            
+            </div>                 
         </div>
     </div>
 </body>
