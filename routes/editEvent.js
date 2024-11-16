@@ -13,7 +13,6 @@ router.get('/edit-event/details/:eventid', async (req, res) => {
     try {
         const [eventdetails] = await db.query(eventdetailssql, [eventId]);
         if (!eventdetails) return res.status(400).json({ message: 'Event ID is required' });
-        console.log(eventdetails);
         const eventDetailsJson = JSON.stringify(eventdetails);
         res.render('editEventDetails', {eventdetails:eventDetailsJson, userRole});
     } catch (error) {
