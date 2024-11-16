@@ -224,6 +224,7 @@
     </div>
 
     <script>
+        const userID = '<%=userId%>'
         function switchTab(tabId) {
             const tabs = ['all', 'deleted'];
 
@@ -297,7 +298,7 @@
             tableBody.innerHTML = ''; // Clear existing rows
 
             users.forEach(user => {
-                const row = `
+                const row = user.usr_id != userID ? `
                     <tr>
                         <td class="p-4">
                             <div class="text-base font-semibold">${user.usr_aname}</div>
@@ -324,7 +325,7 @@
                             </td>
                         `}
                     </tr>
-                `;
+                `:'';
                 tableBody.insertAdjacentHTML('beforeend', row);
             });
         }
@@ -350,8 +351,10 @@
                 <label><strong>Role:</strong></label>
                 <select id="userRole" class="w-full p-2 border rounded-lg mb-2">
                     ${user.usr_role === 'Pending' ? '<option value="regw" selected>Pending</option>' : ''}
-                    <option value="admin" ${user.usr_role === 'Admin' ? 'selected' : ''}>Admin</option>
-                    <option value="hod" ${user.usr_role === 'HOD' ? 'selected' : ''}>HOD</option>
+                    <% if (userRole === 'admin') { %>
+                        <option value="admin" ${user.usr_role === 'Admin' ? 'selected' : '' }>Admin</option>
+                        <option value="hod" ${user.usr_role === 'HOD' ? 'selected' : '' }>HOD</option>
+                    <% } %>
                     <option value="em" ${user.usr_role === 'Manager' ? 'selected' : ''}>Manager</option>
                     <option value="ev" ${user.usr_role === 'Viewer' ? 'selected' : ''}>Viewer</option>
                 </select>

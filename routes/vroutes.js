@@ -198,7 +198,8 @@ router.get('/user-management', (req, res) => {
     if (req.session.user_role === 'admin'|| req.session.user_role === 'hod') {
         const userRole = req.session.user_role;
         const userDept = req.session.user_dept;
-        res.render('user-management', {userRole, userDept});
+        const userId = req.session.user_id;
+        res.render('user-management', {userRole, userDept, userId});
     } else {
         res.status(403).render(403);
     }
