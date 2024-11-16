@@ -21,9 +21,18 @@ router.get('/events', async (req, res) => {
             evn_food AS foodProvided,
             evn_stat AS status,
             evn_approval AS approvalStatus,
-            evn_form_link AS formLink
+            evn_form_link AS formLink,
+            CASE 
+                WHEN evn_dept = 'cs' THEN 'Department of Computer Science and IT'
+                WHEN evn_dept = 'vm' THEN 'Department of Visual Media'
+                WHEN evn_dept = 'phs' THEN 'Department of Physical Science'
+                WHEN evn_dept = 'math' THEN 'Department of Mathematics'
+                WHEN evn_dept = 'com' THEN 'Department of Commerce'
+                WHEN evn_dept = 'eng' THEN 'Department of English'
+                ELSE evn_dept
+            END AS department
         FROM event_tb
-        WHERE evn_approval = 1  -- Only approved events
+        WHERE evn_approval = 1 AND evn_stat = 1  -- Only approved events
         ORDER BY event_sd ASC;
     `;
 

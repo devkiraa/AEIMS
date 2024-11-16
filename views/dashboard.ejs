@@ -57,7 +57,8 @@
             <img id="happeningNowBanner" src="" alt="Happening Now Event Banner" class="w-full h-40 object-cover rounded-lg">
         </div>
         <div class="flex-1">
-            <h2 class="text-2xl font-bold text-gray-800 mb-2">Happening Today: <span id="happeningNowName"></span></h2>
+            <h2 class="text-2xl font-bold text-gray-800">Happening Today: <span id="happeningNowName"></span></h2>
+            <h2 class="text-lg font-bold text-gray-600 mb-2"><span id="happeningNowDepartment"></span></h2>
             <p id="happeningNowDescription" class="text-gray-700 mb-4"></p>
             <p class="text-sm text-blue-500" id="happeningNowTime"></p>
             <p class="text-sm text-gray-500" id="happeningNowLocation"></p>
@@ -85,7 +86,8 @@
         <!-- Modal Content Area -->
         <div class="flex-1 pr-6">
             <button id="closeModal" class="absolute top-2 right-2 text-gray-600">X</button>
-            <h3 id="modalEventName" class="text-2xl font-semibold mb-2"></h3>
+            <h3 id="modalEventName" class="text-2xl font-semibold"></h3>
+            <h2 id="modalEventDepartment" class="text-lg text-gray-500 mb-2"></h2>
             <p id="modalEventDescription" class="text-gray-700 mb-4"></p>
             <p id="modalEventType" class="text-sm text-gray-500 mb-2"></p>
             <p id="modalEventDate" class="text-blue-500"></p>
@@ -116,6 +118,7 @@
             const happeningNowContainer = document.getElementById('happening-now-container');
             const happeningNowBanner = document.getElementById('happeningNowBanner');
             const happeningNowName = document.getElementById('happeningNowName');
+            const happeningNowDepartment = document.getElementById('happeningNowDepartment');
             const happeningNowDescription = document.getElementById('happeningNowDescription');
             const happeningNowTime = document.getElementById('happeningNowTime');
             const happeningNowLocation = document.getElementById('happeningNowLocation');
@@ -163,8 +166,9 @@
                         happeningNowContainer.classList.remove('hidden');
                         happeningNowBanner.src = event.banner || 'https://via.placeholder.com/720x300';
                         happeningNowName.textContent = event.name;
+                        happeningNowDepartment.textContent = event.department;
                         happeningNowDescription.textContent = event.description;
-                        happeningNowTime.textContent = `Happening Today From ${event.startTime.slice(0, 5)} to ${event.endTime.slice(0, 5)}`;
+                        happeningNowTime.textContent = `Happening Today, From ${event.startTime.slice(0, 5)} to ${event.endTime.slice(0, 5)}`;
     
                         const venueMapping = {
                             1: "CS Lab1", 2: "CS Lab2", 3: "CS Lab3", 4: "CS Lab4", 5: "CS Lab5", 6: "CS Lab6",
@@ -241,6 +245,7 @@
     
                 document.getElementById('modalEventName').textContent = event.name;
                 document.getElementById('modalEventDescription').textContent = event.description;
+                document.getElementById('modalEventDepartment').textContent = event.department;
     
                 const startDate = new Date(event.startDate);
                 startDate.setTime(startDate.getTime() + 86400000);
