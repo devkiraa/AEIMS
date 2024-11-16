@@ -66,21 +66,17 @@ router.post('/login', async (req, res) => {
     }
 });
 
-// POST signup route
 router.post('/signup', async (req, res) => {
     const { full_name, mobile, email, password, club, dept } = req.body;
 
     try {
-         // Check if the user already exists
-const [existingUser] = await db.query('SELECT * FROM users WHERE usr_name = ?', [email]);
+        // Check if the user already exists
+        const [existingUser] = await db.query('SELECT * FROM users WHERE usr_name = ?', [email]);
 
-if (existingUser.length > 0) {
-    // Render the signup page with an error message if the email is already registered
-    return res.render('signup', { errorMessage: 'Email is already registered. Please use a different email.' });
-} else {
-    // Render the signup page with errorMessage set to null
-    res.render('signup', { errorMessage: null });
-}
+        if (existingUser.length > 0) {
+            // Render the signup page with an error message if the email is already registered
+            return res.render('signup', { errorMessage: 'Email is already registered. Please use a different email.' });
+        }
 
         // Hash password
         const hashedPassword = await bcrypt.hash(password, 10);
@@ -129,7 +125,7 @@ if (existingUser.length > 0) {
                         </html>
                     `,
                     "is_html": true
-                })            
+                })
             });
 
             if (emailResponse.ok) {
@@ -137,7 +133,7 @@ if (existingUser.length > 0) {
                 const now = new Date();
                 const mail_date = now.toISOString().split('T')[0]; // Format as YYYY-MM-DD
                 const mail_time = now.toTimeString().split(' ')[0]; // Format as HH:MM:SS
-                
+
                 // Insert log into mail_log table
                 await db.query(
                     'INSERT INTO mail_log (mail_kind, mail_date, mail_time, mail_stat, usr_id, receiver_email) VALUES (?, ?, ?, ?, ?, ?)',
@@ -146,15 +142,15 @@ if (existingUser.length > 0) {
 
                 return res.redirect('/signup-waiting');
             } else {
-                console.error('Error sending email');
+                console.error('Error sending email:', emailResponse.statusText);
                 return res.status(500).render('error', { status: 500, title: 'Email Error', message: 'Failed to send the welcome email. Please try again later.' });
             }
-        } catch (error) {
-            console.error("Email Sending Error:", error);
+        } catch (emailError) {
+            console.error("Email Sending Error:", emailError);
             return res.status(500).render('error', { status: 500, title: 'Email Error', message: 'There was an error while sending the welcome email. Please try again later.' });
         }
-    } catch (error) {
-        console.error("Signup Database Error:", error);
+    } catch (dbError) {
+        console.error("Signup Database Error:", dbError);
         res.status(500).render('error', { status: 500, title: 'Signup Error', message: 'There was an issue with your signup. Please try again later.' });
     }
 });
