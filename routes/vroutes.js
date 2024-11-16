@@ -103,29 +103,6 @@ router.get('/inventory', (req, res) => {
     }
 });
 
-// GET profile page
-router.get('/profile', (req, res) => {
-    if (!req.session.user_id) {
-        return res.redirect('/login');
-    }
-
-    // Check if the user is an admin
-    if (req.session.user_role === 'admin') {
-        const userRole = req.session.user_role;
-        const message = req.session.message || null; // Get the message from the session
-        const errorMessage = req.session.errorMessage || null; // Get the error message from the session
-        const user = req.session.user || {};
-        // Clear session messages after rendering
-        req.session.message = null;
-        req.session.errorMessage = null;
-
-        // Render the profile view, passing userRole, message, and errorMessage
-        res.render('profile', { userRole, message, errorMessage, user: user });
-    } else {
-        res.status(403).render('403');
-    }
-});
-
 // Booking page
 router.get('/book-event', (req, res) => {
     if (!req.session.user_id) {

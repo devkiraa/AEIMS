@@ -73,36 +73,40 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div class="mb-3">
                     <label for="full_name" class="block text-gray-700">Full Name</label>
-                    <input type="text" name="full_name" id="full_name" value="<%= user.usr_aname || '' %>" class="w-full p-2 border border-gray-300 rounded mt-1" required>
+                    <input type="text" name="full_name" id="full_name" class="w-full p-2 border border-gray-300 rounded mt-1" required>
                 </div>
                 <div class="mb-3">
                     <label for="email" class="block text-gray-700">Email</label>
-                    <input type="email" name="email" id="email" value="<%= user.usr_name || '' %>" class="w-full p-2 border border-gray-300 rounded mt-1" required disabled>
+                    <input type="email" name="email" id="email" class="w-full p-2 border border-gray-300 rounded mt-1" required disabled>
                 </div>
                 <div class="mb-3">
                     <label for="mobile" class="block text-gray-700">Mobile</label>
-                    <input type="text" name="mobile" id="mobile" value="<%= user.usr_mob || '' %>" class="w-full p-2 border border-gray-300 rounded mt-1" required>
+                    <input type="text" name="mobile" id="mobile" class="w-full p-2 border border-gray-300 rounded mt-1" required>
                 </div>
                 <div class="mb-3">
                     <label for="dept" class="block text-gray-700">Department</label>
-                    <select name="dept" id="dept" class="w-full p-2 border border-gray-300 rounded mt-1" required>
-                        <option value="cs" <%= user.usr_dept === 'cs' ? 'selected' : '' %>>Computer Science and IT</option>
-                        <option value="math" <%= user.usr_dept === 'math' ? 'selected' : '' %>>Mathematics</option>
-                        <option value="com" <%= user.usr_dept === 'com' ? 'selected' : '' %>>Commerce</option>
-                        <option value="vm" <%= user.usr_dept === 'vm' ? 'selected' : '' %>>Visual Media</option>
-                        <option value="phs" <%= user.usr_dept === 'phs' ? 'selected' : '' %>>Physical Sciences</option>
-                        <option value="eng" <%= user.usr_dept === 'eng' ? 'selected' : '' %>>English</option>
+                    <select name="dept" id="dept" class="w-full p-2 border border-gray-300 rounded mt-1" disabled>
+                        <option value="math">Mathematics</option>
+                        <option value="com">Commerce</option>
+                        <option value="vm">Visual Media</option>
+                        <option value="phs">Physical Sciences</option>
+                        <option value="eng">English</option>
+                        <option value="cs">Computer Science and IT</option>
                     </select>
                 </div>
                 <div class="mb-3">
                     <label for="club" class="block text-gray-700">Club Association</label>
-                    <select name="club" id="club" class="w-full p-2 border border-gray-300 rounded mt-1">
-                        <option value="none" <%= user.usr_club === 'none' ? 'selected' : '' %>>None</option>
-                        <option value="iedc" <%= user.usr_club === 'iedc' ? 'selected' : '' %>>IEDC</option>
-                        <option value="sic" <%= user.usr_club === 'sic' ? 'selected' : '' %>>Software Innovator's Club</option>
-                        <option value="iic" <%= user.usr_club === 'iic' ? 'selected' : '' %>>Institutions Innovation Council</option>
-                        <option value="csi" <%= user.usr_club === 'csi' ? 'selected' : '' %>>Computer Society of India</option>
+                    <select name="club" id="club" class="w-full p-2 border border-gray-300 rounded mt-1" required>
+                        <option value="none">None</option>
+                        <option value="iedc">IEDC</option>
+                        <option value="sic">Software Innovator's Club</option>
+                        <option value="iic">Institutions Innovation Council</option>
+                        <option value="csi">Computer Society of India</option>
                     </select>
+                </div>
+                <div class="mb-3 justify-self">
+                    <p>Joined on:</p>
+                    <input type="text" name="joined" id="joined" class="w-full p-2 border border-white rounded mt-1" disabled>
                 </div>
             </div>
             <button type="submit" class="bg-blue-500 text-white py-2 px-6 rounded mt-6 w-full">Update Profile</button>
@@ -111,7 +115,48 @@
 
     <script>
         // Toggle profile dropdown menu
+
+        // Function to decode HTML entities
+        function decodeHtmlEntities(str) {
+            const txt = document.createElement("textarea");
+            txt.innerHTML = str;
+            return txt.value;
+        }
+
+        function formatDate(dateString) {
+            const eventStartDate = new Date(dateString);
+            eventStartDate.setTime(eventStartDate.getTime());
+            const year = eventStartDate.getFullYear();
+            const month = String(eventStartDate.getMonth() + 1).padStart(2, '0');
+            const day = String(eventStartDate.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        }
+        
         document.addEventListener('DOMContentLoaded', () => {
+            const userProfileEncoded = '<%= user %>'; // This is the encoded string from the backend
+            const userProfileDecoded = decodeHtmlEntities(userProfileEncoded); // Decode HTML entities
+            let userProfile;
+
+            try {
+                userProfile = JSON.parse(userProfileDecoded); // Parse the JSON string
+                console.log(userProfile[0]);
+                document.getElementById('full_name').value = userProfile[0].usr_aname;
+                document.getElementById('email').value = userProfile[0].usr_name;
+                document.getElementById('mobile').value = userProfile[0].usr_mob;
+                document.getElementById('joined').value = formatDate(userProfile[0].usr_cre_date);
+
+                // Set the selected club based on userProfile[0].usr_club
+                const clubSelect = document.getElementById('club');
+                clubSelect.value = userProfile[0].usr_club; // Set the value of the select element
+
+                // Set the selected club based on userProfile[0].usr_club
+                const deptSelect = document.getElementById('dept');
+                deptSelect.value = userProfile[0].usr_dept; // Set the value of the select element
+            } catch (error) {
+                console.error("Error parsing JSON:", error);
+                return; // Exit if JSON parsing fails
+            }
+
             const profileButton = document.getElementById('profileButton');
             const profileDropdown = document.getElementById('profileDropdown');
         

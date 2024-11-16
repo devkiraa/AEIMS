@@ -69,7 +69,7 @@ app.use('/api', eventRoutes);
 app.use('/api', resourceAvailabilityRoutes);
 app.use('/api', myEventsRoutes);
 app.use('/api', createEventRoutes);
-app.use('/api', profileRouter);
+app.use('/', profileRouter);
 app.use('/', editEventRouter);
 
 // Set session data globally for views
