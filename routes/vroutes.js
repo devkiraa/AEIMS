@@ -190,6 +190,22 @@ router.get('/event-approval', async (req, res) => {
     }
 });
 
+// Approve and reject events route
+router.get('/dept-events', async (req, res) => {
+    if (!req.session.user_id) {
+        return res.redirect('/login');
+    }
+
+    if (req.session.user_role === 'admin' || req.session.user_role === 'hod') {
+        const userRole = req.session.user_role;
+        const userDept = req.session.user_dept;
+        // Pass the events data to the template
+        res.render('departmentEvents', {userRole, userDept});
+    } else {
+        res.status(403).render(403);
+    }
+});
+
 router.get('/user-management', (req, res) => {
     if (!req.session.user_id) {
         return res.redirect('/login');

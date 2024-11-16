@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Event Approval</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+        }
+        /* Popup Styles */
+        .popup-overlay {
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+        .popup-content {
+            position: relative;
+        }
+        .popup-close {
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
+            cursor: pointer;
+            font-size: 1.5rem;
+            color: #4B5563;
+            transition: color 0.3s;
+        }
+        .popup-close:hover {
+            color: #EF4444;
+        }
+    </style>
+    <script>
+        const userDept = "<%= userDept %>"; // Embed the userDept variable
+        function switchTab(tabId) {
+    const tabs = ['past', 'ongoing', 'upcoming'];
+
+    // Hide all tab content and reset tab styles
+    tabs.forEach(tab => {
+        const tabContent = document.getElementById(tab);
+        const tabButton = document.getElementById(`${tab}-tab`);
+
+        if (tabContent) {
+            tabContent.classList.add('hidden');
+        }
+        if (tabButton) {
+            tabButton.classList.remove('text-blue-600');
+            tabButton.classList.add('text-gray-500');
+        }
+    });
+
+    // Show the selected tab's content and update tab style
+    const selectedTabContent = document.getElementById(tabId);
+    const selectedTabButton = document.getElementById(`${tabId}-tab`);
+    
+    if (selectedTabContent) {
+        selectedTabContent.classList.remove('hidden');
+    }
+    if (selectedTabButton) {
+        selectedTabButton.classList.add('text-blue-600');
+        selectedTabButton.classList.remove('text-gray-500');
+    }
+}      
+
+        document.addEventListener('DOMContentLoaded', function () {
+            switchTab('ongoing');
+
+            // Fetch events when the page loads
+            fetchEvents();
+        
+            // Toggle dropdown functionality for profile menu
+            const profileButton = document.getElementById('profileButton');
+            const profileDropdown = document.getElementById('profileDropdown');
+            
+            profileButton.addEventListener('click', (event) => {
+                event.stopPropagation();
+                profileDropdown.classList.toggle('hidden');
+            });
+        
+            document.addEventListener('click', (event) => {
+                if (!profileDropdown.classList.contains('hidden') && !profileDropdown.contains(event.target) && event.target !== profileButton) {
+                    profileDropdown.classList.add('hidden');
+                }
+            });
+        });
+
+        // Fetch event data from the backend
+
+        async function fetchEvents() {
+            try {
+                const response = await fetch('/api/events');
+                const events = await response.json();
+
+                // Get current date for comparisons
+                const currentDate = new Date();
+                currentDate.setHours(0, 0, 0, 0); // Set time to midnight for precise date comparison
+
+                console.log(events); // For debugging
+                console.log(currentDate); // Check the current date format in console
+
+                // Filter events by date for past, ongoing, and upcoming events
+                const pastEvents = events.filter(event =>
+                    event.evn_approval === 1 &&
+                    event.evn_dept === userDept &&
+                    new Date(event.evn_ed).setHours(0, 0, 0, 0) < currentDate.getTime()
+                );
+
+                const ongoingEvents = events.filter(event =>
+                    event.evn_approval === 1 &&
+                    event.evn_dept === userDept &&
+                    new Date(event.event_sd).setHours(0, 0, 0, 0) <= currentDate.getTime() &&
+                    new Date(event.evn_ed).setHours(0, 0, 0, 0) >= currentDate.getTime()
+                );
+
+                const upcomingEvents = events.filter(event =>
+                    event.evn_approval === 1 &&
+                    event.evn_dept === userDept &&
+                    new Date(event.event_sd).setHours(0, 0, 0, 0) > currentDate.getTime()
+                );
+
+                // Populate the tables
+                populateTable('pastEventTable', pastEvents, 'Past');
+                populateTable('ongoingEventTable', ongoingEvents, 'Ongoing');
+                populateTable('upcomingEventTable', upcomingEvents, 'Upcoming');
+
+            } catch (error) {
+                console.error("Error fetching events: ", error);
+            }
+        }
+
+        // Function to populate each table based on status
+        function populateTable(tableId, events, status) {
+            const table = document.getElementById(tableId);
+            table.innerHTML = ''; // Clear any existing data
+
+            events.forEach(event => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td class="p-4">${event.evn_name}</td>
+                    <td class="p-4">${event.organizer}</td>
+                    <td class="p-4 ${tableId === 'pastEventTable' ? 'text-red-500' : tableId === 'ongoingEventTable' ? 'text-green-500' : 'text-yellow-500'}">${status}</td>
+                    <td class="p-4">-</td>
+                `;
+                table.appendChild(row);
+            });
+        }
+
+        // Function to open popup and show event details
+        function openPopup(evn_id, evn_name, evn_desc, evn_dept, event_sd, evn_ed, evn_st, event_et, organizer) {
+            const formattedStartDate = new Date(event_sd).toISOString().split('T')[0];
+            const formattedEndDate = new Date(evn_ed).toISOString().split('T')[0];
+
+            const popupContent = document.getElementById('popupEventContent');
+            popupContent.innerHTML = `
+                <p><strong>Event Name:</strong> ${evn_name}</p>
+                <p><strong>Description:</strong> ${evn_desc}</p>
+                <p><strong>Department:</strong> ${evn_dept}</p>
+                <p><strong>Start Date:</strong> ${formattedStartDate}</p>
+                <p><strong>End Date:</strong> ${formattedEndDate}</p>
+                <p><strong>Start Time:</strong> ${evn_st}</p>
+                <p><strong>End Time:</strong> ${event_et}</p>
+                <p><strong>Organizer:</strong> ${organizer}</p>
+            `;
+            document.getElementById('eventPopup').classList.remove('hidden');
+
+            // Set the approve/reject buttons with event ID
+            document.getElementById('approveButton').onclick = () => approveEvent(evn_id);
+            document.getElementById('rejectButton').onclick = () => rejectEvent(evn_id);
+        }
+
+        // Function to close the popup
+        function closePopup() {
+            document.getElementById('eventPopup').classList.add('hidden');
+        }
+    </script>
+</head>
+<body class="bg-gray-50">
+    <div class="min-h-screen flex flex-col">
+        <!-- Navbar -->
+    <nav class="bg-blue-600 p-4">
+        <div class="container mx-auto flex justify-between items-center">
+            <!-- Navbar Links -->
+            <div class="flex items-center space-x-6">
+                <ul class="flex space-x-6 text-white">
+                    <!-- Home Link - Always First -->
+                    <li><a href="/" class="hover:text-gray-300">Home</a></li>
+            
+                    <!-- Conditional Links for 'admin' or 'icts' -->
+                    <% if (userRole === 'admin' || userRole === 'icts') { %>
+                        <li><a href="/book-event" class="hover:text-gray-300">Book</a></li>
+                        <li><a href="/user-management" class="hover:text-gray-300">Users</a></li>
+                        <li><a href="/inventory" class="hover:text-gray-300">Inventory</a></li>
+                        <li><a href="/my-events" class="hover:text-gray-300">My Events</a></li>
+                    <% } %>
+            
+                    <!-- Conditional Links for 'hod' -->
+                    <% if (userRole === 'hod') { %>
+                        <li><a href="/user-management" class="hover:text-gray-300">Users</a></li>
+                        <li><a href="/dept-events" class="hover:text-gray-300">Dept Events</a></li>
+                        <li><a href="/event-approval" class="hover:text-gray-300">Approval</a></li>
+                    <% } %>
+            
+                    <!-- Conditional Links for 'em' -->
+                    <% if (userRole === 'em') { %>
+                        <li><a href="/book-event" class="hover:text-gray-300">Book</a></li>
+                        <li><a href="/my-events" class="hover:text-gray-300">My Events</a></li>
+                    <% } %>
+            
+                    <!-- About Us Link - Always Last -->
+                    <li><a href="/about-us" class="hover:text-gray-300">About Us</a></li>
+                </ul>
+            </div>         
+
+            <!-- Profile Dropdown (Visible on Click) -->
+            <div class="relative dropdown">
+                <button class="bg-white rounded-full p-2" id="profileButton">
+                    <img src="/assets/icons/avatar.svg" alt="User Icon" class="w-6 h-6">
+                </button>
+                <div class="dropdown-menu absolute hidden right-0 mt-2 w-48 bg-white rounded-lg shadow-lg" id="profileDropdown">
+                    <a href="/profile" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">Profile</a>
+                    <a href="/change-password" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">Change Password</a>
+                    <a href="/logout" class="block px-4 py-2 text-gray-700 hover:bg-gray-100" onclick="sessionStorage.clear()">Logout</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+        <!-- Main Content -->
+        <main class="flex-grow container mx-auto p-6 max-w-5xl">
+            <h1 class="text-3xl font-bold mb-8">Event Approval</h1>
+        
+            <!-- Flex container to align tabs and search bar -->
+            <div class="mb-6 flex justify-between items-center">
+                <!-- Tab navigation -->
+                <ul class="flex divide-x divide-gray-300">
+                    <li id="past-tab" class="px-4 text-gray-500 hover:text-gray-700 cursor-pointer" onclick="switchTab('past')">
+                        Past Events
+                    </li>
+                    <li id="ongoing-tab" class="px-4 text-gray-500 hover:text-gray-700 cursor-pointer" onclick="switchTab('ongoing')">
+                        Ongoing Events
+                    </li>
+                    <li id="upcoming-tab" class="px-4 text-gray-500 hover:text-gray-700 cursor-pointer" onclick="switchTab('upcoming')">
+                        Upcoming Events
+                    </li>
+                </ul>
+                
+        
+                <!-- Search bar -->
+                <div class="w-full md:w-1/2">
+                    <input 
+                        type="text" 
+                        placeholder="Search Event..." 
+                        class="w-full p-2 border rounded-lg" 
+                        id="searchEvent">
+                </div>
+            </div>
+        
+            <div id="past" class="tab-content hidden">
+                <h2 class="text-xl font-semibold mb-4">Past Events</h2>
+                <div class="overflow-x-auto">
+                    <table class="min-w-full bg-white border border-gray-300 rounded-lg">
+                        <thead>
+                            <tr class="bg-gray-100 text-gray-600 text-left">
+                                <th class="p-4">Event Name</th>
+                                <th class="p-4">Organizer</th>
+                                <th class="p-4">Status</th>
+                                <th class="p-4">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="pastEventTable">
+                            <!-- past event rows will be populated dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Add another tab for ongoing Events -->
+            <div id="ongoing" class="tab-content hidden">
+                <h2 class="text-xl font-semibold mb-4">Ongoing Events</h2>
+                <div class="overflow-x-auto">
+                    <table class="min-w-full bg-white border border-gray-300 rounded-lg">
+                        <thead>
+                            <tr class="bg-gray-100 text-gray-600 text-left">
+                                <th class="p-4">Event Name</th>
+                                <th class="p-4">Organizer</th>
+                                <th class="p-4">Status</th>
+                                <th class="p-4">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="ongoingEventTable">
+                            <!-- Ongoing event rows will be populated dynamically -->
+                            </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Event Tables for Tabs -->
+            <div id="upcoming" class="tab-content hidden">
+                <h2 class="text-xl font-semibold mb-4">Upcoming Events</h2>
+                <div class="overflow-x-auto">
+                    <table class="min-w-full bg-white border border-gray-300 rounded-lg">
+                        <thead>
+                            <tr class="bg-gray-100 text-gray-600 text-left">
+                                <th class="p-4">Event Name</th>
+                                <th class="p-4">Organizer</th>
+                                <th class="p-4">Status</th>
+                                <th class="p-4">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="upcomingEventTable">
+                            <!-- Event rows will be populated dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Popup Modal for Approving or Rejecting Event -->
+    <div id="eventPopup" class="fixed inset-0 hidden flex items-center justify-center popup-overlay">
+        <div class="bg-white p-6 rounded-lg shadow-lg max-w-lg w-full popup-content">
+            <!-- Close Icon -->
+            <span class="popup-close" onclick="closePopup(0)">&times;</span>
+
+            <h2 class="text-xl font-semibold mb-4">Event Details</h2>
+            <div id="popupEventContent">
+                <!-- Event details will be populated dynamically -->
+            </div>                
+        </div>
+    </div>
+</body>
+</html>
