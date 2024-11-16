@@ -106,7 +106,7 @@ router.post('/events/:id/reject', async (req, res) => {
 
     try {
         // Reject the event in the database
-        const rejectQuery = `UPDATE event_tb SET evn_approval = 0 WHERE evn_id = ?`;
+        const rejectQuery = `UPDATE event_tb SET evn_approval = -1 WHERE evn_id = ?`;
         await db.query(rejectQuery, [eventId]);
 
         // Fetch the event and organizer details, including email from 'users'

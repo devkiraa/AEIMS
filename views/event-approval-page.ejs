@@ -78,7 +78,7 @@
               // Separate events by approval status
               const pendingEvents = events.filter(event => (event.evn_approval === 0 && event.evn_dept === userDept));
               const approvedEvents = events.filter(event => (event.evn_approval === 1 && event.evn_dept === userDept));
-              const rejectedEvents = events.filter(event => (event.evn_approval === 2 && event.evn_dept === userDept));
+              const rejectedEvents = events.filter(event => (event.evn_approval === -1 && event.evn_dept === userDept));
           
               // Populate pending events table
               const pendingTable = document.getElementById('pendingEventTable');
