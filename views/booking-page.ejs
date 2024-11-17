@@ -479,14 +479,12 @@
                     });
 
                     if (response.ok) {
-                        alert('Event created successfully!');
-                        window.location.href = '/book-event/confirmation'; // Redirect on success
+                        window.location.href = '/myevents'; // Redirect on success
                     } else {
-                        alert('Failed to create event. Please try again.');
+                        console.error(response.message);
                     }
                 } catch (error) {
                     console.error('Error:', error);
-                    alert('An error occurred. Please try again later.');
                 }
             }
         }

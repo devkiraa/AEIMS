@@ -22,8 +22,8 @@ router.post('/quick-event', async (req, res) => {
 
         // Prepare and execute the insert query
         const query = `
-            INSERT INTO event_quick (evn_qk_id, evn_qk_name, ven_id, evn_qk_sd, evn_qk_ed, evn_qk_st, evn_qk_et, usr_id)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+            INSERT INTO event_quick (evn_qk_id, evn_qk_name, ven_id, evn_qk_sd, evn_qk_ed, evn_qk_st, evn_qk_et, usr_id, qck_stat)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, 0)
         `;
         await db.query(query, [nextId, eventTitle, venue, startDate, endDate, startTime, endTime, usr_id]);
 
