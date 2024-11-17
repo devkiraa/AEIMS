@@ -374,7 +374,7 @@
             const serviceItem = {
                 inv_id: currentInventoryId,
                 inv_serv_count: currentServiceCount + parseInt(document.getElementById('service_item_count').value),
-                inv_serv_date: currentServiceDate === null ? new Date().toISOString().split('T')[0] : currentServiceDate,
+                inv_serv_date: currentServiceDate === null ? new Date().toISOString().split('T')[0] : new Date(new Date(currentServiceDate).setDate(new Date(currentServiceDate).getDate() + 1)).toISOString().split('T')[0],
                 inv_stat: (currentItemCount - currentRemoveCount) === (currentServiceCount + parseInt(document.getElementById('service_item_count').value)) ? 0 : 1,
             };
 
@@ -424,7 +424,7 @@
             const removeItem = {
                 inv_id: currentInventoryId,
                 inv_rmv_count: currentRemoveCount + parseInt(document.getElementById('delete_item_count').value),
-                inv_rmv_date: currentRemoveDate === null ? new Date().toISOString().split('T')[0] : currentRemoveDate,
+                inv_rmv_date: currentRemoveDate === null ? new Date().toISOString().split('T')[0] : new Date(new Date(currentRemoveDate).setDate(new Date(currentRemoveDate).getDate() + 1)).toISOString().split('T')[0],
                 inv_stat: (currentItemCount - currentServiceCount) === (currentRemoveCount + parseInt(document.getElementById('delete_item_count').value)) ? -1 : 1,
             };
 
@@ -529,7 +529,7 @@
             const restoreItem = {
                 inv_id: currentInventoryId,
                 inv_serv_count: currentServiceCount - parseInt(document.getElementById('restore_item_count').value),
-                inv_serv_date: currentServiceCount === 0 ? null : new Date(date).toISOString().split('T')[0],
+                inv_serv_date: currentServiceCount - parseInt(document.getElementById('restore_item_count').value) === 0 ? null : new Date(date).toISOString().split('T')[0],
                 inv_stat: (currentItemCount - currentRemoveCount) === (currentServiceCount + parseInt(document.getElementById('restore_item_count').value)) ? 0 : 1,
             };
 
