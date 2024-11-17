@@ -144,6 +144,30 @@
                 table.appendChild(row);
             });
         }
+        // Function to filter events based on search input
+    function filterEvents() {
+        const searchInput = document.getElementById('searchEvent').value.toLowerCase();
+        
+        // Get all table rows in all event tables
+        const tables = ['pastEventTable', 'ongoingEventTable', 'upcomingEventTable'];
+        tables.forEach(tableId => {
+            const table = document.getElementById(tableId);
+            const rows = table.getElementsByTagName('tr');
+
+            // Iterate through each row and show/hide based on search input
+            Array.from(rows).forEach(row => {
+                const eventNameCell = row.cells[0]; // Assuming the event name is in the first column
+                if (eventNameCell) {
+                    const eventName = eventNameCell.textContent.toLowerCase();
+                    if (eventName.includes(searchInput)) {
+                        row.style.display = ''; // Show the row
+                    } else {
+                        row.style.display = 'none'; // Hide the row
+                    }
+                }
+            });
+        });
+    }
 
         // Function to open popup and show event details
         function openPopup(evn_id, evn_name, evn_desc, evn_dept, event_sd, evn_ed, evn_st, event_et, organizer) {
@@ -227,7 +251,7 @@
 
         <!-- Main Content -->
         <main class="flex-grow container mx-auto p-6 max-w-5xl">
-            <h1 class="text-3xl font-bold mb-8">Event Approval</h1>
+            <h1 class="text-3xl font-bold mb-8">Department Events</h1>
         
             <!-- Flex container to align tabs and search bar -->
             <div class="mb-6 flex justify-between items-center">
@@ -246,13 +270,14 @@
                 
         
                 <!-- Search bar -->
-                <div class="w-full md:w-1/2">
-                    <input 
-                        type="text" 
-                        placeholder="Search Event..." 
-                        class="w-full p-2 border rounded-lg" 
-                        id="searchEvent">
-                </div>
+<div class="w-full md:w-1/2">
+    <input 
+        type="text" 
+        placeholder="Search Event..." 
+        class="w-full p-2 border rounded-lg" 
+        id="searchEvent"
+        oninput="filterEvents()">
+</div>
             </div>
         
             <div id="past" class="tab-content hidden">

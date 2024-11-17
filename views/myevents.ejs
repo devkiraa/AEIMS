@@ -57,8 +57,9 @@
         <main class="flex-grow container mx-auto p-6 max-w-5xl">
             <h1 class="text-3xl font-bold mb-8">My Events</h1>
 
-            <!-- Tabs for Upcoming and Completed Events -->
-            <div class="mb-6">
+            <!-- Tabs and Search Bar -->
+            <div class="flex justify-between items-center mb-6">
+                <!-- Tabs -->
                 <ul class="flex divide-x divide-gray-300">
                     <li id="upcoming-tab" class="px-4 text-blue-600 hover:text-gray-700 cursor-pointer" onclick="switchTab('upcoming')">
                         Upcoming Events
@@ -67,6 +68,16 @@
                         Completed Events
                     </li>
                 </ul>
+
+                <!-- Search Bar -->
+                <div class="w-full md:w-1/3">
+                    <input 
+                        type="text" 
+                        placeholder="Search Event..." 
+                        class="w-full p-2 border rounded-lg" 
+                        id="searchEvent"
+                        oninput="filterEvents()">
+                </div>
             </div>
 
             <!-- Upcoming Events Table -->
@@ -132,16 +143,20 @@
             try {
                 document.getElementById('upcomingEventTable').innerHTML = "<tr><td colspan='4'>Loading...</td></tr>";
                 document.getElementById('completedEventTable').innerHTML = "<tr><td colspan='3'>Loading...</td></tr>";
-
+                
                 const response = await fetch('/api/myevents');
                 if (!response.ok) throw new Error("Failed to fetch events");
-
+                
                 const events = await response.json();
-
+                
                 const currentDate = new Date().toISOString().split('T')[0];
-                const upcomingEvents = events.filter(event => event.event_sd >= currentDate);
-                const completedEvents = events.filter(event => event.event_sd < currentDate);
-
+                const filteredEvents = events.filter(event => event.evn_stat !== 0); // Exclude inactive events
+                
+                const upcomingEvents = filteredEvents.filter(event => event.event_sd >= currentDate);
+                const completedEvents = filteredEvents.filter(event => 
+                    event.event_sd < currentDate && event.evn_approval === 1 // Only show approved events in Completed
+                );
+                
                 populateEventTable(upcomingEvents, 'upcomingEventTable', true);
                 populateEventTable(completedEvents, 'completedEventTable', false);
             } catch (error) {
@@ -150,6 +165,19 @@
                 document.getElementById('completedEventTable').innerHTML = "<tr><td colspan='3'>Error loading events.</td></tr>";
             }
         }
+        async function deleteEvent(eventId) {
+            if (!confirm("Are you sure you want to mark this event as inactive?")) return;
+            try {
+                const response = await fetch(`/api/delete-event/${eventId}`, { method: 'DELETE' });
+                if (!response.ok) throw new Error("Failed to mark event as inactive");
+                alert("Event marked as inactive successfully");
+                fetchUserEvents(); // Refresh the events list
+            } catch (error) {
+                console.error("Error marking event as inactive:", error);
+                alert("Failed to mark event as inactive.");
+            }
+        }
+                
 
         function populateEventTable(events, tableId, showActions) {
             const tableBody = document.getElementById(tableId);
@@ -163,13 +191,19 @@
             events.forEach(event => {
                 const row = document.createElement('tr');
                 row.classList.add('border-t', 'border-gray-200');
-
+            
                 row.innerHTML = `
                     <td class="p-4">${event.evn_name}</td>
                     <td class="p-4">${formatDate(event.event_sd)}</td>
                     <td class="p-4">${event.evn_st}</td>
-                    <td class="p-4">${event.evn_approval === 1 ? 'Approved' : 'Not Approved'}</td> <!-- Approval Status -->
-                     ${showActions ? `
+                    <td class="p-4">
+                        ${event.evn_approval === 1 
+                            ? 'Approved' 
+                            : event.evn_approval === 0 
+                            ? 'Pending' 
+                            : ' Rejected'}
+                    </td>
+                    ${showActions ? `
                     <td class="p-4">
                         <button class="text-blue-600 hover:text-blue-800" onclick="editEvent(${event.evn_id})">
                             <img src="/assets/icons/edit_24dp_6B7280_FILL0_wght500_GRAD0_opsz24.svg" alt="edit" class="w-6 h-6">
@@ -179,9 +213,9 @@
                         </button>
                     </td>` : ''}
                 `;
-
+            
                 tableBody.appendChild(row);
-            });
+            });            
         }
 
         function formatDate(dateString) {
@@ -212,7 +246,17 @@
                 alert("Failed to delete event.");
             }
         }
-
+        // Event Search Functionality
+        function filterEvents() {
+            const query = document.getElementById('searchEvent').value.toLowerCase();
+            ['upcomingEventTable', 'completedEventTable'].forEach(tableId => {
+                const rows = document.getElementById(tableId).rows;
+                Array.from(rows).forEach(row => {
+                    const eventName = row.cells[0]?.innerText.toLowerCase();
+                    row.style.display = eventName && eventName.includes(query) ? '' : 'none';
+                });
+            });
+        }
         function editEvent(eventId) {
             window.location.href = `/edit-event/details/${eventId}`;
         }

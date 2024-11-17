@@ -11,28 +11,28 @@ router.get('/myevents', async (req, res) => {
         const userId = req.session.user_id;
         if (!userId) return res.status(401).json({ message: 'Unauthorized' });
 
-        // SQL to fetch events with coordinators included
+        // SQL to fetch events with coordinators included, excluding evn_stat = 0
         const sqlEvents = `
-    SELECT 
-        e.evn_id, 
-        e.evn_name, 
-        e.event_sd, 
-        e.evn_ed,
-        e.evn_st,
-        e.event_et,
-        e.evn_approval, -- Fetch approval status
-        GROUP_CONCAT(ec.usr_id) AS coordinators
-    FROM 
-        event_tb AS e
-    INNER JOIN 
-        event_coordinator AS ec 
-    ON 
-        e.evn_id = ec.evn_id
-    WHERE 
-        ec.usr_id = ?
-    GROUP BY e.evn_id
-    ORDER BY e.event_sd ASC;
-`;
+            SELECT 
+                e.evn_id, 
+                e.evn_name, 
+                e.event_sd, 
+                e.evn_ed,
+                e.evn_st,
+                e.event_et,
+                e.evn_approval, -- Fetch approval status
+                GROUP_CONCAT(ec.usr_id) AS coordinators
+            FROM 
+                event_tb AS e
+            INNER JOIN 
+                event_coordinator AS ec 
+            ON 
+                e.evn_id = ec.evn_id
+            WHERE 
+                ec.usr_id = ? AND e.evn_stat != 0
+            GROUP BY e.evn_id
+            ORDER BY e.event_sd ASC;
+        `;
         const [events] = await db.query(sqlEvents, [userId]);
 
         res.json(events.map(event => ({
@@ -42,6 +42,27 @@ router.get('/myevents', async (req, res) => {
     } catch (error) {
         console.error("Error fetching events:", error);
         res.status(500).json({ message: 'Server Error' });
+    }
+});
+
+// Route to mark an event as inactive
+router.delete('/delete-event/:id', async (req, res) => {
+    const eventId = req.params.id;
+    try {
+        // Ensure the event exists before updating
+        const checkQuery = 'SELECT evn_stat FROM event_tb WHERE evn_id = ?';
+        const [event] = await db.query(checkQuery, [eventId]);
+        if (event.length === 0 || event[0].evn_stat === 0) {
+            return res.status(404).send({ message: 'Event not found or already inactive.' });
+        }
+
+        // Update the event's status to inactive
+        const query = 'UPDATE event_tb SET evn_stat = 0 WHERE evn_id = ?';
+        await db.query(query, [eventId]);
+        res.status(200).send({ message: 'Event status updated to inactive.' });
+    } catch (error) {
+        console.error('Error updating event status:', error);
+        res.status(500).send({ message: 'Failed to update event status.' });
     }
 });
 
