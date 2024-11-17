@@ -84,5 +84,92 @@ router.get('/event-coordinators', async (req, res) => {
         res.status(500).json({ message: 'Server Error' });
     }
 });
+// Route to fetch quick events
+router.get('/quick-events', async (req, res) => {
+    try {
+        const userId = req.session.user_id;
+        if (!userId) return res.status(401).json({ message: 'Unauthorized' });
+
+        const sqlQuickEvents = `
+            SELECT 
+                q.evn_qk_id,
+                q.evn_qk_name,
+                q.ven_id,
+                q.evn_qk_sd,
+                q.evn_qk_ed,
+                q.evn_qk_st,
+                q.evn_qk_et,
+                q.qck_stat
+            FROM 
+                event_quick AS q
+            WHERE 
+                q.qck_stat = 0
+            ORDER BY 
+                q.evn_qk_sd ASC;
+        `;
+        const [quickEvents] = await db.query(sqlQuickEvents);
+
+        res.json(quickEvents);
+    } catch (error) {
+        console.error('Error fetching quick events:', error);
+        res.status(500).json({ message: 'Server Error' });
+    }
+});
+
+// Route to upgrade a quick event to a full event
+router.put('/quick-events/:id/upgrade', async (req, res) => {
+    const quickEventId = req.params.id;
+    const { evn_id } = req.body; // Expect the full event ID for the upgrade
+    try {
+        const checkQuery = `
+            SELECT qck_stat 
+            FROM event_quick 
+            WHERE evn_qk_id = ? AND qck_stat = 0;
+        `;
+        const [checkResult] = await db.query(checkQuery, [quickEventId]);
+
+        if (checkResult.length === 0) {
+            return res.status(404).json({ message: 'Quick event not found or already upgraded.' });
+        }
+
+        const upgradeQuery = `
+            UPDATE event_quick 
+            SET qck_stat = 1, evn_id = ? 
+            WHERE evn_qk_id = ? AND qck_stat = 0;
+        `;
+        const [result] = await db.query(upgradeQuery, [evn_id, quickEventId]);
+
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ message: 'Failed to upgrade quick event.' });
+        }
+
+        res.status(200).json({ message: 'Quick event upgraded successfully.' });
+    } catch (error) {
+        console.error('Error upgrading quick event:', error);
+        res.status(500).json({ message: 'Failed to upgrade quick event.' });
+    }
+});
+
+// Route to delete a quick event
+router.delete('/quick-events/:id/delete', async (req, res) => {
+    const quickEventId = req.params.id;
+    try {
+        const deleteQuery = `
+            UPDATE event_quick 
+            SET qck_stat = -1 
+            WHERE evn_qk_id = ?;
+        `;
+        const [result] = await db.query(deleteQuery, [quickEventId]);
+
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ message: 'Quick event not found or already deleted.' });
+        }
+
+        res.status(200).json({ message: 'Quick event deleted successfully.' });
+    } catch (error) {
+        console.error('Error deleting quick event:', error);
+        res.status(500).json({ message: 'Failed to delete quick event.' });
+    }
+});
 
 module.exports = router;
