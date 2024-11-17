@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Add Guest Details</title>
+    <title>Edit Guest Details</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <style>
@@ -34,6 +34,16 @@
     <script>
         let currentGuestIndex = 0; // Track the current guest index
         let totalGuests = 0; // Total number of guests
+        const guestDetailsEncoded = '<%= guestdetails %>'; // This is the encoded string from the backend
+        const guestDetailsDecoded = decodeHtmlEntities(guestDetailsEncoded); // Decode HTML entities
+        let guestDetails;
+
+        // Function to decode HTML entities
+        function decodeHtmlEntities(str) {
+            const txt = document.createElement("textarea");
+            txt.innerHTML = str;
+            return txt.value;
+        }
 
         // Function to show/hide external guest options
         function toggleGuestOptions() {
@@ -48,13 +58,14 @@
             checkFormValidity(); // Check form validity when guest type changes
         }
 
-        window.onload = function() {
+        window.addEventListener("DOMContentLoaded", function() {
+            guestDetails = JSON.parse(guestDetailsDecoded);
 
             // Retrieve event data from sessionStorage
-            const eventDetails = JSON.parse(sessionStorage.getItem('eventDetails'));
+            const eventDetails = JSON.parse(sessionStorage.getItem('editedEventDetails'));
             if (!eventDetails) {
                 // Redirect to the previous page if eventData is not found
-                window.location.href = '/book-event/event-details';
+                window.location.href = '/my-events';
                 return;
             }
 
@@ -88,20 +99,21 @@
                 input.addEventListener('change', checkFormValidity);
             });
             checkFormValidity(); // Initial check on page load
-        };
+        });
 
         function loadGuestDetails() {
-            const guestDetails = JSON.parse(sessionStorage.getItem('guestDetails')) || [];
-            if (guestDetails[currentGuestIndex]) {
+            const guestdetails = guestDetails;
+            if (guestdetails[currentGuestIndex]) {
                 const guest = guestDetails[currentGuestIndex];
-                document.getElementById('guestName').value = guest.guestName || '';
-                document.getElementById('aboutGuest').value = guest.aboutGuest || '';
-                document.querySelector(`input[name="guestType"][value="${guest.guestType}"]`).checked = true;
-                document.querySelector(`input[name="guestFood"][value="${guest.guestFood}"]`).checked = true;
-                document.querySelector(`input[name="guestAccommodation"][value="${guest.guestAccommodation}"]`).checked = true;
-                document.querySelector(`input[name="guestConveyance"][value="${guest.guestConveyance}"]`).checked = true;
-                document.querySelector(`input[name="guestFees"][value="${guest.guestFees}"]`).checked = true;
+                document.getElementById('guestName').value = guest.gst_name;
+                document.getElementById('aboutGuest').value = guest.gst_details || '';
+                document.querySelector(`input[name="guestType"][value="${guest.gst_type === 0 ? 'internal' : 'external'}"]`).checked = true;
+                document.querySelector(`input[name="guestFood"][value="${guest.gst_food === 0 ? 'no' : 'yes'}"]`).checked = true;
+                document.querySelector(`input[name="guestAccommodation"][value="${guest.gst_acc === 0 ? 'no' : 'yes'}"]`).checked = true;
+                document.querySelector(`input[name="guestConveyance"][value="${guest.gst_cnv === 0 ? 'no' : 'yes'}"]`).checked = true;
+                document.querySelector(`input[name="guestFees"][value="${guest.gst_fees === 0 ? 'no' : 'yes'}"]`).checked = true;
 
+                console.log("Hello");
                 // Call toggleGuestOptions to show/hide external options based on the selected guest type
                 toggleGuestOptions();
             } else {
@@ -122,7 +134,7 @@
         }
 
         function saveToSessionStorage() {
-            const guestDetails = JSON.parse(sessionStorage.getItem('guestDetails')) || [];
+            const guestDetails = JSON.parse(sessionStorage.getItem('editedGuestDetails')) || [];
             const guestName = document.getElementById('guestName').value;
             const aboutGuest = document.getElementById('aboutGuest').value;
             const guestType = document.querySelector('input[name="guestType"]:checked').value;
@@ -143,12 +155,12 @@
 
             // Save the current guest details
             guestDetails[currentGuestIndex] = updatedData;
-            sessionStorage.setItem('guestDetails', JSON.stringify(guestDetails));
+            sessionStorage.setItem('editedGuestDetails', JSON.stringify(guestDetails));
+
+            currentGuestIndex++;
 
             // Store the current guest index
             sessionStorage.setItem('currentGuestIndex', currentGuestIndex);
-
-            currentGuestIndex++;
 
             // Check if we have more guests to add
             if (currentGuestIndex < totalGuests) {
@@ -156,6 +168,9 @@
                 loadGuestDetails();
                 toggleGuestOptions();
             } else {
+                if (currentGuestIndex == totalGuests) {
+                    currentGuestIndex--;
+                }
                 // Redirect to the next page if all guests are added
                 window.location.href = '/book-event/resource';
             }
@@ -264,7 +279,7 @@
     <!-- Main Content Wrapper -->
     <div class="content-wrapper">
         <div class="container mx-auto px-4 py-8 page-container">
-            <h2 class="text-2xl font-semibold mb-6">Add Guest Details!</h2>
+            <h2 class="text-2xl font-semibold mb-6">Edit Guest Details</h2>
 
             <form onsubmit="event.preventDefault(); saveToSessionStorage();">
                 <div class="mb-6">
