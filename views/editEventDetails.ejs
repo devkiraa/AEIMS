@@ -165,6 +165,10 @@
         let userList; // Declare userList globally
         let highlightedIndex = -1; // Track the highlighted index in the user list
 
+        const eventDetailsEncoded = '<%= eventdetails %>'; // This is the encoded string from the backend
+        const eventDetailsDecoded = decodeHtmlEntities(eventDetailsEncoded); // Decode HTML entities
+        let eventDetails;
+
         const venueMapping = {
             'cslb1': "CS Lab 1", 'cslb2': "CS Lab 2",
             'cslb3': "CS Lab 3", 'cslb4': "CS Lab 4", 'cslb5': "CS Lab 5", 'cslb6': "CS Lab 6",
@@ -176,6 +180,13 @@
             1: "CS Lab 1", 2: "CS Lab 2", 3: "CS Lab 3", 4: "CS Lab 4", 5: "CS Lab 5", 6: "CS Lab 6",
             7: "Auditorium", 8: "Seminar Hall", 9: "Conference Room", 10: "Prayer Hall", 11: "Library",
             12: "Data Analytics Lab", 13: "CIR Seminar Hall"
+        };
+
+        const venueMappingxId = {
+            'cslb1': 1, 'cslb2': 2,
+            'cslb3': 3, 'cslb4': 4, 'cslb5': 5, 'cslb6': 6,
+            'audt': 7, 'semh': 8, 'confh': 9, 'prah': 10,
+            'lib': 11, 'dal': 12, 'cirsh': 13
         };
 
         // Function to decode HTML entities
@@ -217,11 +228,11 @@
             }
         }
 
-        function handleInputChange() {
+        function handleInputChange(eventDetails) {
             const allFilled = ['start_date', 'end_date', 'start_time', 'end_time']
                 .every((id) => document.getElementById(id).value);
 
-            if (allFilled) checkAvailability();
+            if (allFilled) checkAvailability(eventDetails);
             checkRequiredFields();
         }
 
@@ -263,15 +274,40 @@
                 venueSelect.appendChild(missingOption);
             }
         }
+
+        // Check if all required fields are filled
+        function checkRequiredFields() {
+            const eventTitle = document.getElementById('event_title');
+            const eventDescription = document.getElementById('event_description');
+            const eventLink = document.getElementById('event_link');
+
+            // Elements to check for file link or input presence
+            const pfileLink = document.getElementById('poster-link');
+            const bfileLink = document.getElementById('banner-link');
+            const pfileInput = document.getElementById('event_poster');
+            const bfileInput = document.getElementById('event_banner');
+            const nextButton = document.querySelector('.next-btn');
+
+            // Check if all required fields are filled, including either file link or file input
+            const isPosterValid = pfileLink.style.display === 'flex' || pfileInput.files.length > 0;
+            const isBannerValid = bfileLink.style.display === 'flex' || bfileInput.files.length > 0;
+
+            // Check if all fields are valid
+            if (eventTitle.value && eventDescription.value && eventLink.value && eventLink.value.length < 250 && isPosterValid && isBannerValid) {
+                nextButton.classList.add('enabled');
+                nextButton.classList.remove('disabled');
+                nextButton.disabled = false;
+            } else {
+                nextButton.classList.remove('enabled');
+                nextButton.classList.add('disabled');
+                nextButton.disabled = true;
+            }
+        }
         
         document.addEventListener("DOMContentLoaded", async function() {
-            const eventDetailsEncoded = '<%= eventdetails %>'; // This is the encoded string from the backend
-            const eventDetailsDecoded = decodeHtmlEntities(eventDetailsEncoded); // Decode HTML entities
-            let eventDetails;
-
             // Attach event listeners for input fields to trigger availability check
             ['start_date', 'end_date', 'start_time', 'end_time', 'event_title'].forEach((id) => {
-                document.getElementById(id).addEventListener('input', handleInputChange);
+                document.getElementById(id).addEventListener('input', () => handleInputChange(eventDetails));
             });
 
             try {
@@ -314,10 +350,10 @@
                 document.getElementById('end_date').value = formatDate(eventDetails[0].evn_ed);
                 document.getElementById('start_time').value = eventDetails[0].evn_st;
                 document.getElementById('end_time').value = eventDetails[0].event_et;
+                document.getElementById('banner-filename').href = eventDetails[0].evn_banner;
+                document.getElementById('poster-filename').href = eventDetails[0].event_poster;
 
                 checkAvailability(eventDetails);
-
-                console.log(eventDetails[0]);
 
                 if (eventDetails[0].evn_vol_cnt === 0) {
                     document.querySelector('input[name="event_volunteers"][value="no"]').checked = true;
@@ -328,9 +364,18 @@
                 }
 
                 if (eventDetails[0].evn_food === 0) {
-                    document.querySelector('input[name="event_food][value="no"]').checked = true;
+                    document.querySelector('input[name="event_food"][value="no"]').checked = true;
                 } else {
                     document.querySelector('input[name="event_food"][value="yes"]').checked = true;
+                }
+
+                if (eventDetails[0].guest_count === 0) {
+                    document.querySelector('input[name="event_guests"][value="none"]').checked = true;
+                } else if (eventDetails[0].guest_count === 1 ){
+                    document.querySelector('input[name="event_guests"][value="single"]').checked = true;
+                } else {
+                    document.querySelector('input[name="event_guests"][value="multiple"]').checked = true;
+                    document.getElementById('guest-counter').value = eventDetails[0].guest_count;
                 }
             } else {
                 console.error('No event data found in sessionStorage.');
@@ -418,25 +463,6 @@
             // Retrieve existing data from sessionStorage
             const existingData = JSON.parse(sessionStorage.getItem('eventData'));
 
-            // Check if all required fields are filled
-            function checkRequiredFields() {
-                const eventTitle = document.getElementById('event_title');
-                const eventDescription = document.getElementById('event_description');
-                const eventLink = document.getElementById('event_link');
-                const pfileInput = document.getElementById('event_poster');
-                const bfileInput = document.getElementById('event_banner');
-                const nextButton = document.querySelector('.next-btn');
-
-                // Check if all fields are filled
-                if (eventTitle.value && eventDescription.value && eventLink.value && (eventLink.value.length < 250) && (pfileInput.files.length > 0) && (bfileInput.files.length > 0)) {
-                    nextButton.classList.add('enabled');
-                    nextButton.disabled = false;
-                } else {
-                    nextButton.classList.remove('enabled');
-                    nextButton.disabled = true;
-                }
-            }
-
             // Add event listeners to input fields to trigger checkRequiredFields
             const inputFields = [
                 'event_title',
@@ -477,6 +503,10 @@
                 const guestCounter = parseInt(document.getElementById('guest-counter').value);
                 const eventBanner = document.getElementById('event_banner').files[0];
                 const eventPoster = document.getElementById('event_poster').files[0];
+                const pfileLink = document.getElementById('poster-link');
+                const bfileLink = document.getElementById('banner-link');
+                const pfileName = document.getElementById('poster-filename');
+                const bfileName = document.getElementById('banner-filename');
 
                 const vselectedOption = document.querySelector('input[name="event_volunteers"]:checked');
                 const cselectedOption = document.querySelector('input[name="event_coordinators"]:checked');
@@ -534,7 +564,7 @@
                     const { volunteerCount, eventFood, guestCount } = eventConfigurations[key][guestKey];
 
                     // Update the existing data with the new values
-                    updatedData = {
+                    const updatedData = {
                         eventTitle,
                         eventDescription,
                         eventLink,
@@ -545,46 +575,117 @@
                     };
 
                     const formData = new FormData();
-                    formData.append('eventPoster', eventPoster);
-                    formData.append('eventBanner', eventBanner);
 
-                    // Save the updated data to sessionStorage
-                    sessionStorage.setItem('eventDetails', JSON.stringify(updatedData));
-
-                    // Send the FormData to the server
-                    try {
-                        const response = await fetch('/api/upload-file', { // Endpoint to handle file upload
-                            method: 'POST',
-                            body: formData
-                            });
-
-                        if (response.ok) {
-                            const result = await response.json(); // Get the response from the server
-                            const posterUrl = result.eventPosterUrl; // Server returns eventPoster URL
-                            const bannerUrl = result.eventBannerUrl; // Server returns eventBanner URL
-
-                            // Store the URLs in sessionStorage
-                            sessionStorage.setItem('eventPosterUrl', posterUrl);
-                            sessionStorage.setItem('eventBannerUrl', bannerUrl);
-
-                            // Redirect to the next page
-                            if (eventConfigurations[key][guestKey].guestCount === 0) {
-                                window.location.href = '/book-event/resource';
-                            } else {
-                                window.location.href = '/book-event/guest-details';
-                            }
-                        } else {
-                            console.error("Upload failed.");
+                    if (pfileLink.style.display === 'flex' && bfileLink.style.display === 'flex') {
+                        sessionStorage.setItem('editedEventDetails', JSON.stringify(updatedData));
+                        sessionStorage.setItem('editedEventPosterUrl', pfileName.href);
+                        sessionStorage.setItem('editedEventBannerUrl', bfileName.href);
+                    } else if (pfileLink.style.display === 'flex' && eventBanner.files.length > 0) {
+                        if (eventBanner) {
+                            formData.append('eventBanner', eventBanner);
                         }
-                } catch (error) {
-                    console.error("Error uploading:", error);
-                }
-                    // // Redirect to the next page
-                    // if (eventConfigurations[key][guestKey].guestCount === 0) {
-                    //     window.location.href = '/book-event/resource';
-                    // } else {
-                    //     window.location.href = '/book-event/guest-details';
-                    // }
+
+                        // Save the updated data to sessionStorage
+                        sessionStorage.setItem('editedEventDetails', JSON.stringify(updatedData));
+                        sessionStorage.setItem('eventPosterUrl', pfileName.href);
+
+                        // Only send FormData if there are files to upload
+                        if (formData.has('eventBanner')) {
+                            try {
+                                const response = await fetch('/api/upload-file/banner', { // Endpoint to handle file upload
+                                    method: 'POST',
+                                    body: formData
+                                });
+
+                                if (response.ok) {
+                                    const result = await response.json(); // Get the response from the server
+                                    const bannerUrl = result.eventBannerUrl; // Server returns eventBanner URL
+
+                                    sessionStorage.setItem('editedEventBannerUrl', bannerUrl);
+                                } else {
+                                    console.error("Upload failed.");
+                                }
+                            } catch (error) {
+                                console.error("Error uploading:", error);
+                            }
+                        }
+                    } else if (eventPoster.files.length > 0 && bfileLink.style.display === 'flex') {
+                        // Append files to FormData only if the upload option was visible (files are selected)
+                        if (eventPoster) {
+                            formData.append('eventPoster', eventPoster);
+                        }
+
+                        // Save the updated data to sessionStorage
+                        sessionStorage.setItem('editedEventDetails', JSON.stringify(updatedData));
+                        sessionStorage.setItem('eventBannerUrl', bfileName.href);
+
+                        // Only send FormData if there are files to upload
+                        if (formData.has('eventPoster')) {
+                            try {
+                                const response = await fetch('/api/upload-file/poster', { // Endpoint to handle file upload
+                                    method: 'POST',
+                                    body: formData
+                                });
+
+                                if (response.ok) {
+                                    const result = await response.json(); // Get the response from the server
+                                    const posterUrl = result.eventPosterUrl; // Server returns eventPoster URL
+
+                                    // Store the URLs in sessionStorage
+                                    sessionStorage.setItem('editedEventPosterUrl', posterUrl);
+                                } else {
+                                    console.error("Upload failed.");
+                                }
+                            } catch (error) {
+                                console.error("Error uploading:", error);
+                            }
+                        }
+                    } else if (eventPoster.files.length > 0 && eventBanner.files.length > 0) {
+                        // Append files to FormData only if the upload option was visible (files are selected)
+                        if (eventPoster) {
+                            formData.append('eventPoster', eventPoster);
+                        }
+                        if (eventBanner) {
+                            formData.append('eventBanner', eventBanner);
+                        }
+
+                        // Save the updated data to sessionStorage
+                        sessionStorage.setItem('editedEventDetails', JSON.stringify(updatedData));
+
+                        // Only send FormData if there are files to upload
+                        if (formData.has('eventPoster') || formData.has('eventBanner')) {
+                            try {
+                                const response = await fetch('/api/upload-file', { // Endpoint to handle file upload
+                                    method: 'POST',
+                                    body: formData
+                                });
+
+                                if (response.ok) {
+                                    const result = await response.json(); // Get the response from the server
+                                    const posterUrl = result.eventPosterUrl; // Server returns eventPoster URL
+                                    const bannerUrl = result.eventBannerUrl; // Server returns eventBanner URL
+
+                                    // Store the URLs in sessionStorage
+                                    sessionStorage.setItem('editedEventPosterUrl', posterUrl);
+                                    sessionStorage.setItem('editedEventBannerUrl', bannerUrl);
+                                } else {
+                                    console.error("Upload failed.");
+                                }
+                            } catch (error) {
+                                console.error("Error uploading:", error);
+                            }
+                        }
+                    } else {
+                        console.error("An unknown error occurred while handling files");
+                        return;
+                    }
+
+                    // Redirect to the next page
+                    if (eventConfigurations[key][guestKey].guestCount === 0) {
+                        window.location.href = `/edit-event/resource/${eventDetails[0].evn_id}`;
+                    } else {
+                        window.location.href = `/edit-event/guest-details/${eventDetails[0].evn_id}`;
+                    }
                 } else {
                     console.error("Critical Value Error!");
                 }
@@ -700,7 +801,6 @@
                     const selectedUser = users.find(user => user.usr_aname === highlightedItem.textContent);
                     if (selectedUser) {
                         // Handle the selected user (e.g., add to a list, display details, etc.)
-                        console.log(`Selected user: ${selectedUser.usr_aname}`);
                         searchBar.value = ''; // Clear the search input
                         highlightedIndex = -1; // Reset the highlighted index
                     }
@@ -720,87 +820,70 @@
                 };
             }
 
-            function validateFile(chk) {
-                const allowedExtensions = /(\.jpg|\.jpeg|\.png)$/i;
+        function validateFile(chk) {
+            const allowedExtensions = /(\.jpg|\.jpeg|\.png)$/i;
+            const fileInput = chk === 0 ? document.getElementById('event_banner') : document.getElementById('event_poster');
+            const errorMessage = chk === 0 ? document.getElementById('banner-error') : document.getElementById('poster-error');
+            const linkContainer = chk === 0 ? document.getElementById('banner-link') : document.getElementById('poster-link');
+            const fileNameLink = chk === 0 ? document.getElementById('banner-filename') : document.getElementById('poster-filename');
+            const filePath = fileInput.value;
 
-                if (chk === 0) {
-                    const fileInput = document.getElementById('event_banner');
-                    const errorMessage = document.getElementById('banner-error');
-                    const filePath = fileInput.value;
-        
-                    if (!allowedExtensions.exec(filePath)) {
-                        errorMessage.textContent = 'Please upload a file with .jpg, .jpeg, or .png extension.';
-                        errorMessage.classList.remove('hidden');  // Show the error message
-                        fileInput.value = '';  // Clear the file input
-                        return false;
-                    } else {
-                        errorMessage.classList.add('hidden'); // Hide the error message if the file is valid
-                    }
-
-                    // Log and validate file details
-                    const file = fileInput.files[0];
-                    if (file) {        
-                        // Use FileReader to get image dimensions
-                        const reader = new FileReader();
-                        reader.onload = function(e) {
-                            const img = new Image();
-                            img.src = e.target.result;
-
-                            img.onload = function() {
-                                // Additional check for specific dimensions
-                                if (img.width !== 720 || img.height !== 300) {
-                                    errorMessage.textContent = 'Image must be 720x300 pixels.';
-                                    errorMessage.classList.remove('hidden');
-                                    fileInput.value = '';  // Clear the file input if dimensions are incorrect
-                                } else {
-                                    errorMessage.classList.add('hidden');  // Hide error if file is valid
-                                }
-                            };
-                        };
-                        reader.readAsDataURL(file); // Read the file as Data URL for image preview
-                    } else {
-                        console.log("No file selected");
-                    }
-                } else if (chk === 1) {
-                    const fileInput = document.getElementById('event_poster');
-                    const errorMessage = document.getElementById('poster-error');
-                    const filePath = fileInput.value;
-        
-                    if (!allowedExtensions.exec(filePath)) {
-                        errorMessage.textContent = 'Please upload a file with .jpg, .jpeg, or .png extension.';
-                        errorMessage.classList.remove('hidden');  // Show the error message
-                        fileInput.value = '';  // Clear the file input
-                        return false;
-                    } else {
-                        errorMessage.classList.add('hidden'); // Hide the error message if the file is valid
-                    }
-
-                    // Log and validate file details
-                    const file = fileInput.files[0];
-                    if (file) {        
-                        // Use FileReader to get image dimensions
-                        const reader = new FileReader();
-                        reader.onload = function(e) {
-                            const img = new Image();
-                            img.src = e.target.result;
-
-                            img.onload = function() {
-                                // Additional check for specific dimensions
-                                if (img.width !== 1080 || img.height !== 1350) {
-                                    errorMessage.textContent = 'Image must be 1080x1350 pixels.';
-                                    errorMessage.classList.remove('hidden');
-                                    fileInput.value = '';  // Clear the file input if dimensions are incorrect
-                                } else {
-                                    errorMessage.classList.add('hidden');  // Hide error if file is valid
-                                }
-                            };
-                        };
-                        reader.readAsDataURL(file); // Read the file as Data URL for image preview
-                    } else {
-                        console.log("No file selected");
-                    }
-                }
+            if (!allowedExtensions.exec(filePath)) {
+                errorMessage.textContent = 'Please upload a file with .jpg, .jpeg, or .png extension.';
+                errorMessage.classList.remove('hidden');
+                fileInput.value = '';
+                return false;
             }
+
+            const file = fileInput.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const img = new Image();
+                    img.src = e.target.result;
+                    img.onload = function() {
+                        const isValidDimension = (chk === 0 && img.width === 720 && img.height === 300) || (chk === 1 && img.width === 1080 && img.height === 1350);
+
+                        if (!isValidDimension) {
+                            errorMessage.textContent = chk === 0 ? 'Image must be 720x300 pixels.' : 'Image must be 1080x1350 pixels.';
+                            errorMessage.classList.remove('hidden');
+                            fileInput.value = '';
+                        } else {
+                            errorMessage.classList.add('hidden');
+
+                            // Set hyperlink to the file blob URL and show filename
+                            const fileURL = URL.createObjectURL(file);
+                            fileNameLink.href = fileURL;
+                            fileNameLink.textContent = file.name;
+
+                            // Show link and hide file input
+                            linkContainer.style.display = "flex";
+                            fileInput.style.display = "none";
+                            fileInput.disabled = true; // Disable the file input when hidden
+                        }
+                    };
+                };
+                reader.readAsDataURL(file);
+            } else {
+                console.log("No file selected");
+            }
+        }
+
+            function removeFile(type) {
+                const fileInput = document.getElementById(`event_${type}`);
+                const linkContainer = document.getElementById(`${type}-link`);
+                const errorMessage = document.getElementById(`${type}-error`);
+
+                fileInput.value = ''; // Clear file input
+
+                // Hide link preview and show file input
+                linkContainer.style.display = "none";
+                fileInput.style.display = "block";
+                fileInput.disabled = false;
+                errorMessage.classList.add('hidden'); // Hide error message if it was shown
+                checkRequiredFields();
+            }
+
             document.addEventListener('DOMContentLoaded', function () {
                 const profileButton = document.getElementById('profileButton');
                 const profileDropdown = document.getElementById('profileDropdown');
@@ -872,7 +955,7 @@
 
     <div class="bg-white w-full max-w-4xl p-8 lg:p-12 shadow-lg form-container mt-8">
         <div class="text-left mb-10">
-            <h2 class="form-title">Add Event Details</h2>
+            <h2 class="form-title">Edit Event Details</h2>
         </div>
         
         <!-- Update the form to use multipart/form-data for file uploads -->
@@ -988,17 +1071,40 @@
                         <span id="link-error" class="text-red-500 text-sm mt-1 hidden">Please shorten the URL.</span>
                     </div>
 
-                    <!-- File upload for event poster -->
+
+                    <!-- File upload for event banner -->
                     <div class="form-section">
-                        <label for="event_banner" class="form-label block">Event Banner <span class="text-xs">(dimensions: 720x300)</span></label>
-                        <input type="file" name="event_banner" id="event_banner" class="w-full p-2 border border-gray-300 rounded mt-1" accept=".jpg, .jpeg, .png" onchange="validateFile(0)">
+                        <label for="event_banner" class="form-label block">
+                            Event Banner <span class="text-xs">(dimensions: 720x300)</span>
+                        </label>
+
+                        <!-- Link preview shown by default -->
+                        <div id="banner-link" class="items-center gap-2 mb-2" style="display: flex;">
+                            <a href="" target="_blank" class="text-blue-500 underline" id="banner-filename">Event_Banner.jpg</a>
+                        <button type="button" onclick="removeFile('banner')" class="text-red-500">&times;</button>
+                        </div>
+
+                        <!-- File input initially hidden -->
+                        <input type="file" name="event_banner" id="event_banner" class="w-full p-2 border border-gray-300 rounded mt-1 disabled"
+                            accept=".jpg, .jpeg, .png" onchange="validateFile(0)" style="display: none;" disabled>
                         <span id="banner-error" class="text-red-500 text-sm mt-1 hidden">Please upload a file with .jpg, .jpeg, or .png extension.</span>
                     </div>
 
                     <!-- File upload for event poster -->
                     <div class="form-section">
-                        <label for="event_poster" class="form-label block">Event Poster <span class="text-xs">(dimensions: 1080x1350)</span></label>
-                        <input type="file" name="event_poster" id="event_poster" class="w-full p-2 border border-gray-300 rounded mt-1" accept=".jpg, .jpeg, .png" onchange="validateFile(1)">
+                        <label for="event_poster" class="form-label block">
+                            Event Poster <span class="text-xs">(dimensions: 1080x1350)</span>
+                    </label>
+
+                        <!-- Link preview shown by default -->
+                        <div id="poster-link" class="flex items-center gap-2 mb-2" style="display: flex;">
+                            <a href="" target="_blank" class="text-blue-500 underline" id="poster-filename">Event_Poster.jpg</a>
+                            <button type="button" onclick="removeFile('poster')" class="text-red-500">&times;</button>
+                        </div>
+
+                        <!-- File input initially hidden -->
+                        <input type="file" name="event_poster" id="event_poster" class="w-full p-2 border border-gray-300 rounded mt-1 disabled"
+                            accept=".jpg, .jpeg, .png" onchange="validateFile(1)" style="display: none;" disabled>
                         <span id="poster-error" class="text-red-500 text-sm mt-1 hidden">Please upload a file with .jpg, .jpeg, or .png extension.</span>
                     </div>
                 </div>
