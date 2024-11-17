@@ -15,6 +15,13 @@ router.post('/create-event', async (req, res) => {
     // Get the current logged-in user's ID and department from the session
     const currentUser_Id = req.session.user_id;
     const currentUser_Dept = req.session.user_dept; // Assuming the user's department is stored in the session
+    let evn_approval = 0;
+
+    if (req.session.user_role === 'admin') {
+        evn_approval = 1;
+    } else if (req.session.user_role === 'em') {
+        evn_approval = 0;
+    }
 
     const [[{ max_id }]] = await db.query('SELECT MAX(evn_id) AS max_id FROM event_tb');
     const eventId = (max_id || 0) + 1; // Changed evnt_id to eventId for consistency
@@ -32,8 +39,8 @@ router.post('/create-event', async (req, res) => {
 
         // Insert event data into the event_tb table
         const eventInsertQuery = `
-            INSERT INTO event_tb (evn_id, evn_name, evn_desc, evn_dept, evn_banner, event_poster, ven_id, event_sd, evn_ed, evn_st, event_et, evn_vol_cnt, evn_snk, evn_food, evn_approval, evn_form_link)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+            INSERT INTO event_tb (evn_id, evn_name, evn_desc, evn_dept, evn_banner, event_poster, ven_id, event_sd, evn_ed, evn_st, event_et, evn_vol_cnt, evn_snk, evn_food, evn_approval, evn_form_link, evn_stat)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
         
         const eventValues = [
             eventId,
@@ -50,8 +57,9 @@ router.post('/create-event', async (req, res) => {
             eventDetails.volunteerCount, // Use volunteerCount from eventDetails
             eventDetails.guestCount, // Assuming this is the count of guests
             eventDetails.eventFood, // Use eventFood from eventDetails
-            0, // Assuming a default approval status
-            eventDetails.eventLink // Use eventLink from eventDetails
+            evn_approval, // Use approval status based on logged in role
+            eventDetails.eventLink, // Use eventLink from eventDetails
+            1 // Assuming a default status
         ];
 
         const [eventResult] = await connection.query(eventInsertQuery, eventValues);
