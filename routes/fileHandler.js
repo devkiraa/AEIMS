@@ -63,4 +63,29 @@ router.post('/upload-file', upload.fields([{ name: 'eventPoster' }, { name: 'eve
     res.json({ eventPosterUrl, eventBannerUrl });
 });
 
+// Endpoint to handle multiple file uploads
+router.post('/upload-file/banner', upload.fields([ { name: 'eventBanner' }]), (req, res) => {
+    if (!req.files || !req.files.eventBanner) {
+        return res.status(400).send('eventBanner must be uploaded.');
+    }
+
+    const eventBannerUrl = `${req.protocol}://${req.get('host')}/uploads/${req.files.eventBanner[0].filename}`;
+
+    // Send the URLs back to the client
+    res.json({ eventPosterUrl, eventBannerUrl });
+});
+
+// Endpoint to handle multiple file uploads
+router.post('/upload-file/poster', upload.fields([{ name: 'eventPoster' }]), (req, res) => {
+    if (!req.files || !req.files.eventPoster) {
+        return res.status(400).send('eventPoster must be uploaded.');
+    }
+
+    // Construct the URLs for the uploaded files
+    const eventPosterUrl = `${req.protocol}://${req.get('host')}/uploads/${req.files.eventPoster[0].filename}`;
+
+    // Send the URLs back to the client
+    res.json({ eventPosterUrl, eventBannerUrl });
+});
+
 module.exports = router;
