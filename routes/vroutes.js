@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const db = require('../routes/auth');
+const db = require('../models/db');
 
 // GET dashboard route
 router.get('/', async (req, res) => {
@@ -66,7 +66,7 @@ router.get('/my-events', (req, res) => {
         const userDept = req.session.user_dept;
         res.render('myEvents', {userRole, userDept});
     } else {
-        res.status(403).render(403);
+        res.status(403).render("403");
     }
 });
 
@@ -99,7 +99,7 @@ router.get('/inventory', (req, res) => {
         const userRole = req.session.user_role;
         res.render('inventory', {userRole});
     } else {
-        res.status(403).render(403);
+        res.status(403).render("403");
     }
 });
 
@@ -114,7 +114,7 @@ router.get('/book-event', (req, res) => {
         const userDept = req.session.user_dept;
         res.render('booking-page', {userRole, userDept});
     } else {
-        res.status(403).render(403);
+        res.status(403).render("403");
     }
 });
 
@@ -140,7 +140,7 @@ router.get('/book-event/event-details', (req, res) => {
         const userID = req.session.user_id;
         res.render('event-detail', {userID, userRole, userDept});
     } else {
-        res.status(403).render(403);
+        res.status(403).render("403");
     }
 });
 
@@ -155,7 +155,7 @@ router.get('/book-event/guest-details', (req, res) => {
         const userDept = req.session.user_dept;
         res.render('guest-details', {userRole, userDept});
     } else {
-        res.status(403).render(403);
+        res.status(403).render("403");
     }
 });
 
@@ -170,7 +170,7 @@ router.get('/book-event/resource', (req, res) => {
         const userDept = req.session.user_dept;
         res.render('resource-selection', {userRole, userDept});
     } else {
-        res.status(403).render(403);
+        res.status(403).render("403");
     }
 });
 
@@ -186,7 +186,7 @@ router.get('/event-approval', async (req, res) => {
         // Pass the events data to the template
         res.render('event-approval-page', {userRole, userDept});
     } else {
-        res.status(403).render(403);
+        res.status(403).render("403");
     }
 });
 
@@ -202,7 +202,7 @@ router.get('/dept-events', async (req, res) => {
         // Pass the events data to the template
         res.render('departmentEvents', {userRole, userDept});
     } else {
-        res.status(403).render(403);
+        res.status(403).render("403");
     }
 });
 
@@ -217,7 +217,7 @@ router.get('/user-management', (req, res) => {
         const userId = req.session.user_id;
         res.render('user-management', {userRole, userDept, userId});
     } else {
-        res.status(403).render(403);
+        res.status(403).render("403");
     }
 });
 

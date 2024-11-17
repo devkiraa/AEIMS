@@ -7,14 +7,17 @@ router.get('/edit-event/details/:eventid', async (req, res) => {
     if (!req.session.user_id) {
         return res.redirect('/login');
     }
+
+    const userId = req.session.user_id;
     const userRole = req.session.user_role;
     const eventId = req.params.eventid;
     const editverfication = `SELECT usr_id from event_coordinator WHERE evn_id = ?`;
     const [editVerificationQuery] = await db.query(editverfication, [eventId]);
-    console.log(editVerificationQuery);
-    if (editVerificationQuery.length === 0 || editVerificationQuery[0].usr_id !== req.session.user_id){
-        res.status(403).render(403);
+
+    if (editVerificationQuery.length === 0 || editVerificationQuery[0].usr_id !== userId){
+        res.status(403).render("403");
     }
+
     const eventdetailssql = `SELECT 
             e.*, 
             COUNT(egd.gst_id) AS guest_count
@@ -44,8 +47,17 @@ router.get('/edit-event/guest-details/:eventid', async (req, res) => {
     if (!req.session.user_id) {
         return res.redirect('/login');
     }
+
+    const userId = req.session.user_id;
     const userRole = req.session.user_role;
     const eventId = req.params.eventid;
+    const editverfication = `SELECT usr_id from event_coordinator WHERE evn_id = ?`;
+    const [editVerificationQuery] = await db.query(editverfication, [eventId]);
+
+    if (editVerificationQuery.length === 0 || editVerificationQuery[0].usr_id !== userId){
+        res.status(403).render("403");
+    }
+
     const eventdetailssql = `SELECT 
         gst_id,
         evn_id,
