@@ -61,6 +61,24 @@
             height: 18px;
         }
     </style>
+    <script>
+        document.addEventListener('DOMContentLoaded', async function () {
+            const profileButton = document.getElementById('profileButton');
+            const profileDropdown = document.getElementById('profileDropdown');
+            
+            // Toggle Profile Dropdown
+            profileButton.addEventListener('click', (event) => {
+                event.stopPropagation();
+                profileDropdown.classList.toggle('hidden');
+            });
+    
+            document.addEventListener('click', (event) => {
+                if (!profileDropdown.classList.contains('hidden') && !profileDropdown.contains(event.target) && event.target !== profileButton) {
+                    profileDropdown.classList.add('hidden');
+                }
+            });
+        });
+    </script>
 </head>
 <body class="bg-gray-50">
     <!-- Navbar -->
