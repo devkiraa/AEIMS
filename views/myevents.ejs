@@ -83,6 +83,7 @@
                                 <th class="p-4">Event Date</th>
                                 <th class="p-4">Start Time</th>
                                 <th class="p-4">Approval Status</th>
+                                <th class="p-4">Action</th>
                             </tr>
                         </thead>
                         <tbody id="upcomingEventTable">
@@ -113,24 +114,25 @@
             </div>
 
             <!-- Quick Events Table -->
-            <div id="quick" class="tab-content hidden">
-                <h2 class="text-xl font-semibold mb-4">Quick Events</h2>
-                <div class="overflow-x-auto">
-                    <table class="min-w-full bg-white border border-gray-300 rounded-lg">
-                        <thead>
-                            <tr class="bg-gray-100 text-gray-600 text-left">
-                                <th class="p-4">Event Name</th>
-                                <th class="p-4">Event Date</th>
-                                <th class="p-4">Start Time</th>
-                                <th class="p-4">Approval Status</th>
-                            </tr>
-                        </thead>
-                        <tbody id="quickEventTable">
-                            <!-- Events populated dynamically -->
-                        </tbody>
-                    </table>
-                </div>
-            </div>
+<div id="quick" class="tab-content hidden">
+    <h2 class="text-xl font-semibold mb-4">Quick Events</h2>
+    <div class="overflow-x-auto">
+        <table class="min-w-full bg-white border border-gray-300 rounded-lg">
+            <thead>
+                <tr class="bg-gray-100 text-gray-600 text-left">
+                    <th class="p-4">Event Name</th>
+                    <th class="p-4">Event Date</th>
+                    <th class="p-4">Start Time</th> <!-- Added Start Time Column -->
+                    <th class="p-4">Action</th>
+                </tr>
+            </thead>
+            <tbody id="quickEventTable">
+                <!-- Events populated dynamically -->
+            </tbody>
+        </table>
+    </div>
+</div>
+
         </main>
     </div>
     <script>
@@ -155,30 +157,39 @@
                 document.getElementById('completedEventTable').innerHTML = "<tr><td colspan='3'>Loading...</td></tr>";
                 document.getElementById('quickEventTable').innerHTML = "<tr><td colspan='3'>Loading...</td></tr>";
         
-                const response = await fetch('/api/myevents');
-                if (!response.ok) throw new Error("Failed to fetch events");
+                const [eventsResponse, quickEventsResponse] = await Promise.all([
+                    fetch('/api/myevents'),
+                    fetch('/api/quick-events')
+                ]);
         
-                const events = await response.json();
+                if (!eventsResponse.ok || !quickEventsResponse.ok) {
+                    throw new Error("Failed to fetch events");
+                }
+        
+                const events = await eventsResponse.json();
+                const quickEvents = await quickEventsResponse.json();
         
                 const currentDate = new Date().toISOString().split('T')[0];
                 const filteredEvents = events.filter(event => event.evn_stat !== 0); // Exclude inactive events
         
                 const upcomingEvents = filteredEvents.filter(event => event.event_sd >= currentDate);
                 const completedEvents = filteredEvents.filter(event => 
-                    event.event_sd < currentDate && event.evn_approval === 1 // Only show approved events in Completed
+                    event.event_sd < currentDate && event.evn_approval === 1 // Only approved events in Completed
                 );
-                const quickEvents = filteredEvents.filter(event => event.is_quick_event === 1); // Assuming 'is_quick_event' field exists
         
                 populateEventTable(upcomingEvents, 'upcomingEventTable', true);
                 populateEventTable(completedEvents, 'completedEventTable', false);
-                populateEventTable(quickEvents, 'quickEventTable', false); // Populate Quick Events
+        
+                // Populate Quick Events Table
+                const activeQuickEvents = quickEvents.filter(qe => qe.qck_stat === 0);
+                populateQuickEventTable(activeQuickEvents, 'quickEventTable');
             } catch (error) {
                 console.error("Error fetching events:", error);
                 document.getElementById('upcomingEventTable').innerHTML = "<tr><td colspan='4'>Error loading events.</td></tr>";
                 document.getElementById('completedEventTable').innerHTML = "<tr><td colspan='3'>Error loading events.</td></tr>";
                 document.getElementById('quickEventTable').innerHTML = "<tr><td colspan='3'>Error loading events.</td></tr>";
             }
-        }
+        }        
         
         async function deleteEvent(eventId) {
             if (!confirm("Are you sure you want to mark this event as inactive?")) return;
@@ -232,7 +243,68 @@
                 tableBody.appendChild(row);
             });            
         }
-
+        function populateQuickEventTable(quickEvents, tableId) {
+            const tableBody = document.getElementById(tableId);
+            tableBody.innerHTML = '';
+            
+            if (quickEvents.length === 0) {
+                tableBody.innerHTML = `<tr><td colspan="4">No quick events found.</td></tr>`; // Updated colspan
+                return;
+            }
+            
+            quickEvents.forEach(event => {
+                const row = document.createElement('tr');
+                row.classList.add('border-t', 'border-gray-200');
+                
+                row.innerHTML = `
+                    <td class="p-4">${event.evn_qk_name}</td>
+                    <td class="p-4">${formatDate(event.evn_qk_sd)}</td>
+                    <td class="p-4">${event.evn_qk_st || 'N/A'}</td> <!-- Displaying Start Time -->
+                    <td class="p-4">
+                        <button class="text-green-600 hover:text-green-800" onclick="upgradeQuickEvent(${event.evn_qk_id})">
+                            Upgrade
+                        </button>
+                        <button class="text-red-600 hover:text-red-800 ml-2" onclick="deleteQuickEvent(${event.evn_qk_id})">
+                            Delete
+                        </button>
+                    </td>
+                `;
+                
+                tableBody.appendChild(row);
+            });
+        }        
+        async function upgradeQuickEvent(quickEventId) {
+            const evnId = prompt("Enter the full event ID to associate with this quick event:");
+            if (!evnId) return;
+        
+            try {
+                const response = await fetch(`/api/quick-events/${quickEventId}/upgrade`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ evn_id: evnId })
+                });
+        
+                if (!response.ok) throw new Error("Failed to upgrade quick event");
+                alert("Quick event upgraded successfully");
+                fetchUserEvents();
+            } catch (error) {
+                console.error("Error upgrading quick event:", error);
+                alert("Failed to upgrade quick event.");
+            }
+        }
+        async function deleteQuickEvent(quickEventId) {
+            if (!confirm("Are you sure you want to delete this quick event?")) return;
+        
+            try {
+                const response = await fetch(`/api/quick-events/${quickEventId}/delete`, { method: 'DELETE' });
+                if (!response.ok) throw new Error("Failed to delete quick event");
+                alert("Quick event deleted successfully");
+                fetchUserEvents();
+            } catch (error) {
+                console.error("Error deleting quick event:", error);
+                alert("Failed to delete quick event.");
+            }
+        }                
         function formatDate(dateString) {
             const eventStartDate = new Date(dateString);
             eventStartDate.setTime(eventStartDate.getTime() + 86400000);
