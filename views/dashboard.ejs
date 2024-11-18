@@ -198,30 +198,42 @@
             }
     
             function createEventCard(event) {
-                const eventCard = document.createElement('div');
-                eventCard.className = 'bg-white rounded-lg shadow-lg p-4';
+    const eventCard = document.createElement('div');
+    eventCard.className = 'bg-white rounded-lg shadow-lg p-4';
+
+    // Adjust the start date and time
+    const eventStartDate = new Date(event.startDate);
+    const startTimeParts = event.startTime.split(':');
+    eventStartDate.setHours(startTimeParts[0], startTimeParts[1], 0, 0);  // Set hours and minutes from startTime
     
-                const eventStartDate = new Date(event.startDate);
-                eventStartDate.setTime(eventStartDate.getTime() + 86400000);  // Adjusting for timezone
-                const formattedDate = eventStartDate.toISOString().split('T')[0];
-                const formattedTime = event.startTime.slice(0, 5);
-    
-                let eventStatus = '';
-                let timeRemaining = '';
-    
-                const currentDateUTC = new Date(Date.now());
-    
-                if (eventStartDate > currentDateUTC) {
-                    const timeDiff = eventStartDate - currentDateUTC;
-                    const daysRemaining = Math.floor(timeDiff / (1000 * 60 * 60 * 24));
-                    const hoursRemaining = Math.floor((timeDiff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-                    timeRemaining = `${daysRemaining} days, ${hoursRemaining} hours remaining`;
-                    eventStatus = 'Upcoming';
-                } else if (currentDateUTC >= eventStartDate && currentDateUTC <= new Date(event.endDate)) {
-                    eventStatus = 'Happening Now';
-                } else {
-                    eventStatus = 'Event Ended';
-                }
+    // Adjusting for timezone, if needed (this step assumes you want to shift the date by a day as in your original code)
+    eventStartDate.setTime(eventStartDate.getTime());  // Adjusting for timezone
+
+    const formattedDate = eventStartDate.toISOString().split('T')[0];
+    const formattedTime = event.startTime.slice(0, 5);
+
+    let eventStatus = '';
+    let timeRemaining = '';
+
+    const currentDateUTC = new Date(Date.now());
+
+    // If the event has not started yet
+    if (eventStartDate > currentDateUTC) {
+        const timeDiff = eventStartDate - currentDateUTC;
+        const daysRemaining = Math.floor(timeDiff / (1000 * 60 * 60 * 24));
+        const hoursRemaining = Math.floor((timeDiff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const minutesRemaining = Math.floor((timeDiff % (1000 * 60 * 60)) / (1000 * 60));
+        timeRemaining = `${daysRemaining} days, ${hoursRemaining} hours, ${minutesRemaining} minutes remaining`;
+        eventStatus = 'Upcoming';
+    } 
+    // If the event is currently happening
+    else if (currentDateUTC >= eventStartDate && currentDateUTC <= new Date(event.endDate)) {
+        eventStatus = 'Happening Now';
+    } 
+    // If the event has ended
+    else {
+        eventStatus = 'Event Ended';
+    }
     
                 eventCard.innerHTML = `
                     <img src="${event.banner || 'https://via.placeholder.com/720x300'}" alt="Event Banner" class="w-full h-40 object-cover rounded-t-lg">
