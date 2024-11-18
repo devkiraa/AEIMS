@@ -163,8 +163,6 @@ router.post('/api/modify-event/:eventid', async (req, res) => {
 
     const eventId = req.params.eventid;
 
-    console.log(editedGuestDetails);
-
     // Get the current logged-in user's ID and department from the session
     const currentUser_Id = req.session.user_id;
     const currentUser_Dept = req.session.user_dept; // Assuming the user's department is stored in the session
@@ -229,7 +227,6 @@ router.post('/api/modify-event/:eventid', async (req, res) => {
         ];
 
         const [eventModifyResult] = await connection.query(eventUpdateQuery, eventModifiedValues);
-        // console.log(eventModifyResult);
 
         // Disable SQL safe updates
         await connection.query('SET SQL_SAFE_UPDATES = 0;');
