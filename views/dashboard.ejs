@@ -124,44 +124,48 @@
             const happeningNowLocation = document.getElementById('happeningNowLocation');
             const upcomingEventsContainer = document.getElementById('upcoming-events-container');
             const pastEventsContainer = document.getElementById('past-events-container');
-
+        
             sessionStorage.clear();
-
+        
             // Toggle Profile Dropdown
             profileButton.addEventListener('click', (event) => {
                 event.stopPropagation();
                 profileDropdown.classList.toggle('hidden');
             });
-    
+        
             document.addEventListener('click', (event) => {
                 if (!profileDropdown.classList.contains('hidden') && !profileDropdown.contains(event.target) && event.target !== profileButton) {
                     profileDropdown.classList.add('hidden');
                 }
             });
-    
+        
             // Close Modal
             closeModal.addEventListener('click', () => {
                 eventModal.classList.add('hidden');
             });
-    
+        
             window.addEventListener('click', (event) => {
                 if (event.target === eventModal) {
                     eventModal.classList.add('hidden');
                 }
             });
-    
+        
             try {
                 const response = await fetch('/api/dashboard/events');
                 const events = await response.json();
                 const currentDateUTC = new Date(Date.now());
                 let isHappeningNow = false;
-    
+        
                 events.forEach(event => {
                     const eventStartDate = new Date(event.startDate);
                     const eventEndDate = new Date(event.endDate);
-    
-                    // Check if the event is currently happening
-                    if (!isHappeningNow && currentDateUTC >= eventStartDate && currentDateUTC <= eventEndDate) {
+        
+                    // Check if the event is currently happening (today)
+                    const eventStartDateWithoutTime = new Date(eventStartDate.setHours(0, 0, 0, 0)); // Strip time from event's start date
+                    const currentDateWithoutTime = new Date(currentDateUTC.setHours(0, 0, 0, 0)); // Strip time from current date
+        
+                    if (!isHappeningNow && eventStartDateWithoutTime.getTime() === currentDateWithoutTime.getTime() &&
+                        currentDateUTC >= eventStartDate && currentDateUTC <= eventEndDate) {
                         // Populate Happening Now section
                         happeningNowContainer.classList.remove('hidden');
                         happeningNowBanner.src = event.banner || 'https://via.placeholder.com/720x300';
@@ -169,7 +173,7 @@
                         happeningNowDepartment.textContent = event.department;
                         happeningNowDescription.textContent = event.description;
                         happeningNowTime.textContent = `Happening Today, From ${event.startTime.slice(0, 5)} to ${event.endTime.slice(0, 5)}`;
-    
+        
                         const venueMapping = {
                             1: "CS Lab1", 2: "CS Lab2", 3: "CS Lab3", 4: "CS Lab4", 5: "CS Lab5", 6: "CS Lab6",
                             7: "Auditorium", 8: "Seminar Hall", 9: "Conference Room", 10: "Prayer Hall", 11: "Library",
@@ -178,7 +182,7 @@
                         happeningNowLocation.textContent = `Venue: ${venueMapping[event.venueId] || 'Unknown Venue'}`;
                         isHappeningNow = true;
                     }
-    
+        
                     // Populate Upcoming and Past Events sections
                     const eventCard = createEventCard(event);
                     if (eventStartDate >= currentDateUTC) {
@@ -187,7 +191,7 @@
                         pastEventsContainer.appendChild(eventCard);
                     }
                 });
-    
+        
                 // Show message if no events are ongoing or upcoming
                 if (!isHappeningNow) {
                     happeningNowContainer.innerHTML = '<p class="text-gray-500">No events are currently happening.</p>';
@@ -196,45 +200,42 @@
                 console.error('Failed to load events:', error);
                 document.getElementById('events-container').innerHTML = '<p class="text-red-500">Failed to load events.</p>';
             }
-    
+        
             function createEventCard(event) {
-    const eventCard = document.createElement('div');
-    eventCard.className = 'bg-white rounded-lg shadow-lg p-4';
-
-    // Adjust the start date and time
-    const eventStartDate = new Date(event.startDate);
-    const startTimeParts = event.startTime.split(':');
-    eventStartDate.setHours(startTimeParts[0], startTimeParts[1], 0, 0);  // Set hours and minutes from startTime
-    
-    // Adjusting for timezone, if needed (this step assumes you want to shift the date by a day as in your original code)
-    eventStartDate.setTime(eventStartDate.getTime());  // Adjusting for timezone
-
-    const formattedDate = eventStartDate.toISOString().split('T')[0];
-    const formattedTime = event.startTime.slice(0, 5);
-
-    let eventStatus = '';
-    let timeRemaining = '';
-
-    const currentDateUTC = new Date(Date.now());
-
-    // If the event has not started yet
-    if (eventStartDate > currentDateUTC) {
-        const timeDiff = eventStartDate - currentDateUTC;
-        const daysRemaining = Math.floor(timeDiff / (1000 * 60 * 60 * 24));
-        const hoursRemaining = Math.floor((timeDiff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-        const minutesRemaining = Math.floor((timeDiff % (1000 * 60 * 60)) / (1000 * 60));
-        timeRemaining = `${daysRemaining} days, ${hoursRemaining} hours, ${minutesRemaining} minutes remaining`;
-        eventStatus = 'Upcoming';
-    } 
-    // If the event is currently happening
-    else if (currentDateUTC >= eventStartDate && currentDateUTC <= new Date(event.endDate)) {
-        eventStatus = 'Happening Now';
-    } 
-    // If the event has ended
-    else {
-        eventStatus = 'Event Ended';
-    }
-    
+                const eventCard = document.createElement('div');
+                eventCard.className = 'bg-white rounded-lg shadow-lg p-4';
+        
+                // Adjust the start date and time
+                const eventStartDate = new Date(event.startDate);
+                const startTimeParts = event.startTime.split(':');
+                eventStartDate.setHours(startTimeParts[0], startTimeParts[1], 0, 0);  // Set hours and minutes from startTime
+                
+                const formattedDate = eventStartDate.toISOString().split('T')[0];
+                const formattedTime = event.startTime.slice(0, 5);
+        
+                let eventStatus = '';
+                let timeRemaining = '';
+        
+                const currentDateUTC = new Date(Date.now());
+        
+                // If the event has not started yet
+                if (eventStartDate > currentDateUTC) {
+                    const timeDiff = eventStartDate - currentDateUTC;
+                    const daysRemaining = Math.floor(timeDiff / (1000 * 60 * 60 * 24));
+                    const hoursRemaining = Math.floor((timeDiff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                    const minutesRemaining = Math.floor((timeDiff % (1000 * 60 * 60)) / (1000 * 60));
+                    timeRemaining = `${daysRemaining} days, ${hoursRemaining} hours, ${minutesRemaining} minutes remaining`;
+                    eventStatus = 'Upcoming';
+                } 
+                // If the event is currently happening
+                else if (currentDateUTC >= eventStartDate && currentDateUTC <= new Date(event.endDate)) {
+                    eventStatus = 'Happening Now';
+                } 
+                // If the event has ended
+                else {
+                    eventStatus = 'Event Ended';
+                }
+        
                 eventCard.innerHTML = `
                     <img src="${event.banner || 'https://via.placeholder.com/720x300'}" alt="Event Banner" class="w-full h-40 object-cover rounded-t-lg">
                     <div class="mt-4">
@@ -247,52 +248,43 @@
                 eventCard.addEventListener('click', () => showModal(event, eventStartDate));
                 return eventCard;
             }
-    
+        
             function showModal(event, eventStartDate) {
                 const venueMapping = {
                     1: "CS Lab1", 2: "CS Lab2", 3: "CS Lab3", 4: "CS Lab4", 5: "CS Lab5", 6: "CS Lab6",
                     7: "Auditorium", 8: "Seminar Hall", 9: "Conference Room", 10: "Prayer Hall", 11: "Library",
                     12: "Data Analytics Lab", 13: "CIR Seminar Hall"
                 };
-    
+        
                 document.getElementById('modalEventName').textContent = event.name;
                 document.getElementById('modalEventDescription').textContent = event.description;
                 document.getElementById('modalEventDepartment').textContent = event.department;
-    
+        
                 const startDate = new Date(event.startDate);
                 startDate.setTime(startDate.getTime() + 86400000);
                 const formattedStartDate = startDate.toISOString().split('T')[0];
                 const formattedStartTime = event.startTime.slice(0, 5);
-    
+        
                 const endDate = new Date(event.endDate);
                 endDate.setTime(endDate.getTime() + 86400000);
                 const formattedEndDate = endDate.toISOString().split('T')[0];
                 const formattedEndTime = event.endTime.slice(0, 5);
-    
+        
                 document.getElementById('modalEventDate').innerHTML = `
                     <p><strong>Start Date:</strong> ${formattedStartDate}</p>
                     <p><strong>Start Time:</strong> ${formattedStartTime}</p>
                     <p><strong>End Date:</strong> ${formattedEndDate}</p>
                     <p><strong>End Time:</strong> ${formattedEndTime}</p>
                 `;
-    
+        
                 document.getElementById('modalEventLocation').textContent = `Venue: ${venueMapping[event.venueId] || 'Unknown Venue'}`;
-    
+        
                 const eventPosterPath = event.image || '/uploads/default-poster.png';
-                document.getElementById('modalEventPoster').src = eventPosterPath;
-                document.getElementById('eventPosterLink').href = eventPosterPath;
-    
-                const registerButtonContainer = document.getElementById('registerButtonContainer');
-                if (event.formLink) {
-                    document.getElementById('registerButton').href = event.formLink;
-                    registerButtonContainer.classList.remove('hidden');
-                } else {
-                    registerButtonContainer.classList.add('hidden');
-                }
-    
+                document.getElementById('modalEventPoster').setAttribute('src', eventPosterPath);
+        
                 eventModal.classList.remove('hidden');
             }
-        });
+        });        
     </script>         
 </body>
 </html>
