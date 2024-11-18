@@ -39,11 +39,10 @@
         let currentResource; // Store the resource currently being added
 
         // Retrieve data from sessionStorage
-        const eventData = JSON.parse(sessionStorage.getItem('eventData'));
-        const eventDetails = JSON.parse(sessionStorage.getItem('eventDetails'));
-        const eventBannerURL = sessionStorage.getItem('eventBannerUrl');
-        const eventPosterURL = sessionStorage.getItem('eventBannerUrl');
-        const guestDetails = JSON.parse(sessionStorage.getItem('guestDetails'));
+        const editedEventDetails = JSON.parse(sessionStorage.getItem('editedEventDetails'));
+        const editedEventBannerURL = sessionStorage.getItem('editedEventBannerUrl');
+        const editedEventPosterURL = sessionStorage.getItem('editedEventPosterUrl');
+        const editedGuestDetails = JSON.parse(sessionStorage.getItem('editedGuestDetails'));
         const currentGuestcount = JSON.parse(sessionStorage.getItem('currentGuestIndex'));
 
         document.addEventListener('DOMContentLoaded', function () {
@@ -56,18 +55,14 @@
                 profileDropdown.classList.toggle('hidden');
             });
 
-            if (!eventData) {
-                // Redirect to the previous page if eventData is not found
-                window.location.href = '/book-event';
-                return;
-            } else if (!eventDetails || !eventBannerURL || !eventPosterURL) {
-                // Redirect to the previous page if eventDetails are not found
+            if (!editedEventDetails || !editedEventBannerURL || !editedEventPosterURL) {
+                // Redirect to the previous page if editedEventDetails are not found
                 window.location.href = '/book-event/event-details';
                 return;
             }
 
-            if (eventDetails.guestCount > 0 && !guestDetails) {
-                // Redirect to the previous page if guestDetails is not found
+            if (editedEventDetails.guestCount > 0 && !editedGuestDetails) {
+                // Redirect to the previous page if editedGuestDetails is not found
                 window.location.href = '/book-event/guest-details';
                 return;
             }
@@ -86,10 +81,10 @@
         // Load inventory data from API
         async function loadInventory() {
 
-            const startDate = eventData.startDate;
-            const endDate = eventData.endDate;
-            const startTime = eventData.startTime;
-            const endTime = eventData.endTime;
+            const startDate = editedEventDetails.startDate;
+            const endDate = editedEventDetails.endDate;
+            const startTime = editedEventDetails.startTime;
+            const endTime = editedEventDetails.endTime;
             try {
                 const response = await fetch('/api/resource-available',{
                     method: 'POST',
@@ -136,8 +131,8 @@
                 <tr data-resource-id="${currentResource.inv_id}" data-count="${countToAdd}" class="text-center">
                     <td class="p-4 text-left">${currentResource.inv_prd_name}</td>
                     <td class="p-4">${currentResource.inv_type === 2 ? '-' : countToAdd}</td>
-                    <td class="p-4">${eventData.startDate}</td>
-                    <td class="p-4">${eventData.endDate}</td>
+                    <td class="p-4">${editedEventDetails.startDate}</td>
+                    <td class="p-4">${editedEventDetails.endDate}</td>
                     <td class="p-4">
                         <button class="text-gray-500 hover:text-red-600" onclick="removeResource(this, ${currentResource.inv_id})">
                             <img src="/assets/icons/delete_24dp_6B7280_FILL0_wght500_GRAD0_opsz24.svg" alt="delete" class="w-6 h-6">
@@ -173,7 +168,7 @@
                     const response = await fetch('/api/create-event', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ eventData, eventDetails, eventPosterURL, eventBannerURL, resources})
+                        body: JSON.stringify({editedEventDetails, editedEventPosterURL, editedEventBannerURL, resources})
                     });
 
                     if (response.ok) {
@@ -189,7 +184,7 @@
                     const response = await fetch('/api/create-event', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ eventData, eventDetails, eventPosterURL, eventBannerURL, guestDetails, resources})
+                        body: JSON.stringify({editedEventDetails, editedEventPosterURL, editedEventBannerURL, editedGuestDetails, resources})
                     });
 
                     if (response.ok) {
