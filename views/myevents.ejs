@@ -58,20 +58,35 @@
             <h1 class="text-3xl font-bold mb-8">My Events</h1>
 
             <!-- Tabs -->
-            <div class="flex justify-between items-center mb-6">
-                <ul class="flex divide-x divide-gray-300">
-                    <li id="upcoming-tab" class="px-4 text-blue-600 hover:text-gray-700 cursor-pointer" onclick="switchTab('upcoming')">
-                        Upcoming Events
-                    </li>
-                    <li id="completed-tab" class="px-4 text-gray-500 hover:text-gray-700 cursor-pointer" onclick="switchTab('completed')">
-                        Completed Events
-                    </li>
-                    <li id="quick-tab" class="px-4 text-gray-500 hover:text-gray-700 cursor-pointer" onclick="switchTab('quick')">
-                        Quick Events
-                    </li>
-                </ul>
-            </div>
+<div class="flex justify-between items-center mb-6">
+    <ul class="flex divide-x divide-gray-300">
+        <li id="upcoming-tab" class="px-4 text-blue-600 hover:text-gray-700 cursor-pointer" onclick="switchTab('upcoming')">
+            Upcoming Events
+        </li>
+        <li id="completed-tab" class="px-4 text-gray-500 hover:text-gray-700 cursor-pointer" onclick="switchTab('completed')">
+            Completed Events
+        </li>
+        <li id="quick-tab" class="px-4 text-gray-500 hover:text-gray-700 cursor-pointer" onclick="switchTab('quick')">
+            Quick Events
+        </li>
+    </ul>
+    <!-- Search bar -->
+    <div class="flex items-center space-x-2">
+        <input 
+            type="text" 
+            id="searchEvent" 
+            class="w-72 border border-gray-300 rounded-lg p-2 text-gray-600 focus:outline-none focus:ring focus:ring-blue-200" 
+            placeholder="Search events by name..." 
+            onkeyup="filterEvents()" 
+        />
+        <button 
+            class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:outline-none focus:ring focus:ring-blue-300">
+            Search
+        </button>
+    </div>
+</div>
 
+            
             <!-- Upcoming Events Table -->
             <div id="upcoming" class="tab-content">
                 <h2 class="text-xl font-semibold mb-4">Upcoming Events</h2>
@@ -215,8 +230,8 @@
             document.getElementById('completedEventTable').innerHTML = "<tr><td colspan='3'>Error loading events.</td></tr>";
             document.getElementById('quickEventTable').innerHTML = "<tr><td colspan='3'>Error loading events.</td></tr>";
         }
-    }       
-        
+    }      
+
         async function deleteEvent(eventId) {
             const isConfirmed = confirm("Are you sure you want to delete this event?");
             if (!isConfirmed) return; // Exit if user cancels the action
@@ -300,7 +315,25 @@
     
                 tableBody.appendChild(row);
             });
-        }        
+        }     
+        function filterEvents() {
+            const query = document.getElementById('searchEvent').value.toLowerCase();
+        
+            // List of table IDs to search
+            const tableIds = ['upcomingEventTable', 'completedEventTable', 'quickEventTable'];
+        
+            tableIds.forEach(tableId => {
+                const rows = document.getElementById(tableId).rows;
+        
+                Array.from(rows).forEach(row => {
+                    // Get the event name from the first cell of the row
+                    const eventName = row.cells[0]?.innerText.toLowerCase();
+        
+                    // Toggle visibility based on the search query
+                    row.style.display = eventName && eventName.includes(query) ? '' : 'none';
+                });
+            });
+        }           
         async function upgradeQuickEvent(quickEventId) {
             const evnId = prompt("Enter the full event ID to associate with this quick event:");
             if (!evnId) return;
