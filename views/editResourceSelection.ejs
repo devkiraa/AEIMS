@@ -57,13 +57,13 @@
 
             if (!editedEventDetails || !editedEventBannerURL || !editedEventPosterURL) {
                 // Redirect to the previous page if editedEventDetails are not found
-                window.location.href = '/book-event/event-details';
+                window.location.href = '/my-events';
                 return;
             }
 
             if (editedEventDetails.guestCount > 0 && !editedGuestDetails) {
                 // Redirect to the previous page if editedGuestDetails is not found
-                window.location.href = '/book-event/guest-details';
+                window.location.href = '/my-events';
                 return;
             }
         
@@ -163,9 +163,12 @@
                 count: row.getAttribute('data-count')
             }));
 
-            if (currentGuestcount !== null) {
+            console.log(resources);
+
+            if (currentGuestcount === null) {
+                console.log("hello");
                 try {
-                    const response = await fetch('/api/create-event', {
+                    const response = await fetch('/api/modify-event/<%= eventId %>', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({editedEventDetails, editedEventPosterURL, editedEventBannerURL, resources})
@@ -181,7 +184,8 @@
                 }
             } else if(currentGuestcount >= 0) {
                 try {
-                    const response = await fetch('/api/create-event', {
+                    console.log('hi');
+                    const response = await fetch('/api/modify-event/<%= eventId %>', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({editedEventDetails, editedEventPosterURL, editedEventBannerURL, editedGuestDetails, resources})

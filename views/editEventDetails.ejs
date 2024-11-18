@@ -566,6 +566,11 @@
                     // Update the existing data with the new values
                     const updatedData = {
                         eventTitle,
+                        startDate,
+                        startTime,
+                        endDate,
+                        endTime,
+                        venue,
                         eventDescription,
                         eventLink,
                         volunteerCount,
@@ -587,7 +592,7 @@
 
                         // Save the updated data to sessionStorage
                         sessionStorage.setItem('editedEventDetails', JSON.stringify(updatedData));
-                        sessionStorage.setItem('eventPosterUrl', pfileName.href);
+                        sessionStorage.setItem('editedEventPosterUrl', pfileName.href);
 
                         // Only send FormData if there are files to upload
                         if (formData.has('eventBanner')) {
@@ -617,7 +622,7 @@
 
                         // Save the updated data to sessionStorage
                         sessionStorage.setItem('editedEventDetails', JSON.stringify(updatedData));
-                        sessionStorage.setItem('eventBannerUrl', bfileName.href);
+                        sessionStorage.setItem('editedEventBannerUrl', bfileName.href);
 
                         // Only send FormData if there are files to upload
                         if (formData.has('eventPoster')) {

@@ -30,6 +30,29 @@
             background-color: white;
             padding-bottom: 6rem;
         }
+
+        /* Popup Styles */
+        .popup-overlay {
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+
+        .popup-content {
+            position: relative;
+        }
+
+        .popup-close {
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
+            cursor: pointer;
+            font-size: 1.5rem;
+            color: #4B5563;
+            transition: color 0.3s;
+        }
+
+        .popup-close:hover {
+            color: #EF4444;
+        }
     </style>
     <script>
         let currentGuestIndex = 0; // Track the current guest index
@@ -105,6 +128,7 @@
             const guestdetails = guestDetails;
             if (guestdetails[currentGuestIndex]) {
                 const guest = guestDetails[currentGuestIndex];
+                document.getElementById('gst_id').innerText = guest.gst_id;
                 document.getElementById('guestName').value = guest.gst_name;
                 document.getElementById('aboutGuest').value = guest.gst_details || '';
                 document.querySelector(`input[name="guestType"][value="${guest.gst_type === 0 ? 'internal' : 'external'}"]`).checked = true;
@@ -113,7 +137,6 @@
                 document.querySelector(`input[name="guestConveyance"][value="${guest.gst_cnv === 0 ? 'no' : 'yes'}"]`).checked = true;
                 document.querySelector(`input[name="guestFees"][value="${guest.gst_fees === 0 ? 'no' : 'yes'}"]`).checked = true;
 
-                console.log("Hello");
                 // Call toggleGuestOptions to show/hide external options based on the selected guest type
                 toggleGuestOptions();
             } else {
@@ -135,6 +158,7 @@
 
         function saveToSessionStorage() {
             const guestDetails = JSON.parse(sessionStorage.getItem('editedGuestDetails')) || [];
+            const guestId = document.getElementById('gst_id').innerText;
             const guestName = document.getElementById('guestName').value;
             const aboutGuest = document.getElementById('aboutGuest').value;
             const guestType = document.querySelector('input[name="guestType"]:checked').value;
@@ -144,6 +168,7 @@
             const guestFees = document.querySelector('input[name="guestFees"]:checked').value;
 
             const updatedData = {
+                guestId,
                 guestName,
                 aboutGuest,
                 guestType,
@@ -171,8 +196,8 @@
                 if (currentGuestIndex == totalGuests) {
                     currentGuestIndex--;
                 }
-                // Redirect to the next page if all guests are added
-                window.location.href = `/edit-event/resource/<%= eventId %>`;
+
+                clearInventoryPopup();
             }
         }
 
@@ -223,6 +248,42 @@
                 }
             });
         });
+
+        // Open Restore Confirmation Popup
+        function clearInventoryPopup() {
+            const popupContent = document.getElementById('clearInventoryPopupContent');
+            popupContent.innerHTML = `
+                <p>All selected Inventory will be cleared! Do Reselect all</p>
+            `;
+            document.getElementById('clearInventoryPopup').classList.remove('hidden');
+        }
+
+        // Restore User
+        async function clearInventory() {
+            try {
+                const response = await fetch(`/api/clear-resource/<%= eventId %>`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ restore: true }), // Send restore flag
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                closePopup(); // Close the restore popup
+                // Redirect to the next page if all guests are added
+                window.location.href = `/edit-event/resource/<%= eventId %>`;
+            } catch (error) {
+                console.error('Failed to restore user:', error);
+            }
+        }
+
+        function closePopup() {
+            document.getElementById('clearInventoryPopup').classList.add('hidden');
+        }
     </script>
 </head>
 <body class="bg-gray-100 min-h-screen">
@@ -283,6 +344,7 @@
 
             <form onsubmit="event.preventDefault(); saveToSessionStorage();">
                 <div class="mb-6">
+                    <span class="hidden" id="gst_id"></span>
                     <label for="guestName" class="block text-gray-700 text-lg fontmedium">Guest Name</label>
                     <input type="text" id="guestName" placeholder="Name" class="w-full max-w-full md:w-64 mt-2 p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
                 </div>
@@ -380,6 +442,28 @@
                 </button>
             </div>
         </form>
+    </div>
+    <!-- Popup Model for Restore -->
+    <div id="clearInventoryPopup" class="fixed inset-0 hidden flex items-center justify-center popup-overlay">
+        <div class="bg-white p-6 rounded-lg shadow-lg max-w-lg w-full popup-content">
+            <!-- Close Icon -->
+            <span class="popup-close" onclick="closePopup()">&times;</span>
+
+            <h2 class="text-xl font-semibold mb-4">Clearing selected resource</h2>
+            <!-- Dynamic Content -->
+            <div id="clearInventoryPopupContent">
+                <!-- User details or delete confirmation will be populated here -->
+            </div>
+
+            <div class="mt-4 text-right">
+                <button onclick="clearInventory()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg ">
+                    Yes
+                </button>
+                <button onclick="closePopup()" class="bg-gray-200 hover:bg-gray-300 text-gray-700 px-4 py-2 rounded-lg mr-2">
+                    No
+                </button>
+            </div>
+        </div>
     </div>
 </div>
 </body>
