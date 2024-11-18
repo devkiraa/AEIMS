@@ -185,7 +185,7 @@
         // Helper function to format dates
         function formatDate(dateString) {
             const date = new Date(dateString);
-            date.setTime(date.getTime() + 86400000); // Adjust for timezone offset
+            date.setTime(date.getTime()); // Adjust for timezone offset
             const day = String(date.getDate()).padStart(2, '0'); // Ensure two digits
             const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are 0-based
             const year = date.getFullYear();
