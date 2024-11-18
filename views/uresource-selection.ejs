@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Resources</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .btn-primary {
+            background-color: #2563EB; /* Tailwind blue-600 */
+            color: white;
+            padding: 0.75rem 2rem;
+            border-radius: 0.375rem;
+            font-weight: 600;
+        }
+
+        .btn-primary:hover {
+            background-color: #1D4ED8; /* Tailwind blue-700 */
+        }
+
+        .btn-secondary {
+            background-color: #E5E7EB; /* Tailwind gray-300 */
+            color: #374151; /* Tailwind gray-700 */
+            padding: 0.75rem 2rem;
+            border-radius: 0.375rem;
+            font-weight: 600;
+        }
+
+        .btn-secondary:hover {
+            background-color: #D1D5DB; /* Tailwind gray-400 */
+        }
+    </style>
+    <script>
+        let currentResource; // Store the resource currently being added
+
+        // Retrieve data from sessionStorage
+        const eventData = JSON.parse(sessionStorage.getItem('eventData'));
+        const eventDetails = JSON.parse(sessionStorage.getItem('eventDetails'));
+        const eventBannerURL = sessionStorage.getItem('eventBannerUrl');
+        const eventPosterURL = sessionStorage.getItem('eventPosterUrl');
+        const guestDetails = JSON.parse(sessionStorage.getItem('guestDetails'));
+        const currentGuestcount = JSON.parse(sessionStorage.getItem('currentGuestIndex'));
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const profileButton = document.getElementById('profileButton');
+            const profileDropdown = document.getElementById('profileDropdown');
+        
+            // Toggle dropdown on button click
+            profileButton.addEventListener('click', (event) => {
+                event.stopPropagation();
+                profileDropdown.classList.toggle('hidden');
+            });
+
+            if (!eventData) {
+                // Redirect to the previous page if eventData is not found
+                window.location.href = '/book-event';
+                return;
+            } else if (!eventDetails || !eventBannerURL || !eventPosterURL) {
+                // Redirect to the previous page if eventDetails are not found
+                window.location.href = '/book-event/event-details';
+                return;
+            }
+
+            if (eventDetails.guestCount > 0 && !guestDetails) {
+                // Redirect to the previous page if guestDetails is not found
+                window.location.href = '/book-event/guest-details';
+                return;
+            }
+        
+            // Close dropdown if clicked outside
+            document.addEventListener('click', (event) => {
+                if (!profileDropdown.classList.contains('hidden') && !profileDropdown.contains(event.target) && event.target !== profileButton) {
+                    profileDropdown.classList.add('hidden');
+                }
+            });
+
+            // Load inventory data
+            loadInventory();
+        });
+
+        // Load inventory data from API
+        async function loadInventory() {
+
+            const startDate = eventData.startDate;
+            const endDate = eventData.endDate;
+            const startTime = eventData.startTime;
+            const endTime = eventData.endTime;
+            try {
+                const response = await fetch('/api/resource-available',{
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ startDate, endDate, startTime, endTime }),
+                });
+                if (!response.ok) {
+                    throw new Error('Network response was not ok ' + response.statusText);
+                }
+                const inventoryItems = await response.json();
+                populateInventoryTable(inventoryItems);
+            } catch (error) {
+                console.error('Error loading inventory:', error);
+            }
+        }
+
+        // Populate inventory table
+        function populateInventoryTable(inventoryItems) {
+            const tableBody = document.getElementById('inventoryTable');
+            tableBody.innerHTML = ''; // Clear existing rows
+
+            inventoryItems.forEach(item => {
+                const row = `
+                    ${item.inv_stat === 1 ? `<tr class="text-center">
+                        <td class="p-4 text-left">${item.inv_prd_name}</td>
+                        <td class="p-4">${item.inv_type === 0 ? 'Non-Serviceable' : item.inv_type === 1 ? 'Serviceable' : 'Assistance'}</td>
+                        <td class="p-4">${item.inv_type === 0 || item.inv_type === 1 ? item.inv_in_use : '-'}</td>
+                        <td class="p-4">${item.inv_type === 0 || item.inv_type === 1 ? item.inv_available : '-'}</td>
+                        <td class="p-4 text-center">
+                            <button id="addButton-${item.inv_id}" class="text-gray-500 hover:text-red-600" onclick='openAddResourceModal(${JSON.stringify(item)})'>
+                                <img src="/assets/icons/add_24dp_6B7280_FILL0_wght500_GRAD0_opsz24.svg" alt="delete" class="w-6 h-6">
+                            </button>
+                        </td>
+                    </tr>` : ``}
+                `;
+                tableBody.insertAdjacentHTML('beforeend', row);
+            });
+        }
+
+        // Add resource to event resources table
+        function addResourceToEvent() {
+            const countToAdd = parseInt(document.getElementById('resourceCount').value);
+            const newRow = `
+                <tr data-resource-id="${currentResource.inv_id}" data-count="${countToAdd}" class="text-center">
+                    <td class="p-4 text-left">${currentResource.inv_prd_name}</td>
+                    <td class="p-4">${currentResource.inv_type === 2 ? '-' : countToAdd}</td>
+                    <td class="p-4">${eventData.startDate}</td>
+                    <td class="p-4">${eventData.endDate}</td>
+                    <td class="p-4">
+                        <button class="text-gray-500 hover:text-red-600" onclick="removeResource(this, ${currentResource.inv_id})">
+                            <img src="/assets/icons/delete_24dp_6B7280_FILL0_wght500_GRAD0_opsz24.svg" alt="delete" class="w-6 h-6">
+                        </button>
+                    </td>
+                </tr>
+            `;
+            document.getElementById('eventResourcesTable').insertAdjacentHTML('beforeend', newRow);
+
+            // Disable the Add button for the resource
+            document.getElementById(`addButton-${currentResource.inv_id}`).disabled = true;
+            closeAddResourceModal();
+        }
+
+        // Function to remove resource from the event resources table
+        function removeResource(button, resourceId) {
+            // Enable the "Add" button in the inventory table for the respective item
+            document.getElementById(`addButton-${resourceId}`).disabled = false;
+
+            // Remove the resource row from the event resources table
+            button.closest('tr').remove();
+        }
+
+        async function submitEvent() {
+            const rows = document.querySelectorAll('#eventResourcesTable tr');
+            const resources = Array.from(rows).map(row => ({
+                inv_id: row.getAttribute('data-resource-id'),
+                count: row.getAttribute('data-count')
+            }));
+
+            if (currentGuestcount !== null) {
+                try {
+                    const response = await fetch('/api/create-event', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ eventData, eventDetails, eventPosterURL, eventBannerURL, resources})
+                    });
+
+                    if (response.ok) {
+                        window.location.href = '/my-events';
+                    } else {
+                        throw new Error('Failed to create event');
+                    }
+                } catch (error) {
+                    console.error('Error creating event:', error);
+                }
+            } else if(currentGuestcount >= 0) {
+                try {
+                    const response = await fetch('/api/create-event', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ eventData, eventDetails, eventPosterURL, eventBannerURL, guestDetails, resources})
+                    });
+
+                    if (response.ok) {
+                        window.location.href = '/my-events';
+                    } else {
+                        throw new Error('Failed to create event');
+                    }
+                } catch (error) {
+                    console.error('Error creating event:', error);
+                }
+            }
+
+        }
+
+        function openAddResourceModal(item) {
+            currentResource = item; // Store the entire item object
+            const popupContent = document.getElementById('popupContent');
+            popupContent.innerHTML = `
+                <h2 class="text-2xl font-semibold mb-4">Add Resource</h2>
+                <p><strong>Resource Name:</strong>${currentResource.inv_prd_name}</p>
+                <p><strong>Available Count:</strong> ${currentResource.inv_available}</p>
+                <div class="mb-4">
+                    <label for="resourceCount" class="block text-gray-700">Count to Add:</label>
+                    <input type="number" id="resourceCount" class="w-full px-3 py-2 border border-gray-300 rounded" value="1" min="1" max='${currentResource.inv_available}' required>
+                </div>
+                <div class="flex justify-end space-x-4">
+                    <button onclick="addResourceToEvent()" class="bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded">Add</button>
+                    <button onclick="closeAddResourceModal()" class="bg-gray-200 hover:bg-gray-300 text-gray-700 py-2 px-4 rounded">Cancel</button>
+                </div>
+            `;
+            document.getElementById('addResourceModal').classList.remove('hidden');
+        }
+
+        function closeAddResourceModal() {
+            document.getElementById('addResourceModal').classList.add('hidden');
+            document.getElementById('resourceCount').value = ''; // Reset input
+        }
+
+    </script>
+</head>
+<body class="bg-gray-50">
+    <div class="min-h-screen flex flex-col">
+        <!-- Navbar -->
+        <nav class="bg-blue-600 p-4">
+            <div class="container mx-auto flex justify-between items-center">
+                <div class="flex items-center space-x-6">
+                    <ul class="flex space-x-6 text-white">
+                        <li><a href="/" class="hover:text-gray-300">Home</a></li>
+                        <% if (userRole === 'admin' || userRole === 'icts') { %>
+                            <li><a href="/book-event" class="hover:text-gray-300">Book</a></li>
+                            <li><a href="/user-management" class="hover:text-gray-300">Users</a></li>
+                            <li><a href="/inventory" class="hover:text-gray-300">Inventory</a></li>
+                            <li><a href="/my-events" class="hover:text-gray-300">My Events</a></li>
+                        <% } %>
+                        <% if (userRole === 'hod') { %>
+                            <li><a href="/user-management" class="hover:text-gray-300">Users</a></li>
+                            <li><a href="/dept-events" class="hover:text-gray-300">Dept Events</a></li>
+                            <li><a href="/event-approval" class="hover:text-gray-300">Approval</a></li>
+                        <% } %>
+                        <% if (userRole === 'em') { %>
+                            <li><a href="/book-event" class="hover:text-gray-300">Book</a></li>
+                            <li><a href="/my-events" class="hover:text-gray-300">My Events</a></li>
+                        <% } %>
+                        <li><a href="/about-us" class="hover:text-gray-300">About Us</a></li>
+                    </ul>
+                </div>         
+                <div class="relative dropdown">
+                    <button class="bg-white rounded-full p-2" id="profileButton">
+                        <img src="/assets/icons/avatar.svg" alt="User  Icon" class="w-6 h-6">
+                    </button>
+                    <div class="dropdown-menu absolute hidden right-0 mt-2 w-48 bg-white rounded-lg shadow-lg" id="profileDropdown">
+                        <a href="/profile" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">Profile</a>
+                        <a href="/change-password" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">Change Password</a>
+                        <a href="/logout" class="block px-4 py-2 text-gray-700 hover:bg-gray-100" onclick="sessionStorage.clear()">Logout</a>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="flex-grow container mx-auto p-6 max-w-5xl">
+            <h1 class="text-3xl font-bold mb-8 text-center">Add Resources!</h1>
+
+            <!-- Inventory Section -->
+            <div class="mb-12">
+                <h2 class="text-xl font-bold mb-4">Inventory</h2>
+
+                <!-- Search Input -->
+                <div class="mb-4 w-full md:w-1/2 mx-auto">
+                    <input type="text" id="searchInventory" placeholder="Search Inventory..." class="w-full border-2 border-gray-300 rounded-lg p-2">
+                </div>
+
+                <!-- Inventory Table -->
+                <div class="overflow-x-auto">
+                    <table class="min-w-full bg-white border border-gray-300 rounded-lg">
+                        <thead>
+                            <tr class="bg-gray-100 text-gray-600 text-center">
+                                <th class="p-4 text-left">Name</th>
+                                <th class="p-4">Category</th>
+                                <th class="p-4">In Use</th>
+                                <th class="p-4">Available</th>
+                                <th class="p-4">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="inventoryTable">
+                            <!-- Inventory Data will be populated here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Event Resources Section -->
+            <div class="mb-12">
+                <h2 class="text-xl font-bold mb-4">Event Resources</h2>
+                <div class="overflow-x-auto">
+                    <table class="min-w-full bg-white border border-gray-300 rounded-lg">
+                        <thead>
+                            <tr class="bg-gray-100 text-gray-600 text-center">
+                                <th class="p-4 text-left">Name</th>
+                                <th class="p-4">Count</th>
+                                <th class="p-4">Taken Date</th>
+                                <th class="p-4">Return Date</th>
+                                <th class="p-4">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="eventResourcesTable">
+                            <!-- Event Resources Data will be populated here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="flex justify-between">
+                <button class="btn-secondary items-center flex" onclick="window.history.back()">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M7.707 9l4.646-4.646a.5.5 0 00-.708-.708L6.5 9l5.146 5.146a.5.5 0 00.708-.708L7.707 9z" clip-rule="evenodd" />
+                    </svg>
+                    Back
+                </button>
+                <button class="btn-primary flex items-center" onclick="submitEvent()">
+                    Submit
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-2" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M12.293 10.707l-5.146 5.146a.5.5 0 01-.708-.708L11.293 10 6.44 5.146a.5.5 0 01.708-.708l5.146 5.146a.5.5 0 010 .708z" clip-rule="evenodd" />
+                    </svg>
+                </button>
+            </div>
+        </main>
+
+        <!-- Add Resource Modal -->
+        <div id="addResourceModal" class="fixed inset-0 hidden flex items-center justify-center bg-black bg-opacity-50">
+            <div id="popupContent" class="bg-white p-6 rounded-lg shadow-lg w-96 relative">
+                <!-- Dynamic Content -->
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="bg-blue-600 p-4 mt-8">
+            <div class="text-center text-white">
+                &copy; 2024 Event Management System. All rights reserved.
+            </div>
+        </footer>
+    </div>
+</body>
+</html>
