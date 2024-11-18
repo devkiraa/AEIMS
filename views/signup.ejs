@@ -9,12 +9,13 @@
     <style>
         body {
             font-family: 'Poppins', sans-serif;
-            background-image: url('/assets/Background-images/welcome3.jpg');
-            background-size: cover;
-            background-position: left;
-            background-repeat: repeat;
+            background-image: url('/assets/Background-images/signupImage.jpg');
+            background-size: cover ;
+            background-position: center;  /* Ensures the background stays centered */
+            background-attachment: fixed;  /* Keeps the background fixed during scroll */
             min-height: 100vh;
         }
+        
         #password-criteria {
             display: none;
         }
@@ -261,6 +262,8 @@
             document.getElementById('special-characters').classList.toggle('valid', /[!@#$%^&*(),.?":{}|<>]/.test(password));
             document.getElementById('special-characters').classList.toggle('invalid', !/[!@#$%^&*(),.?":{}|<>]/.test(password));
         });
+        
+        
 
     </script>
 </body>

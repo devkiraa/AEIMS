@@ -6,23 +6,91 @@
     <title>Login</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-    <style>
-        body {
-            font-family: 'Poppins', sans-serif;
-        }
+    <style>    
+            /* Typewriter Effect */
+/* Typewriter Effect */
+.typewriter {
+    overflow: hidden;
+    border-right: .15em solid orange;
+    white-space: nowrap;
+    width: 0;
+    animation: typing 3.5s steps(30) 1s forwards, blinkCaret 0.75s step-end 3.5s forwards;
+}
+
+@keyframes typing {
+    from {
+        width: 0;
+    }
+    to {
+        width: 100%;
+    }
+}
+
+@keyframes blinkCaret {
+    0%, 100% {
+        border-color: orange;
+    }
+    50% {
+        border-color: transparent;
+    }
+}
+        
         /* Initially hide the toggle button */
         #togglePassword {
             display: none;
         }
+
         /* Show toggle button when the password field is focused */
         .peer:focus ~ #togglePassword {
             display: flex;
         }
+
+        /* Image styling for left section */
+        .image-section {
+            background-image: url('/assets/Background-images/loginImage.jpg') !important ;/* Replace with your image path */
+            background-size: cover;
+            width:100vw
+        }
+        @keyframes slideUp {
+            0% {
+                transform: translateY(100%);
+                opacity: 0;
+            }
+            100% {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+        
+        .animate-slide-up {
+            animation: slideUp 2s ease-out;
+        }
+        
     </style>
 </head>
-<body class="min-h-screen bg-gray-100 relative">
+<body class="min-h-screen bg-gray-100 flex">
+    <!-- Left Image Section -->
+    <div class="hidden md:block w-1/2 h-screen image-section flex flex-col justify-center relative pl-10">
+        <h1 class="text-white text-4xl mb-4 mt-10 animate-scroll glow typewriter">
+            <b>AEIMS</b>
+        </h1>
+        <b>
+            <p class="text-white text-2xl animate-scroll glow typewriter">
+                Event Bookings Made Easy
+            </p>
+        </b>
+    </div>
+    
+    
+        
+    
+    
+    
+    
+
+    <!-- Right Login Section -->
     <div class="bg-white h-screen w-full max-w-md absolute right-0 top-0 flex flex-col justify-center p-12 rounded-l-lg shadow-lg">
-        <h2 class="text-2xl font-bold mb-6 text-center">Nice to see you again</h2>
+        <h2 class="text-2xl font-bold mb-6 text-center">Nice to see you again !</h2>
         <form action="/login" method="POST">
             <div class="mb-4">
                 <label for="email" class="block text-gray-700">Email ID</label>
