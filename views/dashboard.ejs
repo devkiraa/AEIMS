@@ -172,7 +172,8 @@
                         happeningNowName.textContent = event.name;
                         happeningNowDepartment.textContent = event.department;
                         happeningNowDescription.textContent = event.description;
-                        happeningNowTime.textContent = `Happening Today, From ${event.startTime.slice(0, 5)} to ${event.endTime.slice(0, 5)}`;
+                        happeningNowTime.textContent = `Happening Today, From ${formatTimeTo12Hour(event.startTime)} to ${formatTimeTo12Hour(event.endTime)}`;
+
         
                         const venueMapping = {
                             1: "CS Lab1", 2: "CS Lab2", 3: "CS Lab3", 4: "CS Lab4", 5: "CS Lab5", 6: "CS Lab6",
@@ -200,7 +201,14 @@
                 console.error('Failed to load events:', error);
                 document.getElementById('events-container').innerHTML = '<p class="text-red-500">Failed to load events.</p>';
             }
-        
+            function formatTimeTo12Hour(time24) {
+                const [hour, minute] = time24.split(':');
+                const hourInt = parseInt(hour, 10);
+                const ampm = hourInt >= 12 ? 'PM' : 'AM';
+                const hour12 = hourInt % 12 || 12; // Convert hour to 12-hour format
+                return `${hour12}:${minute} ${ampm}`;
+            }
+            
             function createEventCard(event) {
                 const eventCard = document.createElement('div');
                 eventCard.className = 'bg-white rounded-lg shadow-lg p-4';
@@ -255,35 +263,37 @@
                     7: "Auditorium", 8: "Seminar Hall", 9: "Conference Room", 10: "Prayer Hall", 11: "Library",
                     12: "Data Analytics Lab", 13: "CIR Seminar Hall"
                 };
-        
+            
                 document.getElementById('modalEventName').textContent = event.name;
                 document.getElementById('modalEventDescription').textContent = event.description;
                 document.getElementById('modalEventDepartment').textContent = event.department;
-        
+            
                 const startDate = new Date(event.startDate);
-                startDate.setTime(startDate.getTime() + 86400000);
                 const formattedStartDate = startDate.toISOString().split('T')[0];
-                const formattedStartTime = event.startTime.slice(0, 5);
-        
+                const formattedStartTime = formatTimeTo12Hour(event.startTime);
+            
                 const endDate = new Date(event.endDate);
-                endDate.setTime(endDate.getTime() + 86400000);
                 const formattedEndDate = endDate.toISOString().split('T')[0];
-                const formattedEndTime = event.endTime.slice(0, 5);
-        
+                const formattedEndTime = formatTimeTo12Hour(event.endTime);
+            
                 document.getElementById('modalEventDate').innerHTML = `
                     <p><strong>Start Date:</strong> ${formattedStartDate}</p>
                     <p><strong>Start Time:</strong> ${formattedStartTime}</p>
                     <p><strong>End Date:</strong> ${formattedEndDate}</p>
                     <p><strong>End Time:</strong> ${formattedEndTime}</p>
                 `;
-        
+            
                 document.getElementById('modalEventLocation').textContent = `Venue: ${venueMapping[event.venueId] || 'Unknown Venue'}`;
-        
+            
                 const eventPosterPath = event.image || '/uploads/default-poster.png';
-                document.getElementById('modalEventPoster').setAttribute('src', eventPosterPath);
-        
+                const posterURL = new URL(eventPosterPath, window.location.origin); // Ensure absolute URL
+            
+                document.getElementById('modalEventPoster').setAttribute('src', posterURL.href);
+                document.getElementById('eventPosterLink').setAttribute('href', posterURL.href);
+            
                 eventModal.classList.remove('hidden');
             }
+            
         });        
     </script>         
 </body>
