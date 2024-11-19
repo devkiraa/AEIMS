@@ -60,6 +60,10 @@ router.delete('/delete-event/:id', async (req, res) => {
         const query = 'UPDATE event_tb SET evn_stat = 0 WHERE evn_id = ?';
         await db.query(query, [eventId]);
         res.status(200).send({ message: 'Event status updated to inactive.' });
+
+        const dquery = 'DELETE FROM venues_bookings WHERE evn_id = ?;';
+        await db.query(dquery, [eventId]);
+        res.status(200).send({ message: 'Event status updated to inactive.' });
     } catch (error) {
         console.error('Error updating event status:', error);
         res.status(500).send({ message: 'Failed to update event status.' });

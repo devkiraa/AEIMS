@@ -151,6 +151,9 @@ router.post('/events/:id/reject', async (req, res) => {
             ["event rejection", mail_date, mail_time, status, usr_id, organizerEmail]
         );
 
+        const dquery = 'DELETE FROM venues_bookings WHERE evn_id = ?;';
+        await db.query(dquery, [eventId]);
+
         res.json({ success: true, emailSent });
     } catch (error) {
         console.error("Error rejecting event: ", error);
