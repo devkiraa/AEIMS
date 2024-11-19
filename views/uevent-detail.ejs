@@ -166,8 +166,116 @@
         let highlightedIndex = -1; // Track the highlighted index in the user list
 
         const user_id = '<%=userID%>'
+
+        const venueMapping = {
+            'cslb1': "CS Lab 1", 'cslb2': "CS Lab 2",
+            'cslb3': "CS Lab 3", 'cslb4': "CS Lab 4", 'cslb5': "CS Lab 5", 'cslb6': "CS Lab 6",
+            'audt': "Auditorium", 'semh': "Seminar Hall", 'confh': "Conference Room", 'prah': "Prayer Hall",
+            'lib': "Library", 'dal': "Data Analytics Lab", 'cirsh': "CIR Seminar Hall"
+        };
+
+        const venueMappingId = {
+            1: "CS Lab 1", 2: "CS Lab 2", 3: "CS Lab 3", 4: "CS Lab 4", 5: "CS Lab 5", 6: "CS Lab 6",
+            7: "Auditorium", 8: "Seminar Hall", 9: "Conference Room", 10: "Prayer Hall", 11: "Library",
+            12: "Data Analytics Lab", 13: "CIR Seminar Hall"
+        };
+
+        const venueMappingxId = {
+            'cslb1': 1, 'cslb2': 2,
+            'cslb3': 3, 'cslb4': 4, 'cslb5': 5, 'cslb6': 6,
+            'audt': 7, 'semh': 8, 'confh': 9, 'prah': 10,
+            'lib': 11, 'dal': 12, 'cirsh': 13
+        };
+
+        function formatDate(dateString) {
+            const eventStartDate = new Date(dateString);
+            eventStartDate.setTime(eventStartDate.getTime());
+            const year = eventStartDate.getFullYear();
+            const month = String(eventStartDate.getMonth() + 1).padStart(2, '0');
+            const day = String(eventStartDate.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        }
+
+        async function checkAvailability(eventDetails) {
+            const startDate = document.getElementById('start_date').value;
+            const endDate = document.getElementById('end_date').value;
+            const startTime = document.getElementById('start_time').value;
+            const endTime = document.getElementById('end_time').value;
+            console.log("hello2");
+            console.log(startDate);
+
+            if (!(startDate && endDate && startTime && endTime)) return;
+
+            try {
+                const response = await fetch('/api/check-availability', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ startDate, endDate, startTime, endTime }),
+                });
+
+                if (!response.ok) throw new Error('Failed to fetch venue availability');
+                const venues = await response.json();
+                console.log("hello1");
+                updateVenues(venues, eventDetails);
+            } catch (error) {
+                console.error('Error fetching availability:', error);
+            }
+        }
+
+        function updateVenues(venues, eventDetails) {
+            const venueSelect = document.getElementById("venue");
+            console.log(eventDetails);
+            const selectedVenueName = venueMappingId[eventDetails.venue]; // Get the venue name from the ID
+            const selectedVenueKey = Object.keys(venueMapping).find(
+                key => venueMapping[key] === selectedVenueName
+            ); // Find the corresponding key in venueMapping
+            let selectedVenueFound = false;
+
+            // Clear any existing options
+            venueSelect.innerHTML = "";
+
+            // Iterate over the venues object to add available venues
+            for (const [venue, status] of Object.entries(venues)) {
+                if (status === "available" || status === "waiting") {
+                    const option = document.createElement("option");
+                    option.value = venue;
+                    option.textContent = venueMapping[venue] || venue;
+
+                    // Check if this is the selected venue and mark it as selected
+                    if (venue === selectedVenueKey) {
+                        option.selected = true;
+                        selectedVenueFound = true;
+                    }
+
+                    venueSelect.appendChild(option);
+                }
+            }
+
+            // If the selected venue is missing, add it with blue text
+            if (!selectedVenueFound && selectedVenueKey) {
+                const missingOption = document.createElement("option");
+                missingOption.value = selectedVenueKey; // Set the key as the value
+                missingOption.textContent = selectedVenueName; // Display the mapped name
+                missingOption.style.color = "blue"; // Set text color to blue
+                missingOption.selected = true;
+                venueSelect.appendChild(missingOption);
+            }
+        }
+
+        function handleInputChange(eventDetails) {
+            const allFilled = ['start_date', 'end_date', 'start_time', 'end_time']
+                .every((id) => document.getElementById(id).value);
+
+            if (allFilled) checkAvailability(eventDetails);
+            checkRequiredFields();
+        }
         
         document.addEventListener("DOMContentLoaded", async function() {
+            // Attach event listeners for input fields to trigger availability check
+            ['start_date', 'end_date', 'start_time', 'end_time', 'event_title'].forEach((id) => {
+                document.getElementById(id).addEventListener('input', () => handleInputChange(eventData));
+            });
+
             const coordinatorRadios = document.querySelectorAll('input[name="event_coordinators"]');
             coordinatorRadios.forEach(radio => {
                 radio.addEventListener('change', toggleCoordinatorSearch);
@@ -184,111 +292,25 @@
             });
 
             // Retrieve event data from sessionStorage
-            const eventData = JSON.parse(sessionStorage.getItem('eventData'));
+            const eventData = JSON.parse(sessionStorage.getItem('quickEventData'));
             if (!eventData) {
                 // Redirect to the previous page if eventData is not found
-                window.location.href = '/book-event';
+                // window.location.href = '/book-event';
                 return;
             }
 
             // Check if eventData exists
             if (eventData) {
                 // Populate the fields with the retrieved data
-                document.getElementById('start_date').value = eventData.startDate;
-                document.getElementById('end_date').value = eventData.endDate;
+                document.getElementById('start_date').value = formatDate(eventData.startDate);
+                document.getElementById('end_date').value = formatDate(eventData.endDate);
                 document.getElementById('start_time').value = eventData.startTime;
                 document.getElementById('end_time').value = eventData.endTime;
+                console.log(eventData);
+                document.getElementById('event_title').value = eventData.eventName
 
-                // Check if the venue value
-                const venueSelect = document.getElementById('venue');
-                let newOption;
+                checkAvailability(eventData);
 
-                switch (eventData.venue) {
-                    case 1:
-                        newOption = document.createElement('option');
-                        newOption.value = 'cslb1';
-                        newOption.textContent = 'CS Lab 1';
-                        break;
-                    case 2:
-                        newOption = document.createElement('option');
-                        newOption.value = 'cslb2';
-                        newOption.textContent = 'CS Lab 2';
-                        break;
-                    case 3:
-                        newOption = document.createElement('option');
-                        newOption.value = 'cslb3';
-                        newOption.textContent = 'CS Lab 3';
-                        break;
-                    case 4:
-                        newOption = document.createElement('option');
-                        newOption.value = 'cslb4';
-                        newOption.textContent = 'CS Lab 4';
-                        break;
-                    case 5:
-                        newOption = document.createElement('option');
-                        newOption.value = 'cslb5';
-                        newOption.textContent = 'CS Lab 5';
-                        break;
-                    case 6:
-                        newOption = document.createElement('option');
-                        newOption.value = 'cslb6';
-                        newOption.textContent = 'CS Lab 6';
-                        break;
-                    case 7:
-                        newOption = document.createElement('option');
-                        newOption.value = 'audt';
-                        newOption.textContent = 'Auditorium';
-                        break;
-                    case 8:
-                        newOption = document.createElement('option');
-                        newOption.value = 'semh';
-                        newOption.textContent = 'Seminar Hall';
-                        break;
-                    case 9:
-                        newOption = document.createElement('option');
-                        newOption.value = 'confh';
-                        newOption.textContent = 'Conference Room';
-                        break;
-                    case 10:
-                        newOption = document.createElement('option');
-                        newOption.value = 'prah';
-                        newOption.textContent = 'Prayer Hall';
-                        break;
-                    case 11:
-                        newOption = document.createElement('option');
-                        newOption.value = 'lib';
-                        newOption.textContent = 'Library';
-                        break;
-                    case 12:
-                        newOption = document.createElement('option');
-                        newOption.value = 'dal';
-                        newOption.textContent = 'Data Analytics Lab';
-                        break;
-                    case 13:
-                        newOption = document.createElement('option');
-                        newOption.value = 'cirsh';
-                        newOption.textContent = 'CIR Seminar Hall';
-                        break;
-                    default:
-                        // showErrorPopup('Unknown Venue selected!.');
-                        // console.error('404 Not Found: Unknown venue selected');
-                        // return;
-                        document.getElementById('venue').value = eventData.venue;
-                        console.error("Unknown");
-                }
-
-                // Append the new option to the venue dropdown and set it as selected
-                if (newOption) {
-                    venueSelect.appendChild(newOption);
-                    venueSelect.value = newOption.value;
-                }
-
-                // Disable the fields
-                document.getElementById('start_date').disabled = true;
-                document.getElementById('end_date').disabled = true;
-                document.getElementById('start_time').disabled = true;
-                document.getElementById('end_time').disabled = true;
-                document.getElementById('venue').disabled = true;
             } else {
                 console.error('No event data found in sessionStorage.');
             }

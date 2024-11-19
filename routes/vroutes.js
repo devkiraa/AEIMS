@@ -174,6 +174,56 @@ router.get('/book-event/resource', (req, res) => {
     }
 });
 
+// Event details page
+router.get('/book-event/event-details/:quickid', async (req, res) => {
+    if (!req.session.user_id) {
+        return res.redirect('/login');
+    }
+
+    if (req.session.user_role === 'admin'|| req.session.user_role === 'hod' || req.session.user_role === 'em') {
+        const userRole = req.session.user_role;
+        const userDept = req.session.user_dept;
+        const userID = req.session.user_id;
+        res.render('uevent-detail', {userID, userRole, userDept});
+    } else {
+        res.status(403).render("403");
+    }
+});
+
+// Guest details page
+router.get('/book-event/guest-details/:quickid', (req, res) => {
+    if (!req.session.user_id) {
+        return res.redirect('/login');
+    }
+
+    if (req.session.user_role === 'admin'|| req.session.user_role === 'hod' || req.session.user_role === 'em') {
+        const userRole = req.session.user_role;
+        const userDept = req.session.user_dept;
+        res.render('uguest-details', {userRole, userDept});
+    } else {
+        res.status(403).render("403");
+    }
+});
+
+router.get('api/getquick', (req, res) => {
+
+});
+
+// Resource selection page
+router.get('/book-event/resource/:quickid', (req, res) => {
+    if (!req.session.user_id) {
+        return res.redirect('/login');
+    }
+    
+    if (req.session.user_role === 'admin'|| req.session.user_role === 'hod' || req.session.user_role === 'em') {
+        const userRole = req.session.user_role;
+        const userDept = req.session.user_dept;
+        res.render('uresource-selection', {userRole, userDept});
+    } else {
+        res.status(403).render("403");
+    }
+});
+
 // Approve and reject events route
 router.get('/event-approval', async (req, res) => {
     if (!req.session.user_id) {
