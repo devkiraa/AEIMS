@@ -35,30 +35,4 @@ router.post('/quick-event', async (req, res) => {
     }
 });
 
-// Endpoint to retrieve quick event data by evn_qck_id
-router.get('/getquick', async (req, res) => {
-    const quickEventId = req.query.evn_qck_id; // Access the evn_qck_id from the query parameters
-
-    if (!quickEventId) {
-        return res.status(400).json({ error: 'evn_qck_id is required' });
-    }
-
-    try {
-        // Query the database to retrieve the quick event details
-        const [rows] = await db.query(
-            'SELECT * FROM event_quick WHERE evn_qk_id = ?', [quickEventId]
-        );
-
-        if (rows.length === 0) {
-            return res.status(404).json({ error: 'Quick event not found' });
-        }
-
-        // Send back the quick event data
-        res.json(rows[0]);
-    } catch (error) {
-        console.error('Error fetching quick event data:', error);
-        res.status(500).json({ error: 'Failed to retrieve quick event data' });
-    }
-});
-
 module.exports = router;
