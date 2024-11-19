@@ -37,6 +37,8 @@ router.post('/profile', async (req, res) => {
     const { full_name, mobile, club } = req.body;
     const userId = req.session.user_id;
 
+    req.session.user_name = full_name;
+
     try {
         // Update the user profile in the user_details table
         await db.query(
