@@ -63,6 +63,11 @@
             cursor: not-allowed;
         }
 
+        .waiting[disabled] {
+            background-color: #F2C94C !important;
+            cursor: not-allowed;
+        }
+
         /* Button styles */
         .venue-btn {
             padding: 12px 24px;
@@ -280,6 +285,7 @@
                 button.classList.remove('available', 'waiting', 'booked');
                 button.classList.add(status);
                 button.disabled = status === 'booked';
+                button.disabled = status === 'waiting';
             });
         }
 
@@ -620,7 +626,7 @@
             </div>
         </div>
 
-        <div class="quick-row">
+        <!-- <div class="quick-row">
             <label class="block text-gray-700">Quick Event</label>
             <div>
                 <label class="radio-label">
@@ -632,7 +638,7 @@
                     No
                 </label>
             </div>
-        </div>
+        </div> -->
 
         <!-- Event title, hidden by default -->
         <div id="event-row" class="event-row">

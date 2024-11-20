@@ -158,6 +158,29 @@
         #event_description {
             height: 129px;
         }
+
+        /* Popup Styles */
+        .popup-overlay {
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+
+        .popup-content {
+            position: relative;
+        }
+
+        .popup-close {
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
+            cursor: pointer;
+            font-size: 1.5rem;
+            color: #4B5563;
+            transition: color 0.3s;
+        }
+
+        .popup-close:hover {
+            color: #EF4444;
+        }
     </style>
     <script>
         let users = []; // Declare users globally
@@ -302,6 +325,42 @@
                 nextButton.classList.add('disabled');
                 nextButton.disabled = true;
             }
+        }
+
+        // Open Restore Confirmation Popup
+        function clearInventoryPopup() {
+            const popupContent = document.getElementById('clearInventoryPopupContent');
+            popupContent.innerHTML = `
+                <p>All selected Inventory will be cleared! Do Reselect all</p>
+            `;
+            document.getElementById('clearInventoryPopup').classList.remove('hidden');
+        }
+
+        // Restore User
+        async function clearInventory() {
+            try {
+                const response = await fetch(`/api/clear-resource/${eventDetails[0].evn_id}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ restore: true }), // Send restore flag
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                closePopup(); // Close the restore popup
+                // Redirect to the next page if all guests are added
+                window.location.href = `/edit-event/resource/${eventDetails[0].evn_id}`;
+            } catch (error) {
+                console.error('Failed to restore user:', error);
+            }
+        }
+
+        function closePopup() {
+            document.getElementById('clearInventoryPopup').classList.add('hidden');
         }
         
         document.addEventListener("DOMContentLoaded", async function() {
@@ -687,7 +746,7 @@
 
                     // Redirect to the next page
                     if (eventConfigurations[key][guestKey].guestCount === 0) {
-                        window.location.href = `/edit-event/resource/${eventDetails[0].evn_id}`;
+                        clearInventoryPopup();
                     } else {
                         window.location.href = `/edit-event/guest-details/${eventDetails[0].evn_id}`;
                     }
@@ -1131,6 +1190,28 @@
                 </button>
             </div>
         </form>
+        <!-- Popup Model for Clearing Resource -->
+        <div id="clearInventoryPopup" class="fixed inset-0 hidden flex items-center justify-center popup-overlay">
+            <div class="bg-white p-6 rounded-lg shadow-lg max-w-lg w-full popup-content">
+                <!-- Close Icon -->
+                <span class="popup-close" onclick="closePopup()">&times;</span>
+
+                <h2 class="text-xl font-semibold mb-4">Clearing selected resource</h2>
+                <!-- Dynamic Content -->
+                <div id="clearInventoryPopupContent">
+                    <!-- User details or delete confirmation will be populated here -->
+                </div>
+
+                <div class="mt-4 text-right">
+                    <button onclick="clearInventory()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg ">
+                        Yes
+                    </button>
+                    <button onclick="closePopup()" class="bg-gray-200 hover:bg-gray-300 text-gray-700 px-4 py-2 rounded-lg mr-2">
+                        No
+                    </button>
+                </div>
+            </div>
+        </div>
     </div>
 </body>
 </html>

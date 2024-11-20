@@ -95,7 +95,7 @@
             <p id="modalEventLocation" class="text-sm text-gray-500"></p>
 
             <!-- Registration Link (Only show if available) -->
-            <div id="registerButtonContainer" class="mt-4 hidden">
+            <div id="registerButtonContainer" class="mt-4">
                 <a href="" id="registerButton" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700" target="_blank">Register</a>
             </div>
         </div>
@@ -253,11 +253,11 @@
                         <p class="text-sm text-gray-500">${timeRemaining}</p>
                     </div>
                 `;
-                eventCard.addEventListener('click', () => showModal(event, eventStartDate));
+                eventCard.addEventListener('click', () => showModal(event, eventStartDate, eventStatus));
                 return eventCard;
             }
         
-            function showModal(event, eventStartDate) {
+            function showModal(event, eventStartDate, eventStatus) {
                 const venueMapping = {
                     1: "CS Lab1", 2: "CS Lab2", 3: "CS Lab3", 4: "CS Lab4", 5: "CS Lab5", 6: "CS Lab6",
                     7: "Auditorium", 8: "Seminar Hall", 9: "Conference Room", 10: "Prayer Hall", 11: "Library",
@@ -267,7 +267,14 @@
                 document.getElementById('modalEventName').textContent = event.name;
                 document.getElementById('modalEventDescription').textContent = event.description;
                 document.getElementById('modalEventDepartment').textContent = event.department;
-            
+                document.getElementById('registerButton').href = event.formLink;
+
+                if (eventStatus === 'Event Ended'){
+                    document.getElementById('registerButton').classList.add('hidden');
+                } else {
+                    document.getElementById('registerButton').classList.remove('hidden');
+                }
+                
                 const startDate = new Date(event.startDate);
                 const formattedStartDate = startDate.toISOString().split('T')[0];
                 const formattedStartTime = formatTimeTo12Hour(event.startTime);
